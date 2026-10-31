@@ -7903,6 +7903,21 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
   const hud = mkEl('div', 'gHud'), act = mkEl('button', 'gAct'), dlg = mkEl('div', 'gDlg'), toastEl = mkEl('div', 'gToast'), badge = mkEl('div', 'gBadge');
   act.type = 'button';
   if (innerWidth < 700) hud.classList.add('min');
+  // 版面避讓：搜尋列在左上時任務板排在其下；雲端標籤避開小地圖；開場卡出現時任務板先收合，避免重疊
+  let introMin = false;
+  function place() {
+    const q = id => document.getElementById(id), vis = e => e && e.offsetWidth > 0 && e.offsetHeight > 0;
+    if (innerWidth >= 700) {
+      const sr = q('search'), r = vis(sr) ? sr.getBoundingClientRect() : null;
+      hud.style.top = (r && r.left < 200 ? Math.round(r.bottom) + 8 : 92) + 'px';
+      const mini = q('mini'), mr = vis(mini) ? mini.getBoundingClientRect() : null;
+      badge.style.right = mr && mr.bottom > innerHeight - 40 ? Math.round(innerWidth - mr.left + 8) + 'px' : '';
+    }
+    const it = q('intro'), onIntro = document.body.classList.contains('intro') && vis(it);
+    if (onIntro && it.getBoundingClientRect().top < hud.getBoundingClientRect().bottom + 8 && !hud.classList.contains('min')) { hud.classList.add('min'); introMin = true; }
+    if (!onIntro && introMin) { introMin = false; if (innerWidth >= 700) hud.classList.remove('min'); }
+  }
+  addEventListener('resize', place); setInterval(place, 700); setTimeout(place, 200);
   let toastT = 0;
   function toast(msg, ms) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), ms || 3200); }
   L.toast = toast;
