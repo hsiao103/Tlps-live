@@ -7929,6 +7929,70 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   ];
   const FEST_N = 6;
 
+  /* ---------- 考試週 ---------- */
+  const SUBJ = ['國語', '數學', '自然', '社會', '英語'];
+  const Q = [
+    [ // 國語
+      ['「畫蛇添足」的意思是？', ['做多餘的事，反而把事情弄壞', '畫得非常逼真', '畫畫畫得很快', '喜歡養蛇'], 0],
+      ['「春眠不覺曉」的下一句是？', ['處處聞啼鳥', '夜來風雨聲', '花落知多少', '床前明月光'], 0],
+      ['「他跑得像風一樣快」用了哪一種修辭？', ['譬喻', '擬人', '誇飾', '排比'], 0],
+      ['下列哪一個字是「形聲字」？', ['日', '河', '上', '山'], 1],
+      ['「守株待兔」告訴我們什麼道理？', ['不能只靠運氣，要努力才有收穫', '兔子跑得很快', '樹很重要', '要保護動物'], 0],
+      ['「謙虛」的相反詞是？', ['驕傲', '誠實', '勇敢', '勤勞'], 0],
+      ['「小明把垃圾丟進垃圾桶。」這句話的主詞是？', ['小明', '垃圾', '垃圾桶', '丟'], 0]
+    ],
+    [ // 數學
+      ['24 × 5 = ？', ['100', '110', '120', '130'], 2],
+      ['長方形長 8 公分、寬 5 公分，面積是多少？', ['13 平方公分', '26 平方公分', '40 平方公分', '80 平方公分'], 2],
+      ['3/4 + 1/4 = ？', ['1', '4/8', '3/16', '1/2'], 0],
+      ['36 顆糖平分給 6 個人，每人幾顆？', ['5', '6', '7', '8'], 1],
+      ['下列哪一個數最大？', ['0.07', '0.65', '0.699', '0.7'], 3],
+      ['正方形邊長 6 公分，周長是多少公分？', ['12', '24', '36', '18'], 1],
+      ['1 公尺等於幾公分？', ['10', '100', '1000', '50'], 1]
+    ],
+    [ // 自然
+      ['植物行光合作用需要什麼？', ['只要土壤', '陽光、水和二氧化碳', '只要空氣', '糖和鹽'], 1],
+      ['在一般情況下，水大約幾度會沸騰？', ['50°C', '80°C', '100°C', '150°C'], 2],
+      ['地球繞著什麼轉動（公轉）？', ['月亮', '太陽', '火星', '北極星'], 1],
+      ['下列哪一種是昆蟲？', ['蜘蛛', '蝴蝶', '蝸牛', '蚯蚓'], 1],
+      ['磁鐵可以吸住下列哪一種物品？', ['塑膠尺', '橡皮擦', '鐵釘', '玻璃杯'], 2],
+      ['月亮本身會發光嗎？', ['會，像太陽一樣', '不會，它是反射太陽的光', '只有滿月會', '只有晚上會'], 1],
+      ['聲音是怎麼產生的？', ['物體振動', '物體變重', '物體變熱', '物體變大'], 0]
+    ],
+    [ // 社會
+      ['臺灣最高的山是？', ['阿里山', '玉山', '雪山', '合歡山'], 1],
+      ['宜蘭縣政府位在哪一個鄉鎮市？', ['羅東鎮', '宜蘭市', '蘇澳鎮', '員山鄉'], 1],
+      ['想保護環境，下列哪一個做法正確？', ['垃圾分類並回收', '隨手亂丟垃圾', '一直開著水龍頭', '冷氣開整天'], 0],
+      ['臺灣的東邊是哪一個大洋？', ['太平洋', '大西洋', '印度洋', '北冰洋'], 0],
+      ['我們的國慶日是哪一天？', ['1 月 1 日', '5 月 1 日', '10 月 10 日', '12 月 25 日'], 2],
+      ['過馬路時應該走哪裡最安全？', ['車子中間', '行人穿越道（斑馬線）', '路邊停車格', '安全島外側'], 1],
+      ['下列哪一個不是臺灣的離島？', ['澎湖', '金門', '綠島', '海南島'], 3]
+    ],
+    [ // 英語
+      ['"apple" 的中文是？', ['香蕉', '蘋果', '橘子', '葡萄'], 1],
+      ['別人問 "How are you?"，最適合怎麼回答？', ['I am fine, thank you.', 'My name is Tom.', 'I am ten.', 'It is red.'], 0],
+      ['星期一的英文是？', ['Sunday', 'Monday', 'Friday', 'Tuesday'], 1],
+      ['She ___ a student.（填入空格）', ['am', 'are', 'is', 'be'], 2],
+      ['"red" 是什麼顏色？', ['藍色', '綠色', '紅色', '黃色'], 2],
+      ['"dog" 的複數是？', ['dogs', 'doges', 'dog', 'dogies'], 0],
+      ['"Thank you." 的意思是？', ['對不起', '謝謝', '再見', '請坐'], 1]
+    ]
+  ];
+  const nthMonday = (y, m, n) => { const d = new Date(y, m - 1, 1); const off = (8 - d.getDay()) % 7; return new Date(y, m - 1, 1 + off + (n - 1) * 7); };
+  const EXAMS = [[11, 2, 'mid', '第一學期期中考'], [1, 2, 'fin', '第一學期期末考'], [4, 3, 'mid', '第二學期期中考'], [6, 3, 'fin', '第二學期期末考']];
+  let examDate = null;   // 測試用：覆寫日期
+  function examNow(now) {
+    const t = now || examDate || new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    for (const e of EXAMS) for (const y of [t.getFullYear() - 1, t.getFullYear(), t.getFullYear() + 1]) {
+      const st = nthMonday(y, e[0], e[1]), off = Math.round((t0 - st) / 864e5);
+      if (off >= -3 && off <= 6) return { key: y + '-' + e[0] + e[2], kind: e[2], name: e[3], start: st, off, phase: off < 0 ? 'review' : off <= 4 ? 'exam' : 'after', day: t0.getDay() };
+    }
+    return null;
+  }
+  const EXS = k => { S.exams = S.exams || {}; return S.exams[k] || (S.exams[k] = { sc: [null, null, null, null, null], rev: 0, revDays: [], claimed: 0 }); };
+  const examDoneN = ex => ex.sc.filter(v => v !== null).length;
+  const gradeOf = n => n >= 90 ? '優' : n >= 70 ? '良' : n >= 50 ? '可' : '再加油';
+
   /* ---------- 夜間探索：校園傳說 ---------- */
   const LEGENDS = [
     { id: 'run', name: '夜跑的腳步聲', place: '操場', icon: '👟', story: '有人說，天黑以後的操場，會傳來「啪搭、啪搭」的跑步聲，可是跑道上一個人也沒有……', truth: '真相：那是跑道旁鐵製排水溝蓋發出的聲音！白天被太陽曬熱會膨脹，晚上變涼又收縮，「啪搭」一聲就是它在變形。這就是「熱脹冷縮」。' },
@@ -8042,6 +8106,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     if (d.clean < 5) return { tx: '撿垃圾打掃校園（' + d.clean + '/5）', nav: 'litter' };
     if (d.help < 1) return { tx: d.req === 0 ? '找人接今天的小請託' : d.req === 1 ? '請託進行中：' + REQ().steps[0].name : '回去向委託人回報', nav: d.req === 1 ? 'step' : 'npc' };
     if (!w.done) return { tx: '做資源回收分類（' + Math.min(w.sorted, 10) + '/10）', nav: 'recy' };
+    { const c = examNow(); if (c) { const ex = EXS(c.key); if (c.phase === 'review' && !ex.revDays.includes(dayKey())) return { tx: '📖 ' + c.name + '快到了，去考試公告欄複習', nav: 'exam' }; if (c.phase === 'exam' && ex.sc[c.day - 1] === null) return { tx: '📝 今天考' + SUBJ[c.day - 1] + '，去考試公告欄應考', nav: 'exam' }; if (c.phase === 'after' && !ex.claimed) return { tx: '🎉 考完了！去公告欄' + (examDoneN(ex) >= 5 ? '領慶功獎勵' : '補考'), nav: 'exam' }; } }
     if (nightFlag && legendObjs.length) return { tx: '🌙 夜裡有校園傳說出沒（' + legendObjs[0].l.place + ' 一帶）', nav: 'legend' };
     if (festCur && (D().fest || []).length < FEST_N && festObjs.length) return { tx: festCur.f.ic + ' 節慶活動：校園裡藏了' + festCur.f.item + '（' + (D().fest || []).length + '/' + FEST_N + '）', nav: 'fest' };
     if (chestObjs.length) return { tx: '教室裡還有 ' + chestObjs.length + ' 個寶箱沒開', nav: 'chest' };
@@ -8494,6 +8559,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   }
   function clubActivity() {
     const c = clubOf(), d = D(), w = W(); if (!c) return;
+    { const ec = examNow(); if (ec && ec.phase === 'exam') { say('社團佈告欄', '這週是' + ec.name + '，社團活動暫停，專心準備考試吧！', [{ label: '好' }]); return; } }
     if (d.club) { say('社團佈告欄', '今天的社團活動已經參加過了，明天再來吧！', [{ label: '好' }]); return; }
     if (S.mp < 5) { toast('魔力不足，完成任務或休息一下再來吧 ✨', 3000); return; }
     if (!spend(6)) return;
@@ -8527,6 +8593,60 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       { label: '退社／轉社', fn: () => say('退出社團', '確定要退出「' + c.name + '」嗎？階級與活動次數會歸零，已得到的屬性不會減少。', [{ label: '確定退社', fn: () => { S.club = null; save(); refreshAll(); toast('已退出社團，可以再選一個！'); } }, { label: '我再想想' }]) },
       { label: '關閉' }]);
   }
+    /* ---------- 考試公告欄 ---------- */
+    const EXAMP = snap(-6, 10, { maxR: 6 }) || { x: -6, y: 0.03, z: 10 };
+    { const mk = sprite(emojiTex('📝', '#fff8e1', '#2f80ed'), [1.1, 1.1], EXAMP.x, EXAMP.y + 2.2, EXAMP.z, 31); bob.push({ s: mk, y: EXAMP.y + 2.2 }); mk.visible = false; L.examMk = mk;
+      const lab = sprite(nameTex('📝 考試公告欄', '#2f80ed'), [2.1, 0.55], EXAMP.x, EXAMP.y + 3.0, EXAMP.z, 30); lab.visible = false; L.examLab = lab;
+      const post = new T.Mesh(new T.BoxGeometry(1.5, 1.1, 0.12), gm(0xcfe3ff)); post.position.set(EXAMP.x, EXAMP.y + 1.2, EXAMP.z); G.add(post);
+      const leg = new T.Mesh(new T.BoxGeometry(0.12, 0.7, 0.12), gm(0x7a5a3a)); leg.position.set(EXAMP.x, EXAMP.y + 0.35, EXAMP.z); G.add(leg); }
+    function examTxt() { const c = examNow(); if (!c) return null; return c.phase === 'review' ? '📖 考前複習' : c.phase === 'exam' ? '📝 ' + SUBJ[c.day - 1] + '考試' : '🎉 考後慶功／補考'; }
+    function examSubjIdx(c) { return c.phase === 'exam' ? c.day - 1 : -1; }
+    function examBoard() {
+      const c = examNow(); if (!c) { say('考試公告欄', '目前沒有考試。\n期中考週：11 月第 2 週、4 月第 3 週\n期末考週：1 月第 2 週、6 月第 3 週\n考前 3 天可以來這裡複習。', [{ label: '好' }]); return; }
+      const ex = EXS(c.key);
+      if (c.phase === 'review') {
+        const d = dayKey(), done = ex.revDays.includes(d);
+        say('📖 ' + c.name + '・考前複習', c.name + '從 ' + (c.start.getMonth() + 1) + '/' + c.start.getDate() + '（週一）開始，還有 ' + (-c.off) + ' 天。\n每天複習 1 次（體力 5・魔力 3），累積「複習提示」最多 3 個——考試時可以刪去 1 個錯誤選項。\n目前複習提示：' + ex.rev + ' / 3', [
+          { label: done ? '今天已經複習過了' : '📖 開始複習', pri: !done, fn: () => { if (done) return; if (S.mp < 3) { toast('魔力不足，先休息一下 ✨', 2600); return; } if (!spend(5)) return; S.mp -= 3; ex.revDays.push(d); ex.rev = Math.min(3, ex.rev + 1); addAttr('study', 2); addPts(5, '考前複習'); save(); refreshAll(); toast('📖 複習完成！複習提示 ' + ex.rev + ' / 3', 3200); } }, { label: '關閉' }]);
+        return;
+      }
+      if (c.phase === 'exam') {
+        const i = examSubjIdx(c), sc = ex.sc[i];
+        if (sc !== null) { say('📝 ' + c.name, '今天的「' + SUBJ[i] + '」已經考完了！成績：' + sc + ' 分（' + gradeOf(sc) + '）\n本週進度 ' + examDoneN(ex) + ' / 5 科。', [{ label: '好' }]); return; }
+        say('📝 ' + c.name + '・' + SUBJ[i], '今天考「' + SUBJ[i] + '」，共 ' + (c.kind === 'fin' ? 6 : 5) + ' 題，每題都是選擇題。\n消耗魔力 5。複習提示剩 ' + ex.rev + ' 個。\n準備好了嗎？', [{ label: '開始考試', pri: true, fn: () => runExam(c, i, false) }, { label: '再準備一下' }]);
+        return;
+      }
+      // after
+      const miss = ex.sc.map((v, i) => v === null ? i : -1).filter(i => i >= 0);
+      const btn = miss.map(i => ({ label: '📝 補考「' + SUBJ[i] + '」（最高 80 分）', fn: () => runExam(c, i, true) }));
+      if (!miss.length && !ex.claimed) { claimExam(c, ex); return; }
+      say('🎉 ' + c.name + '・考後', miss.length ? '還有 ' + miss.length + ' 科沒考，可以補考（成績最高算 80 分）。全部考完就能領慶功獎勵！' : '本週成績都出來了，慶功獎勵你已經領過囉！', btn.concat([{ label: '關閉' }]));
+    }
+    function runExam(c, i, makeup) {
+      const ex = EXS(c.key);
+      if (S.mp < 5) { toast('魔力不足（需要 5），先完成任務或休息一下 ✨', 3000); return; }
+      S.mp -= 5; const n = c.kind === 'fin' ? 6 : 5, per = Math.round(100 / n), qs = shuffled(Q[i], Math.random).slice(0, n); let right = 0;
+      const ask = k => {
+        if (k >= n) return finish();
+        const q = qs[k], opts = shuffled(q[1].map((t, j) => ({ t, ok: j === q[2] })), Math.random);
+        const show = list => say('📝 ' + SUBJ[i] + '（' + (k + 1) + ' / ' + n + '）', q[0], list.map(o => ({ label: o.t, fn: () => { if (o.ok) right++; ask(k + 1); } })).concat(ex.rev > 0 && list.length > 2 ? [{ label: '💡 使用複習提示（剩 ' + ex.rev + '）：刪去一個錯誤選項', fn: () => { ex.rev--; const wrong = list.filter(o => !o.ok); wrong.splice(Math.floor(Math.random() * wrong.length), 1); save(); show(list.filter(o => o.ok || wrong.includes(o))); } }] : []));
+        show(opts);
+      };
+      function finish() {
+        let score = Math.min(100, right * per + (right === n ? 100 - per * n : 0)); if (makeup) score = Math.min(score, 80);
+        ex.sc[i] = score; const pts = Math.round(score / 5 * (c.kind === 'fin' ? 1.5 : 1)); addAttr('study', Math.round(score / 20), true); addPts(pts, SUBJ[i] + '考試 ' + score + ' 分'); save(); refreshAll();
+        say('📝 ' + SUBJ[i] + '成績', '答對 ' + right + ' / ' + n + ' 題\n成績：' + score + ' 分（' + gradeOf(score) + '）' + (makeup ? '（補考最高 80 分）' : '') + '\n獲得 ' + pts + ' 點、學業屬性提升。\n本週進度：' + examDoneN(ex) + ' / 5 科' + (examDoneN(ex) >= 5 && c.phase !== 'after' ? '\n全部考完了！週末到公告欄領慶功獎勵。' : ''), [{ label: score >= 90 ? '太棒了！' : '繼續加油', pri: true }]);
+      }
+      ask(0);
+    }
+    function claimExam(c, ex) {
+      const avg = Math.round(ex.sc.reduce((a, b) => a + (b || 0), 0) / 5), big = c.kind === 'fin' ? 60 : 40;
+      ex.claimed = 1; S.items.med += 2; addPts(big, c.name + '慶功'); const bd = avg >= 90 ? '📚 ' + c.key.slice(0, 4) + c.name.replace('第一學期', '上學期').replace('第二學期', '下學期') + '學霸' : '';
+      if (bd && !S.badges.includes(bd)) S.badges.push(bd); save(); refreshAll();
+      say('🎉 ' + c.name + '慶功', '五科全部考完了！平均 ' + avg + ' 分（' + gradeOf(avg) + '）\n慶功獎勵：' + big + ' 點、補血包 ×2' + (bd ? '、徽章「' + bd + '」' : '（平均 90 分以上可得學霸徽章）') + '。\n好好休息，下一階段再加油！', [{ label: '謝謝老師！', pri: true }]);
+    }
+    ia({ id: 'exam', x: EXAMP.x, y: EXAMP.y, z: EXAMP.z, r: 2.8, txt: () => examTxt() || '📝 考試公告欄', act: examBoard });
+    L.exam = { examNow, examBoard, runExam, EXS, Q, SUBJ, nthMonday, setDate: d => { examDate = d; refreshAll(); }, EXAMP, claim: claimExam };
   ia({ id: 'club', x: CLUBP.x, y: CLUBP.y, z: CLUBP.z, r: 2.8, txt: () => '🎪 社團佈告欄', act: clubDlg });
   L.CLUBS = CLUBS; L.clubOf = clubOf; L.clubDlg = clubDlg; L.clubActivity = clubActivity; L.clubShow = clubShow; L.clubJoin = clubJoin; L.CLUBP = CLUBP;
 
@@ -8579,8 +8699,9 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       (next ? '<div class="st"><span>距進化「' + TIERS[lv + 1][1] + '・' + next[1] + '」(Lv.' + TIERS[lv + 1][0] + ') 還差 ' + (next[0] - S.pts) + ' 點</span></div>' : '<div class="st"><span>🌟 已是最高階級「' + TIERS[lv][3] + '」</span></div>') +
       '<div class="st" id="gClk" style="margin:0 0 2px"></div>' +
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
-      row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') + row(chestObjs.length === 0, '📦 教室寶箱（今日 ' + chestN() + ' 個）', (chestN() - chestObjs.length) + '/' + chestN(), 'chest') + (nightFlag ? row(legendObjs.length === 0, '🌙 夜間傳說（今夜 ' + (legendObjs.length + 0) + ' 則待調查）', legendCount() + '/' + LEGENDS.length, 'legend') : '') + (festCur ? row((D().fest || []).length >= FEST_N, festCur.f.ic + ' 節慶：找' + festCur.f.item, Math.min(FEST_N, (D().fest || []).length) + '/' + FEST_N, 'fest') : '') +
+      row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') + row(chestObjs.length === 0, '📦 教室寶箱（今日 ' + chestN() + ' 個）', (chestN() - chestObjs.length) + '/' + chestN(), 'chest') + (function () { const c = examNow(); if (!c || c.phase === 'after') return ''; const ex = EXS(c.key); if (c.phase === 'review') return row(ex.revDays.includes(dayKey()), '📖 考前複習', ex.revDays.includes(dayKey()) ? '1/1' : '0/1', 'exam'); const i = c.day - 1; return row(ex.sc[i] !== null, '📝 今日考科：' + SUBJ[i], ex.sc[i] !== null ? ex.sc[i] + '分' : '0/1', 'exam'); })() + (nightFlag ? row(legendObjs.length === 0, '🌙 夜間傳說（今夜 ' + (legendObjs.length + 0) + ' 則待調查）', legendCount() + '/' + LEGENDS.length, 'legend') : '') + (festCur ? row((D().fest || []).length >= FEST_N, festCur.f.ic + ' 節慶：找' + festCur.f.item, Math.min(FEST_N, (D().fest || []).length) + '/' + FEST_N, 'fest') : '') +
       (function () { const c = COMPS.find(q => q.id === CP().active); if (!c) return ''; if (c.id === 'tbot') { const h = nextHint(); return '<div class="st" style="align-items:center"><span>🤖 小T：' + h.tx + '</span>' + (h.nav ? '<button type="button" data-nav="' + h.nav + '" style="margin-left:auto">📍</button>' : '') + '</div>'; } return '<div class="st"><span>' + c.ic + ' ' + c.name + '陪著你：' + c.eff + '</span></div>'; })() +
+      (function () { const c = examNow(); if (!c) return ''; const ex = EXS(c.key); return '<div class="st"><span>' + (c.phase === 'review' ? '📖 ' + c.name + '倒數 ' + (-c.off) + ' 天・可到考試公告欄複習（提示 ' + ex.rev + '/3）' : c.phase === 'exam' ? '📝 ' + c.name + '週（第 ' + (c.off + 1) + '/5 天，已考 ' + examDoneN(ex) + ' 科・社團暫停）' : '🎉 ' + c.name + '結束・到公告欄' + (examDoneN(ex) >= 5 ? '領慶功' : '補考')) + '</span></div>'; })() +
       (festCur ? '<div class="st"><span>' + festCur.f.ic + ' ' + festCur.f.name + '活動中・' + festTxt(festCur) + '</span></div>' : '') +
       (function () { const c = clubOf(); if (c) { const w = W(); return '<div class="st"><span>' + c.ic + ' ' + c.name + '・' + RANKS[clubRank()][1] + '（本週活動 ' + (w.cl || 0) + ' 次' + (w.show ? '，成果展已參加' : '') + '）</span></div>'; } return lvOf() >= CLUB_LV ? '<div class="st"><span>🎪 可以去社團佈告欄加入社團了！</span></div>' : '<div class="st"><span>🎪 LV.' + CLUB_LV + ' 開放加入社團</span></div>'; })() +
       '<div class="sec">♻️ 本週活動：資源回收週</div>' + row(w.done, '分類回收物', Math.min(w.sorted, 10) + '/10', 'recy') +
@@ -8592,6 +8713,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     hud.querySelectorAll('[data-nav]').forEach(b => b.onclick = e => { e.stopPropagation(); const k = b.dataset.nav; let p = null;
       if (k === 'garden') p = { name: '菜園', x: beds[2].x, z: beds[2].z + 3 }; else if (k === 'tap') p = { name: '水龍頭', x: TAP.x, z: TAP.z }; else if (k === 'recy') p = { name: '資源回收站', x: RECY.x, z: RECY.z + 2 };
       else if (k === 'litter') { const o = litterObjs[0] || recObjs[0]; if (o) p = { name: '垃圾', x: o.p ? o.p.x : o.mesh.position.x, z: o.p ? o.p.z : o.mesh.position.z }; else toast('垃圾都撿完了！'); }
+      else if (k === 'exam') p = { name: '考試公告欄', x: EXAMP.x, z: EXAMP.z + 1.5 };
       else if (k === 'legend') { const o = legendObjs[0]; if (o) p = { name: o.l.name + '（' + o.l.place + '）', x: o.x, z: o.z, lv: 0 }; else toast('今晚的傳說都調查完了，明天晚上再來！'); }
       else if (k === 'fest') { const o = festObjs[0]; if (o) p = { name: festCur.f.item, x: o.x, z: o.z, lv: 0 }; else toast('今天的' + (festCur ? festCur.f.item : '') + '都找到了！'); }
       else if (k === 'chest') { const o = chestObjs[0]; if (o) p = { name: '教室寶箱・' + o.room, x: o.x, z: o.z, lv: o.lv }; else toast('今天的寶箱都開完了！'); }
@@ -8710,7 +8832,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   function clockTick(dt) {
     if (document.body.classList.contains('intro')) return;
     gh = (gh + dt / HOUR_SEC) % 24; const t = nightAmt(gh); clkAcc += dt;
-    if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = '📅 ' + dateStr() + '　' + clockIc(gh) + ' 校園時間 ' + hhmm(gh); const tp = document.getElementById('gTime'); if (tp) tp.textContent = (new Date().getMonth() + 1) + '/' + new Date().getDate() + '（' + WD[new Date().getDay()] + '）' + clockIc(gh) + ' ' + hhmm(gh); chestObjs.forEach(o => { o.mark.visible = Math.hypot(PL.x - o.x, PL.z - o.z) < 28 && Math.abs(PL.y - o.y) < 4.5; }); legendObjs.forEach(o => { o.mark.visible = !!nightFlag && Math.hypot(PL.x - o.x, PL.z - o.z) < 40; }); }
+    if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = '📅 ' + dateStr() + '　' + clockIc(gh) + ' 校園時間 ' + hhmm(gh); const tp = document.getElementById('gTime'); if (tp) tp.textContent = (new Date().getMonth() + 1) + '/' + new Date().getDate() + '（' + WD[new Date().getDay()] + '）' + clockIc(gh) + ' ' + hhmm(gh); chestObjs.forEach(o => { o.mark.visible = Math.hypot(PL.x - o.x, PL.z - o.z) < 28 && Math.abs(PL.y - o.y) < 4.5; }); { const ec = examNow(); const on = !!ec; if (L.examMk) { L.examMk.visible = on && Math.hypot(PL.x - EXAMP.x, PL.z - EXAMP.z) < 45; L.examLab.visible = L.examMk.visible; } } legendObjs.forEach(o => { o.mark.visible = !!nightFlag && Math.hypot(PL.x - o.x, PL.z - o.z) < 40; }); }
     moveTick(dt); festAcc += dt; if (festAcc > 20) { festAcc = 0; festSync(); }
     if (document.visibilityState === 'visible' && dt < 1) { playAcc += dt; const d = D(); d.play = (d.play || 0) + dt; if (playAcc >= nextRemind) { if (remind() === false) nextRemind = playAcc + 5; } }
   }
