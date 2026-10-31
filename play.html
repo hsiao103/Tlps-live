@@ -7915,7 +7915,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     S.hp = Math.min(S.hp, hpMax()); S.mp = Math.min(S.mp, mpMax());
     Object.keys(S.days).sort().slice(0, -14).forEach(x => delete S.days[x]);
     if (typeof festSync === 'function') { festCur = festNow(); }
-    if (typeof buildLitter === 'function') { buildLitter(); buildRecycle(); if (typeof buildChests === 'function') buildChests(); if (typeof buildFest === 'function') buildFest(); if (typeof placeSteps === 'function') placeSteps(); }
+    if (typeof buildLitter === 'function') { buildLitter(); buildRecycle(); if (typeof buildChests === 'function') buildChests(); if (typeof buildFest === 'function') buildFest(); if (typeof buildLegends === 'function') buildLegends(); if (typeof placeSteps === 'function') placeSteps(); }
   }
   const level = () => tierOf(lvOf());
 
@@ -7928,6 +7928,18 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     { id: 'duanwu', name: '端午節', ic: '🐲', item: '粽子', itemIc: '🍙', day: y => LUNAR.duanwu[y], greet: '端午節快樂！記得吃粽子、掛香包。' }
   ];
   const FEST_N = 6;
+
+  /* ---------- 夜間探索：校園傳說 ---------- */
+  const LEGENDS = [
+    { id: 'run', name: '夜跑的腳步聲', place: '操場', icon: '👟', story: '有人說，天黑以後的操場，會傳來「啪搭、啪搭」的跑步聲，可是跑道上一個人也沒有……', truth: '真相：那是跑道旁鐵製排水溝蓋發出的聲音！白天被太陽曬熱會膨脹，晚上變涼又收縮，「啪搭」一聲就是它在變形。這就是「熱脹冷縮」。' },
+    { id: 'song', name: '會唱歌的涼亭', place: '梅花廣場', icon: '🎵', story: '深夜的梅花廣場，涼亭那邊會傳出「嗚～嗚～」像唱歌一樣的聲音，而且越晚越清楚……', truth: '真相：風吹過涼亭中空的欄杆管子，就像對著笛子吹氣一樣，空氣在管子裡振動而發聲。管子越長，聲音越低沉。這是「共鳴」。' },
+    { id: 'lamp', name: '第十二盞路燈', place: '校門', icon: '💡', story: '校門口有一盞路燈，只有天黑時會一閃一閃，好像在對路過的人眨眼睛……', truth: '真相：路燈裡有「光敏電阻」，天色變暗它就讓電流通過、燈就亮。黃昏時光線忽明忽暗，燈就跟著一閃一閃，原來是自動開關在工作！' },
+    { id: 'shadow', name: '影子小孩', place: '集合場', icon: '👤', story: '集合場的路燈下，有人看到自己的影子旁邊多了一個矮矮的小影子，還會跟著走……', truth: '真相：兩盞燈從不同方向照你，就會出現兩個影子；離燈越近影子越長、越遠越短。多出來的「小孩」只是另一盞燈照出來的影子。' },
+    { id: 'owl', name: '樹上的大眼睛', place: '涼亭・遊戲區', icon: '🦉', story: '遊戲區的大樹上，晚上會出現兩顆金黃色的大眼睛，一動也不動地盯著你……', truth: '真相：那是「領角鴞」！台灣校園常見的夜行性猛禽，晚上出來抓老鼠和昆蟲，對我們很有幫助。看到時請保持安靜，不要用手電筒直接照牠。' },
+    { id: 'eyes', name: '車底下的綠光', place: '停車場', icon: '🐈', story: '停車場的車子底下，每到夜裡就會亮起兩點幽幽的綠色光芒，還會慢慢移動……', truth: '真相：那是流浪貓的眼睛！貓的眼睛後方有一層「反光膜」，能把微弱的光反射回來，所以在黑暗中會發亮。這也是貓在夜裡看得很清楚的祕密。' }
+  ];
+  const legendCount = () => Object.keys(S.legends || {}).length;
+  let legendObjs = [];
   let festCur = null;
   function festNow(now) {
     const t = now || new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
@@ -7986,7 +7998,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   const COMPS = [
     { id: 'dog', i: 0, name: '汪汪', ic: '🐕', eff: '走路與做事消耗的 HP 約 −25%', need: '累計完成 3 天「今日任務全部完成」', prog: () => Math.min(3, S.doneDays || 0) + '/3', ok: () => (S.doneDays || 0) >= 3, say: '汪！今天也一起努力吧！' },
     { id: 'tbot', i: 1, name: '小T', ic: '🤖', eff: '提示下一步該做什麼，並可一鍵 📍 導航', need: '一開始就在身邊', prog: () => '✓', ok: () => true, say: '我是小T，會幫你看今天還缺什麼。' },
-    { id: 'cat', i: 2, name: '星貓', ic: '🐈‍⬛', eff: '（宇宙裂隙開放後解鎖）', need: '宇宙裂隙副本開放後', prog: () => '🔒', ok: () => false, say: '喵～' },
+    { id: 'cat', i: 2, name: '星貓', ic: '🐈‍⬛', eff: '夜間調查傳說不耗 HP／MP，且多得 5 點', need: '夜間發現 3 個校園傳說', prog: () => Math.min(3, legendCount()) + '/3', ok: () => legendCount() >= 3, say: '喵～夜晚是我的時間。' },
     { id: 'sprout', i: 3, name: '芽芽', ic: '🌱', eff: 'HP 自然恢復速度 ×2', need: '累計採收 3 朵花', prog: () => Math.min(3, flowerTotal()) + '/3', ok: () => flowerTotal() >= 3, say: '花開了，我也長大了！' },
     { id: 'bunny', i: 4, name: '兔兔咪', ic: '🐰', eff: 'MP 恢復速度 ×2，與人聊天社交 +1', need: '和所有同樂人物都聊過天', prog: () => Math.min(Object.keys(NP).length, (S.met || []).filter(k => NP[k]).length) + '/' + Object.keys(NP).length, ok: () => Object.keys(NP).length > 0 && Object.keys(NP).every(k => (S.met || []).includes(k)), say: '多認識一些朋友，心情就會變好～' }
   ];
@@ -8030,6 +8042,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     if (d.clean < 5) return { tx: '撿垃圾打掃校園（' + d.clean + '/5）', nav: 'litter' };
     if (d.help < 1) return { tx: d.req === 0 ? '找人接今天的小請託' : d.req === 1 ? '請託進行中：' + REQ().steps[0].name : '回去向委託人回報', nav: d.req === 1 ? 'step' : 'npc' };
     if (!w.done) return { tx: '做資源回收分類（' + Math.min(w.sorted, 10) + '/10）', nav: 'recy' };
+    if (nightFlag && legendObjs.length) return { tx: '🌙 夜裡有校園傳說出沒（' + legendObjs[0].l.place + ' 一帶）', nav: 'legend' };
     if (festCur && (D().fest || []).length < FEST_N && festObjs.length) return { tx: festCur.f.ic + ' 節慶活動：校園裡藏了' + festCur.f.item + '（' + (D().fest || []).length + '/' + FEST_N + '）', nav: 'fest' };
     if (chestObjs.length) return { tx: '教室裡還有 ' + chestObjs.length + ' 個寶箱沒開', nav: 'chest' };
     if (S.club && !d.club) return { tx: '去社團佈告欄做今天的社團活動', nav: 'club' };
@@ -8076,6 +8089,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gBag .lgb{border:1.5px solid #8e5cf5;background:rgba(142,92,245,.12);color:var(--fg);border-radius:99px;font-size:12.5px;padding:3px 12px;cursor:pointer;font-family:inherit}
 #gBag .sl.use{cursor:pointer;border-style:solid;border-color:#e0564a;background:rgba(224,86,74,.1)}
 @media(max-width:600px){#gBag .pn{padding:10px 12px 12px;border-radius:16px}#gBag h3{font-size:16px}#gBag .top{gap:10px;margin-bottom:2px}#gBag .bv{width:60px;height:60px;border-width:2.5px}#gBag .sub{font-size:11.5px;margin-bottom:5px}#gBag .vit{gap:3px;margin:5px 0 4px}#gBag .vb{font-size:11px}#gBag .radar{width:176px;height:auto;margin:0 auto}#gBag .pv{gap:4px;font-size:10.5px;margin:2px 0 5px}#gBag .pv span{padding:1px 8px}#gBag .cmp{gap:4px}#gBag .cp img,#gBag .cp i{width:36px;height:36px;font-size:18px}#gBag .cp b{font-size:11px}#gBag .cp small{font-size:9.5px}#gBag .grid{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin:6px 0}#gBag .row{font-size:11.5px;gap:4px;margin:3px 0}#gBag .row span{padding:1px 8px}#gBag .cl{margin:8px auto 0}}
 #gBag .row{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;margin:4px 0}#gBag .row span{background:rgba(127,127,127,.14);border-radius:99px;padding:2px 10px}#gBag .cl{display:block;margin:12px auto 0;border:0;border-radius:99px;padding:9px 28px;font:800 14px var(--font-ui);color:#fff;background:linear-gradient(90deg,#f5821f,#e0561a);cursor:pointer}
@@ -8335,6 +8349,38 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     if (window.TLTHEME && !window.TLTHEME.manual) { const want = id || 'default'; if (window.TLTHEME.cur !== want) { window.TLTHEME.set(want); window.TLTHEME.manual = false; } }
     const ab = document.getElementById('bThAuto'); if (ab) ab.classList.toggle('on', window.TLTHEME && !window.TLTHEME.manual);
   }
+    function legendPlace(name) { const q = typeof NPLACES !== 'undefined' && NPLACES.find(x => x.name === name); return q ? snap(q.x, q.z, { maxR: 7 }) : null; }
+    function buildLegends() {
+      legendObjs.forEach(o => { G.remove(o.mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); }); legendObjs = [];
+      S.legends = S.legends || {};
+      const left = LEGENDS.filter(l => !S.legends[l.id]); if (!left.length) return;
+      const r = rng('legend' + dayKey());
+      shuffled(left, r).slice(0, 3).forEach(l => {
+        const p = legendPlace(l.place); if (!p) return;
+        const mark = sprite(emojiTex(l.icon, '#2a1b4d', '#b69cff'), [1.0, 1.0], p.x, p.y + 1.5, p.z, 31); mark.visible = false; bob.push({ s: mark, y: p.y + 1.5 });
+        const o = { l, x: p.x, y: p.y, z: p.z, mark };
+        o.ia = ia({ id: 'legend-' + l.id, x: p.x, y: p.y, z: p.z, r: 2.6, txt: () => nightFlag ? '👻 調查「' + l.name + '」' : null, act: () => legendAct(o) });
+        legendObjs.push(o);
+      });
+    }
+    function legendAct(o) {
+      const l = o.l, free = compOn('cat');
+      say('👻 校園傳說・' + l.name, '地點：' + l.place + '\n\n' + l.story, [
+        { label: '🔍 調查真相' + (free ? '（星貓陪你，不耗體力）' : '（體力 4・魔力 3）'), pri: true, fn: () => {
+          if (!free) { if (S.mp < 3) { toast('魔力不足，先完成任務或休息一下 ✨', 3000); return; } if (!spend(4)) return; S.mp -= 3; }
+          S.legends = S.legends || {}; S.legends[l.id] = dayKey(); const n = legendCount();
+          G.remove(o.mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); legendObjs = legendObjs.filter(q => q !== o);
+          addAttr('idea', 2, true); addAttr('study', 1, true); addPts(15 + (free ? 5 : 0), '發現傳說「' + l.name + '」');
+          const fin = n >= LEGENDS.length; if (fin && !S.badges.includes('🌙 傳說解謎家')) { S.badges.push('🌙 傳說解謎家'); setTimeout(() => addPts(50, '集滿全部校園傳說'), 1500); }
+          save(); refreshAll();
+          say('🔍 真相大白！', l.truth + '\n\n已收進「校園傳說圖鑑」（' + n + ' / ' + LEGENDS.length + '）。' + (n === 3 && !S.comp.have.includes('cat') ? '' : '') + (fin ? '\n🏅 全部解開了，獲得徽章「傳說解謎家」！' : ''), [{ label: '原來如此！', pri: true }]);
+        } }, { label: '先不要' }]);
+    }
+    function legendBook() {
+      S.legends = S.legends || {};
+      say('👻 校園傳說圖鑑（' + legendCount() + ' / ' + LEGENDS.length + '）', '夜晚（遊戲時間 19:00～05:00）校園會出現傳說，到現場調查就能解開真相。每晚出現 3 則。', LEGENDS.map(l => S.legends[l.id] ? { label: '📖 ' + l.name, fn: () => say(l.name, l.story + '\n\n' + l.truth, [{ label: '回圖鑑', fn: legendBook }, { label: '關閉' }]) } : { label: '❓ ？？？（出沒地點：' + l.place + '）', fn: legendBook }).concat([{ label: '關閉' }]));
+    }
+    L.legend = { LEGENDS, objs: () => legendObjs, book: legendBook, act: legendAct, count: legendCount };
   L.fest = { festNow, festSync, get cur() { return festCur; }, objs: () => festObjs, FESTS };
 
   /* ---------- 週活動：資源回收 ---------- */
@@ -8533,7 +8579,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       (next ? '<div class="st"><span>距進化「' + TIERS[lv + 1][1] + '・' + next[1] + '」(Lv.' + TIERS[lv + 1][0] + ') 還差 ' + (next[0] - S.pts) + ' 點</span></div>' : '<div class="st"><span>🌟 已是最高階級「' + TIERS[lv][3] + '」</span></div>') +
       '<div class="st" id="gClk" style="margin:0 0 2px"></div>' +
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
-      row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') + row(chestObjs.length === 0, '📦 教室寶箱（今日 ' + chestN() + ' 個）', (chestN() - chestObjs.length) + '/' + chestN(), 'chest') + (festCur ? row((D().fest || []).length >= FEST_N, festCur.f.ic + ' 節慶：找' + festCur.f.item, Math.min(FEST_N, (D().fest || []).length) + '/' + FEST_N, 'fest') : '') +
+      row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') + row(chestObjs.length === 0, '📦 教室寶箱（今日 ' + chestN() + ' 個）', (chestN() - chestObjs.length) + '/' + chestN(), 'chest') + (nightFlag ? row(legendObjs.length === 0, '🌙 夜間傳說（今夜 ' + (legendObjs.length + 0) + ' 則待調查）', legendCount() + '/' + LEGENDS.length, 'legend') : '') + (festCur ? row((D().fest || []).length >= FEST_N, festCur.f.ic + ' 節慶：找' + festCur.f.item, Math.min(FEST_N, (D().fest || []).length) + '/' + FEST_N, 'fest') : '') +
       (function () { const c = COMPS.find(q => q.id === CP().active); if (!c) return ''; if (c.id === 'tbot') { const h = nextHint(); return '<div class="st" style="align-items:center"><span>🤖 小T：' + h.tx + '</span>' + (h.nav ? '<button type="button" data-nav="' + h.nav + '" style="margin-left:auto">📍</button>' : '') + '</div>'; } return '<div class="st"><span>' + c.ic + ' ' + c.name + '陪著你：' + c.eff + '</span></div>'; })() +
       (festCur ? '<div class="st"><span>' + festCur.f.ic + ' ' + festCur.f.name + '活動中・' + festTxt(festCur) + '</span></div>' : '') +
       (function () { const c = clubOf(); if (c) { const w = W(); return '<div class="st"><span>' + c.ic + ' ' + c.name + '・' + RANKS[clubRank()][1] + '（本週活動 ' + (w.cl || 0) + ' 次' + (w.show ? '，成果展已參加' : '') + '）</span></div>'; } return lvOf() >= CLUB_LV ? '<div class="st"><span>🎪 可以去社團佈告欄加入社團了！</span></div>' : '<div class="st"><span>🎪 LV.' + CLUB_LV + ' 開放加入社團</span></div>'; })() +
@@ -8546,6 +8592,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     hud.querySelectorAll('[data-nav]').forEach(b => b.onclick = e => { e.stopPropagation(); const k = b.dataset.nav; let p = null;
       if (k === 'garden') p = { name: '菜園', x: beds[2].x, z: beds[2].z + 3 }; else if (k === 'tap') p = { name: '水龍頭', x: TAP.x, z: TAP.z }; else if (k === 'recy') p = { name: '資源回收站', x: RECY.x, z: RECY.z + 2 };
       else if (k === 'litter') { const o = litterObjs[0] || recObjs[0]; if (o) p = { name: '垃圾', x: o.p ? o.p.x : o.mesh.position.x, z: o.p ? o.p.z : o.mesh.position.z }; else toast('垃圾都撿完了！'); }
+      else if (k === 'legend') { const o = legendObjs[0]; if (o) p = { name: o.l.name + '（' + o.l.place + '）', x: o.x, z: o.z, lv: 0 }; else toast('今晚的傳說都調查完了，明天晚上再來！'); }
       else if (k === 'fest') { const o = festObjs[0]; if (o) p = { name: festCur.f.item, x: o.x, z: o.z, lv: 0 }; else toast('今天的' + (festCur ? festCur.f.item : '') + '都找到了！'); }
       else if (k === 'chest') { const o = chestObjs[0]; if (o) p = { name: '教室寶箱・' + o.room, x: o.x, z: o.z, lv: o.lv }; else toast('今天的寶箱都開完了！'); }
       else if (k === 'club') p = { name: '社團佈告欄', x: CLUBP.x, z: CLUBP.z + 1.5 };
@@ -8606,12 +8653,12 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' +
-      '<div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) setComp(x.id); else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
   }
@@ -8629,7 +8676,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   /* 日夜、時鐘、遊玩時間 */
   function applySky(t) {
     const th = window.TLTHEME && window.TLTHEME.cur && window.TLTHEME.cur !== 'default';
-    const night = t >= 0.5; if (night !== nightFlag) { const first = nightFlag === null; nightFlag = night; isNight = night; applyTime(); classLights(night); lamp.intensity = night ? 1.1 : 0; const bt = document.getElementById('bTime'); if (bt) bt.classList.toggle('on', night); if (!first) toast(night ? '🌙 天黑了，校園的燈亮起來了' : '🌅 天亮了，新的一天開始', 3200); }
+    const night = t >= 0.5; if (night !== nightFlag) { const first = nightFlag === null; nightFlag = night; isNight = night; applyTime(); classLights(night); lamp.intensity = night ? 1.1 : 0; const bt = document.getElementById('bTime'); if (bt) bt.classList.toggle('on', night); if (!first) { toast(night ? '🌙 天黑了，校園的燈亮起來了。夜裡好像有些奇怪的傳說……' : '🌅 天亮了，新的一天開始', 4200); refreshAll(); } }
     if (th || Math.abs(t - lastBlend) < 0.01) return; lastBlend = t;
     const day = new T.Color(0xaed6f0), dusk = new T.Color(0xe9906a), nt = new T.Color(0x0d1626), c = new T.Color();
     if (t < 0.5) c.copy(day).lerp(dusk, t * 2); else c.copy(dusk).lerp(nt, (t - 0.5) * 2);
@@ -8654,7 +8701,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     if (lastX === null) { lastX = PL.x; lastZ = PL.z; return; }
     const st = Math.hypot(PL.x - lastX, PL.z - lastZ); lastX = PL.x; lastZ = PL.z;
     if (st > 6 || st < 0.004 || view.mode !== 'walk' || dlgOpen) { movingT = Math.max(0, movingT - dt); return; }
-    movingT = 0.7; walkAcc += st * (compOn('dog') ? 0.75 : 1);
+    movingT = 0.7; walkAcc += st * (compOn('dog') ? 0.75 : 1) * (nightFlag ? 1.25 : 1);
     if (walkAcc >= 20) { const n = Math.floor(walkAcc / 20); walkAcc -= n * 20; S.hp = Math.max(0, S.hp - n); if (S.hp <= 12 && !lowWarn) { lowWarn = true; toast('⚠️ 體力快用完了！停下來休息、喝水，或按 H 使用補血包', 4200); } if (S.hp > 30) lowWarn = false; updateBars(); }
   }
   L.moving = () => movingT > 0;
@@ -8663,7 +8710,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   function clockTick(dt) {
     if (document.body.classList.contains('intro')) return;
     gh = (gh + dt / HOUR_SEC) % 24; const t = nightAmt(gh); clkAcc += dt;
-    if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = '📅 ' + dateStr() + '　' + clockIc(gh) + ' 校園時間 ' + hhmm(gh); const tp = document.getElementById('gTime'); if (tp) tp.textContent = (new Date().getMonth() + 1) + '/' + new Date().getDate() + '（' + WD[new Date().getDay()] + '）' + clockIc(gh) + ' ' + hhmm(gh); chestObjs.forEach(o => { o.mark.visible = Math.hypot(PL.x - o.x, PL.z - o.z) < 28 && Math.abs(PL.y - o.y) < 4.5; }); }
+    if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = '📅 ' + dateStr() + '　' + clockIc(gh) + ' 校園時間 ' + hhmm(gh); const tp = document.getElementById('gTime'); if (tp) tp.textContent = (new Date().getMonth() + 1) + '/' + new Date().getDate() + '（' + WD[new Date().getDay()] + '）' + clockIc(gh) + ' ' + hhmm(gh); chestObjs.forEach(o => { o.mark.visible = Math.hypot(PL.x - o.x, PL.z - o.z) < 28 && Math.abs(PL.y - o.y) < 4.5; }); legendObjs.forEach(o => { o.mark.visible = !!nightFlag && Math.hypot(PL.x - o.x, PL.z - o.z) < 40; }); }
     moveTick(dt); festAcc += dt; if (festAcc > 20) { festAcc = 0; festSync(); }
     if (document.visibilityState === 'visible' && dt < 1) { playAcc += dt; const d = D(); d.play = (d.play || 0) + dt; if (playAcc >= nextRemind) { if (remind() === false) nextRemind = playAcc + 5; } }
   }
