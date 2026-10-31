@@ -7,7 +7,7 @@
       並開啟「Skip nonce checks」（本專案用 Google 一鍵登入的 ID token 換 Supabase 登入）。
    3. 到 SQL Editor 執行 supabase.sql 建立資料表與權限。 */
 window.TL_LIVE_CONFIG = {
-  supabaseUrl: '',        // 例：https://xxxxxxxx.supabase.co
-  supabaseAnonKey: '',    // 例：eyJhbGciOi...
+  supabaseUrl: 'https://jqzmbeqrsidnqaqvsuaj.supabase.co',        // 例：https://xxxxxxxx.supabase.co
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem1iZXFyc2lkbnFhcXZzdWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NTA4MDEsImV4cCI6MjEwOTAyNjgwMX0.geShwvDZherAuM_4totCeAxwOHfojI3Vwy0Fo_3Niqo',    // 例：eyJhbGciOi...
   table: 'tlps_live_saves'
 };
