@@ -7914,9 +7914,27 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     if (S.vday !== k) { S.vday = k; S.hp = hpMax(); S.mp = Math.max(S.mp, Math.round(mpMax() * 0.5)); }
     S.hp = Math.min(S.hp, hpMax()); S.mp = Math.min(S.mp, mpMax());
     Object.keys(S.days).sort().slice(0, -14).forEach(x => delete S.days[x]);
-    if (typeof buildLitter === 'function') { buildLitter(); buildRecycle(); if (typeof buildChests === 'function') buildChests(); if (typeof placeSteps === 'function') placeSteps(); }
+    if (typeof festSync === 'function') { festCur = festNow(); }
+    if (typeof buildLitter === 'function') { buildLitter(); buildRecycle(); if (typeof buildChests === 'function') buildChests(); if (typeof buildFest === 'function') buildFest(); if (typeof placeSteps === 'function') placeSteps(); }
   }
   const level = () => tierOf(lvOf());
+
+  /* ---------- 節慶（依遊戲日期：節日前 3 天～後 3 天） ---------- */
+  const LUNAR = { newyear: { 2026: [2, 17], 2027: [2, 6], 2028: [1, 26], 2029: [2, 13], 2030: [2, 3], 2031: [1, 23], 2032: [2, 11], 2033: [1, 31], 2034: [2, 19], 2035: [2, 8] }, duanwu: { 2026: [6, 19], 2027: [6, 9], 2028: [5, 28], 2029: [6, 16], 2030: [6, 5], 2031: [6, 24], 2032: [6, 12], 2033: [6, 1], 2034: [6, 20], 2035: [6, 10] } };
+  const FESTS = [
+    { id: 'halloween', name: '萬聖節', ic: '🎃', item: '糖果', itemIc: '🍬', day: y => [10, 31], greet: '不給糖就搗蛋！萬聖節快樂～' },
+    { id: 'christmas', name: '聖誕節', ic: '🎄', item: '禮物', itemIc: '🎁', day: y => [12, 25], greet: '聖誕快樂！校園裡藏了好多禮物喔。' },
+    { id: 'newyear', name: '農曆春節', ic: '🧧', item: '紅包', itemIc: '🧧', day: y => LUNAR.newyear[y], greet: '新年快樂，恭喜發財！' },
+    { id: 'duanwu', name: '端午節', ic: '🐲', item: '粽子', itemIc: '🍙', day: y => LUNAR.duanwu[y], greet: '端午節快樂！記得吃粽子、掛香包。' }
+  ];
+  const FEST_N = 6;
+  let festCur = null;
+  function festNow(now) {
+    const t = now || new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    for (const f of FESTS) for (const y of [t.getFullYear() - 1, t.getFullYear(), t.getFullYear() + 1]) { const md = f.day(y); if (!md) continue; const off = Math.round((t0 - new Date(y, md[0] - 1, md[1])) / 864e5); if (Math.abs(off) <= 3) return { f, off, year: y }; }
+    return null;
+  }
+  const festTxt = c => c.off === 0 ? '就是今天！加碼獎勵 ×2' : c.off < 0 ? '再 ' + (-c.off) + ' 天就是節日' : '節日已過 ' + c.off + ' 天（慶祝活動還在）';
 
   /* ---------- NPC 好感度 ---------- */
   const FAVS = [[0, '陌生'], [10, '認識'], [25, '熟悉'], [50, '好友'], [80, '摯友']];
@@ -7930,6 +7948,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   const likeOf = k => { const i = Object.keys(NPCDEF).indexOf(k); return FLOWERS[(i < 0 ? 0 : i) % FLOWERS.length][0]; };
   function favUI(k) {
     const f = favInfo(k), tx = dlg.querySelector('.tx'), bt = dlg.querySelector('.bt'), d = D(); d.gift = d.gift || [];
+    if (tx && festCur) tx.textContent += '\n' + festCur.f.ic + ' ' + festCur.f.greet;
     if (tx) tx.textContent += '\n💞 好感：' + f.name + '（' + f.v + (f.next ? ' / ' + f.next : '') + '）';
     const has = Object.keys(S.flowers).filter(n => S.flowers[n] > 0), fav = likeOf(k);
     if (bt && has.length && !d.gift.includes(k)) {
@@ -8011,6 +8030,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     if (d.clean < 5) return { tx: '撿垃圾打掃校園（' + d.clean + '/5）', nav: 'litter' };
     if (d.help < 1) return { tx: d.req === 0 ? '找人接今天的小請託' : d.req === 1 ? '請託進行中：' + REQ().steps[0].name : '回去向委託人回報', nav: d.req === 1 ? 'step' : 'npc' };
     if (!w.done) return { tx: '做資源回收分類（' + Math.min(w.sorted, 10) + '/10）', nav: 'recy' };
+    if (festCur && (D().fest || []).length < FEST_N && festObjs.length) return { tx: festCur.f.ic + ' 節慶活動：校園裡藏了' + festCur.f.item + '（' + (D().fest || []).length + '/' + FEST_N + '）', nav: 'fest' };
     if (chestObjs.length) return { tx: '教室裡還有 ' + chestObjs.length + ' 個寶箱沒開', nav: 'chest' };
     if (S.club && !d.club) return { tx: '去社團佈告欄做今天的社團活動', nav: 'club' };
     if (!S.club && lvOf() >= CLUB_LV) return { tx: '到社團佈告欄加入一個社團', nav: 'club' };
@@ -8021,7 +8041,19 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   /* ---------- 介面 ---------- */
   const css = document.createElement('style');
   css.textContent = `
-body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bChar{display:none!important}
+body.live #bVR,body.live #bIso,body.live #bChar,body.live #bDQ{display:none!important}
+body.live #modes{display:none!important}
+body.live.gearopen #modes{display:flex!important;flex-direction:column;align-items:stretch;gap:8px;position:fixed;top:calc(64px + env(safe-area-inset-top,0px));right:16px;left:auto;bottom:auto;width:min(300px,calc(100vw - 32px));max-width:none;max-height:calc(100vh - 90px);overflow-y:auto;padding:12px 14px;border-radius:16px;z-index:30}
+body.live.gearopen #modes .grp{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-right:0;padding-right:0;margin:0}
+body.live.gearopen #modes .glab{display:block!important;width:100%;font-size:12px;font-weight:800;color:var(--muted)}
+body.live.gearopen #modes .gsel{display:none!important}body.live.gearopen #modes .gopts{display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:6px;position:static!important;transform:none!important;opacity:1!important;visibility:visible!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;width:auto!important;max-height:none!important;inset:auto!important;backdrop-filter:none!important}
+body.live.gearopen #modes .grp{position:static!important}
+body.live.gearopen #modes button{font-size:13.5px;padding:6px 11px;width:auto!important;flex:none!important;max-width:none!important;position:static!important;margin:0!important;display:inline-block}
+body.live.gearopen #modes>button{width:100%!important;display:block}
+#gearT{font:800 14px var(--font-ui);color:var(--fg);margin-bottom:-2px}
+#gGear{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;z-index:31;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.14);padding:0}
+#gGear svg{width:24px;height:24px;transition:transform .4s}body.gearopen #gGear svg{transform:rotate(90deg)}body.intro #gGear{display:none}
+@media(max-width:1100px){#gGear{right:68px}}
 #gHud{position:fixed;left:12px;top:92px;z-index:20;width:284px;max-width:calc(100vw - 24px);font-family:var(--font-ui);color:var(--fg);background:var(--panel);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.14);overflow:hidden;backdrop-filter:blur(6px)}
 #gHud .hd span{white-space:nowrap}#gHud .hd{display:flex;align-items:center;gap:6px;padding:9px 12px;cursor:pointer;background:linear-gradient(90deg,#f5821f,#2e9b45);color:#fff;font-weight:800;font-size:14px}
 #gHud .hd .pt:last-child{margin-left:auto}#gHud .hd .pt{font-weight:700;font-size:12.5px;background:rgba(255,255,255,.22);padding:2px 9px;border-radius:99px}
@@ -8239,7 +8271,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
 
   /* ---------- 教室寶箱（每天隨機 4 個） ---------- */
   let chestObjs = [];
-  const CHEST_N = 4;
+  const chestN = () => (festCur ? 5 : 4);
   const chestLeft = () => { const d = D(); return Math.max(0, chestObjs.length - 0); };
   function buildChests() {
     chestObjs.forEach(o => { G.remove(o.mesh); G.remove(o.mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); }); chestObjs = [];
@@ -8248,7 +8280,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     const rooms = NPLACES.filter(q => q.room && (/^\d/.test(q.name) || /教室/.test(q.name)));
     let made = 0;
     shuffled(rooms, r).some((q, i) => {
-      if (made >= CHEST_N) return true;
+      if (made >= chestN()) return true;
       const y0 = q.lv * H + 0.1, p = snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 2.6 }); if (!p || Math.abs(p.y - y0) > 1) return false;
       const id = made++; if (d.chest.includes(id)) return false;
       const grp = new T.Group(); grp.position.set(p.x, p.y, p.z); grp.rotation.y = r() * 6; G.add(grp);
@@ -8272,6 +8304,36 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     save(); refreshAll(); say('📦 教室寶箱', '在「' + o.room + '」打開了寶箱！\n' + msg + (left ? '\n今天教室還有 ' + left + ' 個寶箱。' : '\n今天的寶箱都找完了！'), [{ label: '太好了', pri: true }]);
   }
   L.chests = () => chestObjs; L.openChest = openChest;
+
+
+  /* 節慶收集物（每天 6 個，戶外隨機） */
+  let festObjs = [];
+  function buildFest() {
+    festObjs.forEach(o => { G.remove(o.mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); }); festObjs = [];
+    if (!festCur || typeof litterOK === 'undefined') return;
+    const d = D(); d.fest = d.fest || []; const f = festCur.f, r = rng('fest' + dayKey());
+    const used = litterObjs.map(o => o.p), cand = shuffled(litterOK, r).filter(c => !used.some(u => Math.hypot(u.x - c.x, u.z - c.z) < 2.5)).slice(0, FEST_N);
+    cand.forEach((c, idx) => {
+      if (d.fest.includes(idx)) return;
+      const mark = sprite(emojiTex(f.itemIc, '#fff8e1', '#e0564a'), [0.95, 0.95], c.x, c.y + 1.0, c.z, 29); bob.push({ s: mark, y: c.y + 1.0 });
+      const o = { idx, x: c.x, y: c.y, z: c.z, mark };
+      o.ia = ia({ id: 'fest' + idx, x: c.x, y: c.y, z: c.z, r: 1.8, txt: () => f.ic + ' 撿起' + f.item, act: () => {
+        d.fest.push(idx); G.remove(mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); festObjs = festObjs.filter(q => q !== o);
+        addPts(3, f.name + f.item + '（' + d.fest.length + '/' + FEST_N + '）');
+        if (d.fest.length >= FEST_N && !d.festDone) { d.festDone = 1; const big = festCur.off === 0 ? 60 : 30; setTimeout(() => { addPts(big, f.name + '收集完成' + (festCur.off === 0 ? '（節日當天 ×2）' : '')); const b = f.ic + ' ' + festCur.year + f.name + '收藏家'; if (!S.badges.includes(b)) { S.badges.push(b); setTimeout(() => toast('🏅 獲得徽章「' + b + '」', 3600), 1500); } S.items.med++; save(); refreshAll(); say(f.ic + ' ' + f.name + '加碼獎勵', '你把校園裡的' + f.item + '都找齊了！\n獲得 ' + big + ' 點、補血包 ×1、徽章「' + b + '」。', [{ label: '節日快樂！', pri: true }]); }, 900); }
+        save(); refreshAll(); } });
+      festObjs.push(o);
+    });
+  }
+  function festSync() {
+    const c = festNow(), id = c ? c.f.id : '', old = festCur ? festCur.f.id : '';
+    festCur = c;
+    if (id !== old) { buildFest(); if (typeof buildChests === 'function' && chestObjs) buildChests(); refreshAll(); }
+    else if (c && festCur) festCur = c;
+    if (window.TLTHEME && !window.TLTHEME.manual) { const want = id || 'default'; if (window.TLTHEME.cur !== want) { window.TLTHEME.set(want); window.TLTHEME.manual = false; } }
+    const ab = document.getElementById('bThAuto'); if (ab) ab.classList.toggle('on', window.TLTHEME && !window.TLTHEME.manual);
+  }
+  L.fest = { festNow, festSync, get cur() { return festCur; }, objs: () => festObjs, FESTS };
 
   /* ---------- 週活動：資源回收 ---------- */
   const BINS = [['紙類', 0x2f80ed, '📰'], ['塑膠', 0xf2c230, '🧴'], ['金屬', 0xe0564a, '🥫'], ['玻璃', 0x2e9b45, '🍾'], ['一般垃圾', 0x6b7580, '🗑️']];
@@ -8469,8 +8531,9 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
       (next ? '<div class="st"><span>距進化「' + TIERS[lv + 1][1] + '・' + next[1] + '」(Lv.' + TIERS[lv + 1][0] + ') 還差 ' + (next[0] - S.pts) + ' 點</span></div>' : '<div class="st"><span>🌟 已是最高階級「' + TIERS[lv][3] + '」</span></div>') +
       '<div class="st" id="gClk" style="margin:0 0 2px"></div>' +
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
-      row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') + row(chestObjs.length === 0, '📦 教室寶箱（今日 ' + CHEST_N + ' 個）', (CHEST_N - chestObjs.length) + '/' + CHEST_N, 'chest') +
+      row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') + row(chestObjs.length === 0, '📦 教室寶箱（今日 ' + chestN() + ' 個）', (chestN() - chestObjs.length) + '/' + chestN(), 'chest') + (festCur ? row((D().fest || []).length >= FEST_N, festCur.f.ic + ' 節慶：找' + festCur.f.item, Math.min(FEST_N, (D().fest || []).length) + '/' + FEST_N, 'fest') : '') +
       (function () { const c = COMPS.find(q => q.id === CP().active); if (!c) return ''; if (c.id === 'tbot') { const h = nextHint(); return '<div class="st" style="align-items:center"><span>🤖 小T：' + h.tx + '</span>' + (h.nav ? '<button type="button" data-nav="' + h.nav + '" style="margin-left:auto">📍</button>' : '') + '</div>'; } return '<div class="st"><span>' + c.ic + ' ' + c.name + '陪著你：' + c.eff + '</span></div>'; })() +
+      (festCur ? '<div class="st"><span>' + festCur.f.ic + ' ' + festCur.f.name + '活動中・' + festTxt(festCur) + '</span></div>' : '') +
       (function () { const c = clubOf(); if (c) { const w = W(); return '<div class="st"><span>' + c.ic + ' ' + c.name + '・' + RANKS[clubRank()][1] + '（本週活動 ' + (w.cl || 0) + ' 次' + (w.show ? '，成果展已參加' : '') + '）</span></div>'; } return lvOf() >= CLUB_LV ? '<div class="st"><span>🎪 可以去社團佈告欄加入社團了！</span></div>' : '<div class="st"><span>🎪 LV.' + CLUB_LV + ' 開放加入社團</span></div>'; })() +
       '<div class="sec">♻️ 本週活動：資源回收週</div>' + row(w.done, '分類回收物', Math.min(w.sorted, 10) + '/10', 'recy') +
       (pastOf() >= 0 ? '<div class="st"><span>' + PASTS[pastOf()][1] + ' 前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '</span></div>' : '') + '<div class="st"><button type="button" data-med="1" style="border:1px solid var(--line);background:#fff;border-radius:99px;font-size:12px;padding:1px 9px;cursor:pointer" title="使用補血包（H）">🩹 補血包 ×' + ((S.items && S.items.med) || 0) + '</button><span>💧 水桶 ' + S.can + '/' + canMax() + '</span><span>♻️ 回收物 ' + w.bag.length + '/' + bagCap() + '</span><span>🌸 花朵 ' + Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0) + '</span><span>🏅 ' + S.badges.length + '</span></div></div>';
@@ -8480,6 +8543,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     hud.querySelectorAll('[data-nav]').forEach(b => b.onclick = e => { e.stopPropagation(); const k = b.dataset.nav; let p = null;
       if (k === 'garden') p = { name: '菜園', x: beds[2].x, z: beds[2].z + 3 }; else if (k === 'tap') p = { name: '水龍頭', x: TAP.x, z: TAP.z }; else if (k === 'recy') p = { name: '資源回收站', x: RECY.x, z: RECY.z + 2 };
       else if (k === 'litter') { const o = litterObjs[0] || recObjs[0]; if (o) p = { name: '垃圾', x: o.p ? o.p.x : o.mesh.position.x, z: o.p ? o.p.z : o.mesh.position.z }; else toast('垃圾都撿完了！'); }
+      else if (k === 'fest') { const o = festObjs[0]; if (o) p = { name: festCur.f.item, x: o.x, z: o.z, lv: 0 }; else toast('今天的' + (festCur ? festCur.f.item : '') + '都找到了！'); }
       else if (k === 'chest') { const o = chestObjs[0]; if (o) p = { name: '教室寶箱・' + o.room, x: o.x, z: o.z, lv: o.lv }; else toast('今天的寶箱都開完了！'); }
       else if (k === 'club') p = { name: '社團佈告欄', x: CLUBP.x, z: CLUBP.z + 1.5 };
       else if (k === 'npc') { const n = NP[rq.npc]; if (n) p = { name: n.df.name, x: n.x, z: n.z + 1.5 }; }
@@ -8559,7 +8623,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
 
   /* 日夜、時鐘、遊玩時間 */
   function applySky(t) {
-    const th = typeof TH !== 'undefined' && TH.cur && TH.cur !== 'default';
+    const th = window.TLTHEME && window.TLTHEME.cur && window.TLTHEME.cur !== 'default';
     const night = t >= 0.5; if (night !== nightFlag) { const first = nightFlag === null; nightFlag = night; isNight = night; applyTime(); classLights(night); lamp.intensity = night ? 1.1 : 0; const bt = document.getElementById('bTime'); if (bt) bt.classList.toggle('on', night); if (!first) toast(night ? '🌙 天黑了，校園的燈亮起來了' : '🌅 天亮了，新的一天開始', 3200); }
     if (th || Math.abs(t - lastBlend) < 0.01) return; lastBlend = t;
     const day = new T.Color(0xaed6f0), dusk = new T.Color(0xe9906a), nt = new T.Color(0x0d1626), c = new T.Color();
@@ -8589,13 +8653,13 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     if (walkAcc >= 20) { const n = Math.floor(walkAcc / 20); walkAcc -= n * 20; S.hp = Math.max(0, S.hp - n); if (S.hp <= 12 && !lowWarn) { lowWarn = true; toast('⚠️ 體力快用完了！停下來休息、喝水，或按 H 使用補血包', 4200); } if (S.hp > 30) lowWarn = false; updateBars(); }
   }
   L.moving = () => movingT > 0;
-  let clkAcc = 0;
+  let clkAcc = 0, festAcc = 0;
   const timePill = mkEl('div', 'gTime');
   function clockTick(dt) {
     if (document.body.classList.contains('intro')) return;
     gh = (gh + dt / HOUR_SEC) % 24; const t = nightAmt(gh); clkAcc += dt;
     if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = '📅 ' + dateStr() + '　' + clockIc(gh) + ' 校園時間 ' + hhmm(gh); const tp = document.getElementById('gTime'); if (tp) tp.textContent = (new Date().getMonth() + 1) + '/' + new Date().getDate() + '（' + WD[new Date().getDay()] + '）' + clockIc(gh) + ' ' + hhmm(gh); chestObjs.forEach(o => { o.mark.visible = Math.hypot(PL.x - o.x, PL.z - o.z) < 28 && Math.abs(PL.y - o.y) < 4.5; }); }
-    moveTick(dt);
+    moveTick(dt); festAcc += dt; if (festAcc > 20) { festAcc = 0; festSync(); }
     if (document.visibilityState === 'visible' && dt < 1) { playAcc += dt; const d = D(); d.play = (d.play || 0) + dt; if (playAcc >= nextRemind) { if (remind() === false) nextRemind = playAcc + 5; } }
   }
   L.clock = { get h() { return gh; }, set h(v) { gh = v; lastBlend = -1; applySky(nightAmt(gh)); }, nightAmt, remind, restNow, addPlay: n => { playAcc += n; D().play = (D().play || 0) + n; }, get playAcc() { return playAcc; }, get nextRemind() { return nextRemind; } };
@@ -8618,6 +8682,19 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
   { const lg = document.querySelector('#info .logo .lg'), h1 = document.querySelector('#info .logo h1');
     if (lg && window.__tlLogo) { lg.src = window.__tlLogo; lg.alt = 'Project TLPS Youth'; lg.classList.add('tlogo'); }
     if (h1) { h1.textContent = '關於我轉生到同樂宇宙這檔事'; h1.classList.add('tl1'); } }
+  { // 齒輪：環境設定（視角、風格、節慶、日夜、傳送）
+    const m = document.getElementById('modes');
+    if (m) {
+      const t = document.createElement('div'); t.id = 'gearT'; t.textContent = '⚙ 環境設定'; m.insertBefore(t, m.firstChild);
+      const gl = m.querySelector('#gView .glab'); if (gl) gl.textContent = '視角';
+      const tg = m.querySelector('#gTheme'); if (tg) { const lb = tg.querySelector('.glab'); if (lb) lb.textContent = '節慶（依日期自動）'; const op = tg.querySelector('.gopts'), a = document.createElement('button'); a.type = 'button'; a.id = 'bThAuto'; a.className = 'on'; a.textContent = '自動'; a.title = '依今天日期自動切換節慶'; a.onclick = () => { if (window.TLTHEME) window.TLTHEME.manual = false; festSync(); }; op.insertBefore(a, op.firstChild); op.querySelectorAll('button[data-th]').forEach(b => b.addEventListener('click', () => { if (a) a.classList.remove('on'); })); }
+      const g = document.createElement('button'); g.type = 'button'; g.id = 'gGear'; g.title = '環境設定'; g.setAttribute('aria-label', '環境設定');
+      g.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+      document.body.appendChild(g); g.onclick = e => { e.stopPropagation(); document.body.classList.toggle('gearopen'); };
+      document.addEventListener('pointerdown', e => { if (document.body.classList.contains('gearopen') && !m.contains(e.target) && !g.contains(e.target)) document.body.classList.remove('gearopen'); });
+    }
+    setTimeout(festSync, 300);
+  }
   document.title = 'Project: TLPS Youth｜關於我轉生到同樂宇宙這檔事';
   const home = document.querySelector('#intro h2.home'); if (home) home.innerHTML = '<span class="o">Project: TLPS</span><span class="g">Youth</span>';
   const hp = document.querySelector('#intro p.home'); if (hp) hp.innerHTML = '<b style="display:block;margin-bottom:4px;font-size:15px">關於我轉生到同樂宇宙這檔事</b>這一次的同樂校園生活，由你定義！每天種花、澆水、打掃，一起守護同樂宇宙。';
