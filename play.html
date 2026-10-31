@@ -7843,7 +7843,7 @@ function liftTick(dt) {
   /* ---------- 存檔 ---------- */
   const TITLES = [[0, '小小志工'], [30, '校園小幫手'], [80, '綠手指'], [150, '環保小尖兵'], [260, '校園之星'], [420, '同樂小英雄']];
   const FLOWERS = [['向日葵', 0xffc107], ['波斯菊', 0xf06292], ['太陽花', 0xff7043], ['矮牵牛', 0xab47bc], ['金盞花', 0xffa726], ['藍星花', 0x42a5f5]];
-  const fresh = () => ({ v: 1, pts: 0, streak: 0, best: 0, lastAll: '', days: {}, week: null, beds: FLOWERS.slice(0, 6).map(() => ({ stage: 0, type: 0, water: '' })), flowers: {}, badges: [], can: 0, weeks: 0, seenEra: false, created: dayKey() });
+  const fresh = () => ({ v: 1, pts: 0, streak: 0, best: 0, lastAll: '', days: {}, week: null, beds: FLOWERS.slice(0, 6).map(() => ({ stage: 0, type: 0, water: '' })), flowers: {}, badges: [], can: 0, past: -1, weeks: 0, seenEra: false, created: dayKey() });
   let S = fresh(), SAVE_KEY = 'tlps_live_v1:guest';
   const listeners = [];
   L.onSave = f => listeners.push(f);
@@ -7855,6 +7855,28 @@ function liftTick(dt) {
     try { const o = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); S = o && o.v === 1 ? Object.assign(fresh(), o) : fresh(); } catch (e) { S = fresh(); }
     rollover(true); refreshAll();
   };
+  /* ---------- 前世身分（轉生天賦）---------- */
+  const PASTS = [
+    ['傳奇勇者', '⚔️', '勇者之力', '水桶一次可以裝 5 桶水', '為勇氣與領導力而生，在團隊中發揮力量。'],
+    ['星光偶像', '🎤', '星光魅力', '完成校園人員的請託，加倍獲得 20 點', '用表達與染力，在舞台與活動中閃耀。'],
+    ['天才工程師', '🔧', '天才巧手', '每撿起 1 件垃圾，多得 1 點', '用科技解決問題，動手就能創造可能。'],
+    ['異世界廚師', '🍳', '花朵入菜', '採收花朵，每朵多得 3 點', '用料理與療癒的能力，聚集大家的心。'],
+    ['大魔法師', '🔮', '過目不忘', '資源回收分類時，正確的桶子會亮起 ✨ 提示', '用記憶與分析能力，破解各種挑戰。']
+  ];
+  L.PASTS = PASTS;
+  const pastOf = () => S.past >= 0 && S.past < PASTS.length ? S.past : -1;
+  const canMax = () => pastOf() === 0 ? 5 : 3;
+  function pickPast() {
+    if (pastOf() >= 0 || dlgOpen) return;
+    const btns = PASTS.map((x, k) => ({ label: x[1] + ' ' + x[0] + '｜' + x[2], fn: () => confirmPast(k) }));
+    btns.push({ label: '🎲 讓同樂宇宙抽籤決定', pri: true, fn: () => confirmPast(Math.floor(Math.random() * PASTS.length)) });
+    say('同樂宇宙的召喚', '你因為一場意外，轉生到「同樂宇宙」的校園。\n在原本的世界，你曾經是……？\n（選一個前世身分，會變成校園生活裡的專屬天賦；選好後就不能更換）', btns);
+  }
+  function confirmPast(k) {
+    const x = PASTS[k];
+    say(x[1] + ' 前世身分：' + x[0], '「' + x[4] + '」\n\n專屬天賦【' + x[2] + '】：' + x[3] + '。', [{ label: '就決定是你了！', pri: true, fn: () => { S.past = k; save(); refreshAll(); toast('轉生完成！天賦【' + x[2] + '】啟動 ✨', 4200); } }, { label: '重新選擇', fn: () => setTimeout(pickPast, 120) }]);
+  }
+  L.pickPast = pickPast;
   const D = () => { const k = dayKey(); if (!S.days[k]) S.days[k] = { plant: 0, water: 0, clean: 0, help: 0, litter: [], req: 0, done: false }; return S.days[k]; };
   const W = () => { const k = weekKeyOf(); if (!S.week || S.week.key !== k) S.week = { key: k, taken: [], bag: [], sorted: 0, wrong: 0, done: false }; return S.week; };
   function rollover(force) {
@@ -8021,7 +8043,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     if (b.stage === 0) {
       say('選擇種子', '要種哪一種花？\n每天澆水一次，澆 3 次就會開花。', FLOWERS.map((f, k) => ({ label: f[0], fn: () => { b.stage = 1; b.type = k; b.water = ''; d.plant++; drawBeds(); toast('種下了' + f[0] + '的種子 🌱'); if (d.plant === 1) taskDone('plant', '種花'); save(); refreshAll(); } })).concat([{ label: '先不要' }]));
     } else if (b.stage >= 3) {
-      const f = FLOWERS[b.type]; S.flowers[f[0]] = (S.flowers[f[0]] || 0) + 1; b.stage = 0; b.water = ''; addPts(3, '採收了' + f[0]); d.plant++; if (d.plant === 1) taskDone('plant', '種花'); drawBeds(); save(); refreshAll();
+      const f = FLOWERS[b.type]; S.flowers[f[0]] = (S.flowers[f[0]] || 0) + 1; b.stage = 0; b.water = ''; addPts(pastOf() === 3 ? 6 : 3, '採收了' + f[0]); d.plant++; if (d.plant === 1) taskDone('plant', '種花'); drawBeds(); save(); refreshAll();
     } else if (b.water !== today) {
       if (S.can <= 0) { toast('水桶是空的，先到水龍頭裝水 🚰'); return; }
       S.can--; b.water = today; b.stage++; d.water++; drawBeds(); toast(b.stage >= 3 ? '花開了！🌸' : '澆好水了 💧'); if (d.water === 3) taskDone('water', '澆水'); save(); refreshAll();
@@ -8033,9 +8055,9 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     const head = new T.Mesh(new T.BoxGeometry(0.4, 0.14, 0.14), gm(0x6c7a82)); head.position.set(0.15, 0.9, 0); grp.add(head);
     const bucket = new T.Mesh(new T.CylinderGeometry(0.28, 0.2, 0.36, 10), gm(0x2f80ed)); bucket.position.set(0.55, 0.18, 0); grp.add(bucket);
     sprite(nameTex('🚰 水龍頭', '#2f80ed'), [1.9, 0.5], TAP.x, TAP.y + 1.9, TAP.z, 30);
-    ia({ id: 'tap', x: TAP.x, y: TAP.y, z: TAP.z, r: 2.2, txt: () => L.tapLeak ? '🔧 關緊水龍頭' : (S.can >= 3 ? null : '🚰 裝水'), act: () => {
+    ia({ id: 'tap', x: TAP.x, y: TAP.y, z: TAP.z, r: 2.2, txt: () => L.tapLeak ? '🔧 關緊水龍頭' : (S.can >= canMax() ? null : '🚰 裝水'), act: () => {
       if (L.tapLeak) { L.tapLeak = false; reqProgress('tap'); return; }
-      S.can = 3; toast('水桶裝滿了 💧💧💧'); save(); refreshAll(); } }); }
+      S.can = canMax(); toast('水桶裝滿了 ' + '💧'.repeat(canMax())); save(); refreshAll(); } }); }
   label('菜園', BEDP[2][0] + 2.5, 2.2, BEDP[0][1] - 3.2, 3.2, '#e8f6e3', '#2d6a2d');
 
   /* ---------- 打掃：每日垃圾 ---------- */
@@ -8059,7 +8081,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
       const kind = Math.floor(r() * 4), mesh = mkLitter(kind); mesh.position.set(p.x, p.y, p.z); mesh.rotation.y = r() * 6; G.add(mesh);
       const mark = sprite(emojiTex('🧹', '#fff8e1', '#e0a200'), [0.7, 0.7], p.x, p.y + 1.1, p.z, 28); bob.push({ s: mark, y: p.y + 1.1 });
       const o = { p, mesh, mark }; o.ia = ia({ id: 'lit' + p.i, x: p.x, y: p.y, z: p.z, r: 1.5, txt: () => '🧹 撿起' + LKINDS[kind][0], act: () => {
-        d.litter.push(p.i); d.clean++; G.remove(mesh); G.remove(mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1);
+        d.litter.push(p.i); d.clean++; if (pastOf() === 2) S.pts++; G.remove(mesh); G.remove(mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1);
         toast(d.clean <= 5 ? '撿到' + LKINDS[kind][0] + '！（' + Math.min(d.clean, 5) + '/5）' : '校園更乾淨了 ✨'); if (d.clean === 5) taskDone('clean', '打掃'); save(); refreshAll(); } });
       litterObjs.push(o);
     });
@@ -8094,7 +8116,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     const w = W(); if (!w.bag.length) { close(); return; }
     const it = w.bag[0];
     say('這是「' + it[0] + '」 ' + it[2], '要丟進哪一桶？（背包還有 ' + w.bag.length + ' 件，本週正確 ' + w.sorted + '/10）',
-      BINS.map((b, k) => ({ label: b[2] + ' ' + b[0], fn: () => {
+      BINS.map((b, k) => ({ label: (pastOf() === 4 && k === it[1] ? '✨ ' : '') + b[2] + ' ' + b[0], fn: () => {
         if (k === it[1]) { w.bag.shift(); w.sorted++; toast('答對了 ✅'); if (w.sorted === 10 && !w.done) { w.done = true; S.weeks++; S.badges.push('資源回收週 ' + w.key); addPts(30, '資源回收週達成！'); save(); refreshAll(); say('資源回收週', '🏅 太棒了！本週資源回收目標完成！\n獲得徽章「資源回收週 ' + w.key + '」，並加 30 點。'); return; }
           save(); refreshAll(); if (w.bag.length) setTimeout(sortNext, 250); }
         else { w.wrong++; const right = BINS[it[1]]; save(); say('再想想看', '「' + it[0] + '」應該丟「' + right[2] + ' ' + right[0] + '」。' + (it[1] === 4 ? '\n沾到油、食物或破碎的東西不能回收。' : '\n清洗乾淨、壓扁再回收更好。'), [{ label: '丟進正確的桶子', pri: true, fn: () => { w.bag.shift(); w.sorted++; save(); refreshAll(); if (w.sorted === 10 && !w.done) { w.done = true; S.weeks++; S.badges.push('資源回收週 ' + w.key); addPts(30, '資源回收週達成！'); save(); refreshAll(); } else if (w.bag.length) setTimeout(sortNext, 250); } }]); }
@@ -8143,7 +8165,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     const df = NPCDEF[k], rq = REQ(), d = D(), mine = rq.npc === k;
     if (mine && d.req === 0) say(df.name, rq.ask, [{ label: '沒問題，交給我！', pri: true, fn: () => { d.req = 1; if (k === 'jan') L.tapLeak = true; if (rq.give) toast(rq.give); save(); refreshAll(); } }, { label: '我晚點再來' }]);
     else if (mine && d.req === 1) say(df.name, '任務進行中：' + rq.steps[0].name + '，記得去看看喔。', [{ label: '好，我馬上去', pri: true, fn: () => { navStart({ name: rq.steps[0].name, x: rq.steps[0].pos.x, z: rq.steps[0].pos.z, lv: 0 }); } }, { label: '關閉' }]);
-    else if (mine && d.req === 2) say(df.name, rq.thanks, [{ label: '不客氣！', pri: true, fn: () => { d.req = 3; d.help++; addPts(10, '小志工任務完成'); if (d.help === 1) taskDone('help', '小志工'); save(); refreshAll(); } }]);
+    else if (mine && d.req === 2) say(df.name, rq.thanks, [{ label: '不客氣！', pri: true, fn: () => { d.req = 3; d.help++; addPts(pastOf() === 1 ? 20 : 10, '小志工任務完成'); if (d.help === 1) taskDone('help', '小志工'); save(); refreshAll(); } }]);
     else say(df.name, mine && d.req === 3 ? '今天真的很謝謝你！明天還有新的任務喔。' : df.chat[Math.floor(Math.random() * df.chat.length)] + (REQ().npc !== k ? '\n（今天的小請託，可以去找「' + NPCDEF[REQ().npc].name.split(' ')[0] + '」。）' : ''));
   }
 
@@ -8195,7 +8217,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
       row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') +
       '<div class="sec">♻️ 本週活動：資源回收週</div>' + row(w.done, '分類回收物', Math.min(w.sorted, 10) + '/10', 'recy') +
-      '<div class="st"><span>💧 水桶 ' + S.can + '/3</span><span>🎒 回收物 ' + w.bag.length + '</span><span>🌸 花朵 ' + Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0) + '</span><span>🏅 ' + S.badges.length + '</span></div></div>';
+      (pastOf() >= 0 ? '<div class="st"><span>' + PASTS[pastOf()][1] + ' 前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '</span></div>' : '') + '<div class="st"><span>💧 水桶 ' + S.can + '/' + canMax() + '</span><span>🎒 回收物 ' + w.bag.length + '</span><span>🌸 花朵 ' + Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0) + '</span><span>🏅 ' + S.badges.length + '</span></div></div>';
     hud.querySelector('.hd').onclick = () => hud.classList.toggle('min');
     hud.querySelectorAll('[data-nav]').forEach(b => b.onclick = e => { e.stopPropagation(); const k = b.dataset.nav; let p = null;
       if (k === 'garden') p = { name: '菜園', x: beds[2].x, z: beds[2].z + 3 }; else if (k === 'tap') p = { name: '水龍頭', x: TAP.x, z: TAP.z }; else if (k === 'recy') p = { name: '資源回收站', x: RECY.x, z: RECY.z + 2 };
@@ -8221,7 +8243,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
   const home = document.querySelector('#intro h2.home'); if (home) home.innerHTML = '<span class="o">Project: TLPS</span><span class="g">Youth</span>';
   const hp = document.querySelector('#intro p.home'); if (hp) hp.innerHTML = '<b style="display:block;margin-bottom:4px;font-size:15px">關於我轉生到同樂宇宙這檔事</b>這一次的同樂校園生活，由你定義！每天種花、澆水、打掃，一起守護同樂宇宙。';
   const eb = document.querySelector('#intro .eb.home'); if (eb) eb.lastChild.textContent = 'TLPS Universe・宜蘭縣員山鄉';
-  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); });
+  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); if (pastOf() < 0) setTimeout(pickPast, 700); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); });
   L.ready = true;
 })();
 </script>
