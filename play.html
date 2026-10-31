@@ -8179,6 +8179,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gCM{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:34;display:none;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:6px 10px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px}#gCM.show{display:flex}#gCM span{font-weight:800;padding:0 4px}#gCM button{border:0;background:#f5821f;color:#fff;border-radius:99px;padding:7px 14px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
 #gCS{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:33;display:none;align-items:center;gap:10px;max-width:min(440px,calc(100vw - 24px));background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:8px 14px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px;line-height:1.5;cursor:pointer}#gCS.show{display:flex}#gCS i{font-style:normal;font-size:30px}#gCS b{display:block;font-size:12px;color:var(--muted)}
 #gBag .care{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin:4px 0 6px}#gBag .care .ch{display:flex;justify-content:space-between;gap:6px;font-size:13px;margin-bottom:4px}#gBag .care .ch span{font-size:11.5px;color:var(--muted)}
 #gBag .care .cb{display:flex;align-items:center;gap:6px;margin:3px 0}#gBag .care .cb em{font-style:normal;font-size:12px;width:62px;flex:none}#gBag .care .tr{flex:1;height:9px;border-radius:9px;background:rgba(0,0,0,.12);overflow:hidden}#gBag .care .tr i{display:block;height:100%;background:#f5a623;border-radius:9px;transition:width .4s}#gBag .care .tr i.bd{background:#e0568a}
@@ -8245,7 +8246,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   L.toast = toast;
   let dlgOpen = false, bagOpen = false;
   function say(who, text, btns, img) {
-    dlgOpen = true; dlg.classList.add('show'); dlg.innerHTML = '';
+    dlgOpen = true; if (L.closeCM) L.closeCM(); dlg.classList.add('show'); dlg.innerHTML = '';
     if (img) { const im = document.createElement('img'); im.className = 'av'; im.src = img; dlg.appendChild(im); }
     if (who) { const w = document.createElement('div'); w.className = 'who'; w.textContent = who; dlg.appendChild(w); }
     const t = document.createElement('div'); t.className = 'tx'; t.textContent = text; dlg.appendChild(t);
@@ -9025,10 +9026,19 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     g.fillStyle = '#333'; g.font = 'bold 22px sans-serif'; g.textAlign = 'left'; g.fillText(Math.round(st.full), 206, 29); g.fillText(Math.round(st.bond), 206, 70);
     cBadge.tex.needsUpdate = true;
   }
+  const csMenu = mkEl('div', 'gCM');
+  function closeCM() { csMenu.classList.remove('show'); }
   function touchComp() {
-    const id = CP().active; if (!id) return; const st = csOf(id);
-    if (st.full < 50 && st.food > 0) careFeed(id); else careTalk(id);
+    const id = CP().active; if (!id) return;
+    if (csMenu.classList.contains('show')) { closeCM(); return; }
+    const st = csOf(id), cr = CARE[id], x = COMPS.find(q => q.id === id);
+    csMenu.innerHTML = '<span>' + x.ic + ' ' + x.name + '</span><button type="button" data-a="talk">💬 聊天</button><button type="button" data-a="feed">' + cr.food[0] + ' 餵食 ×' + st.food + '</button>';
+    csMenu.querySelector('[data-a=talk]').onclick = () => { closeCM(); careTalk(id); };
+    csMenu.querySelector('[data-a=feed]').onclick = () => { closeCM(); careFeed(id); };
+    csMenu.classList.add('show');
   }
+  addEventListener('keydown', e => { if (e.code === 'Escape') closeCM(); });
+  L.closeCM = closeCM;
   { const cdom = renderer.domElement; let dn = null;
     cdom.addEventListener('pointerdown', e => { dn = { x: e.clientX, y: e.clientY, t: performance.now() }; });
     cdom.addEventListener('pointerup', e => {
@@ -9036,7 +9046,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       if (mv > 10 || tt > 600 || !cSp || !cSp.visible || dlgOpen || bagOpen || roomOpen) return;
       const r = cdom.getBoundingClientRect(), v = cSp.position.clone().project(camera); if (v.z > 1) return;
       const sx = (v.x + 1) / 2 * r.width + r.left, sy = (1 - v.y) / 2 * r.height + r.top;
-      if (Math.hypot(e.clientX - sx, e.clientY - sy) <= 44) touchComp();
+      if (Math.hypot(e.clientX - sx, e.clientY - sy) <= 44) touchComp(); else closeCM();
     }); }
   compIA = ia({ id: 'comp', x: 0, y: 0, z: 0, r: 2.4, pen: 50, txt: () => { const id = CP().active; return id && cSp && cSp.visible && L.ready ? '💬 摸摸' + COMPS.find(q => q.id === id).name + '（聊天／餵食）' : null; }, act: () => touchComp() });
   L.care = { drawBadge, touchComp, CARE, csOf, careFeed, careTalk, careBuy, compSpeak, gainBond, careTick, bondLv };
