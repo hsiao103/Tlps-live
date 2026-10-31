@@ -1,4 +1,4 @@
-/* ===== 遊戲存檔：本機＋（可選）Firebase 雲端同步 ===== */
+/* ===== 遊戲存檔：本機＋（可選）Supabase 雲端同步 ===== */
 (function () {
   const L = window.__live, A = window.TLAUTH, B = window.TLCLOUD; if (!L || !A) return;
   const s = A.session(); L.loadFor(s ? s.email : 'guest');
