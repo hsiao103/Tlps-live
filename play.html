@@ -8120,10 +8120,13 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     else { const k = 1 - Math.exp(-dt * 4); cSp.position.x += (tx - cSp.position.x) * k; cSp.position.z += (tz - cSp.position.z) * k; }
     const g = groundAt(cSp.position.x, PL.y + 1.2, cSp.position.z), gy = isFinite(g) ? g : PL.y;
     cSp.position.y += (gy + 1.15 + Math.sin(now / 1000 * 3) * 0.1 - cSp.position.y) * (1 - Math.exp(-dt * 8));
-    if (cBadge) { cBadge.s.visible = true; cBadge.s.position.set(cSp.position.x, cSp.position.y + 0.68, cSp.position.z); }
-    if (compIA) { compIA.x = cSp.position.x; compIA.y = PL.y; compIA.z = cSp.position.z; }
+    if (cBadge) {
+      cBadge.s.visible = true; let bx = cSp.position.x, bz = cSp.position.z;
+      { const v = cSp.position.clone().project(camera), dist = camera.position.distanceTo(cSp.position), halfW = dist * Math.tan(camera.fov * Math.PI / 360) * camera.aspect, mx = Math.max(0, 1 - 0.65 / halfW), cl = Math.max(-mx, Math.min(mx, v.x)), sh = (cl - v.x) * halfW, e = camera.matrixWorld.elements; bx += e[0] * sh; bz += e[2] * sh; }
+      cBadge.s.position.set(bx, cSp.position.y + 0.68, bz);
+    }
   }
-  let cBadge = null, compIA = null;
+  let cBadge = null;
   function nextHint() {
     const d = D(), w = W();
     if (d.plant < 1) return { tx: '去菜園種一顆花', nav: 'garden' };
@@ -9048,7 +9051,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       const sx = (v.x + 1) / 2 * r.width + r.left, sy = (1 - v.y) / 2 * r.height + r.top;
       if (Math.hypot(e.clientX - sx, e.clientY - sy) <= 44) touchComp(); else closeCM();
     }); }
-  compIA = ia({ id: 'comp', x: 0, y: 0, z: 0, r: 2.4, pen: 50, txt: () => { const id = CP().active; return id && cSp && cSp.visible && L.ready ? '💬 摸摸' + COMPS.find(q => q.id === id).name + '（聊天／餵食）' : null; }, act: () => touchComp() });
+  addEventListener('keydown', e => { if (e.code === 'KeyC' && !e.ctrlKey && !e.metaKey && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) && !document.body.classList.contains('intro') && !dlgOpen && !bagOpen && !roomOpen) touchComp(); });
   L.care = { drawBadge, touchComp, CARE, csOf, careFeed, careTalk, careBuy, compSpeak, gainBond, careTick, bondLv };
   let clkAcc = 0, festAcc = 0;
   const timePill = mkEl('div', 'gTime');
