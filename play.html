@@ -7916,6 +7916,34 @@ window.__tlCompanions=[["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBD
   }
   const level = () => tierOf(lvOf());
 
+  /* ---------- NPC 好感度 ---------- */
+  const FAVS = [[0, '陌生'], [10, '認識'], [25, '熟悉'], [50, '好友'], [80, '摯友']];
+  const favV = k => (S.fav && S.fav[k]) || 0;
+  const favLv = k => { const v = favV(k); let r = 0; FAVS.forEach((x, i) => { if (v >= x[0]) r = i; }); return r; };
+  const favInfo = k => { const l = favLv(k), n = FAVS[l + 1]; return { l, name: FAVS[l][1], v: favV(k), next: n ? n[0] : 0 }; };
+  function addFav(k, n) {
+    S.fav = S.fav || {}; const l0 = favLv(k); S.fav[k] = favV(k) + n; const l1 = favLv(k);
+    if (l1 > l0) setTimeout(() => { addPts(l1 * 5, NPCDEF[k].name.split(' ')[0] + '成為你的「' + FAVS[l1][1] + '」'); toast('💞 與' + NPCDEF[k].name + '的關係升級：' + FAVS[l1][1] + '！' + (l1 === 2 ? '（見面會補充魔力）' : l1 === 3 ? '（請託獎勵 +5）' : l1 === 4 ? '（請託獎勵 +10）' : ''), 4600); }, 1000);
+  }
+  const likeOf = k => { const i = Object.keys(NPCDEF).indexOf(k); return FLOWERS[(i < 0 ? 0 : i) % FLOWERS.length][0]; };
+  function favUI(k) {
+    const f = favInfo(k), tx = dlg.querySelector('.tx'), bt = dlg.querySelector('.bt'), d = D(); d.gift = d.gift || [];
+    if (tx) tx.textContent += '\n💞 好感：' + f.name + '（' + f.v + (f.next ? ' / ' + f.next : '') + '）';
+    const has = Object.keys(S.flowers).filter(n => S.flowers[n] > 0), fav = likeOf(k);
+    if (bt && has.length && !d.gift.includes(k)) {
+      const pick = has.includes(fav) ? fav : has[0], b = document.createElement('button'); b.type = 'button'; b.className = 'gift';
+      b.textContent = '🌸 送一朵' + pick + (pick === fav ? '（正好是最愛！）' : '（TA 最愛' + fav + '）');
+      b.onclick = () => { close(); S.flowers[pick]--; d.gift.push(k); const g = pick === fav ? 6 : 3; addFav(k, g); addAttr('social', 1); save(); refreshAll(); toast('💞 收到花，好感 +' + g + '　' + NPCDEF[k].name.split(' ')[0] + '很開心！', 3400); };
+      bt.appendChild(b);
+    }
+  }
+  /* ---------- 遊戲時鐘（日夜）與護眼提醒 ---------- */
+  const HOUR_SEC = 120;   // 現實 2 分鐘 = 遊戲 1 小時（一個遊戲日 48 分鐘）
+  let gh = 8, nightFlag = null, lastBlend = -1, playAcc = 0, nextRemind = 1800, restOpen = false;
+  const nightAmt = h => { if (h >= 19 || h < 5) return 1; if (h >= 17.5) return (h - 17.5) / 1.5; if (h < 6.5) return 1 - (h - 5) / 1.5; return 0; };
+  const hhmm = h => { const m = Math.floor(h * 60) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  const clockIc = h => nightAmt(h) > 0.6 ? '🌙' : nightAmt(h) > 0.05 ? (h > 12 ? '🌇' : '🌅') : '☀️';
+
   /* ---------- 社團 ---------- */
   const CLUBS = [
     { id: 'read', name: '閱讀社', ic: '📚', k: 'study', say: '一起讀書、分享好書，學業會一直進步。' },
@@ -8007,6 +8035,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
 #gBag h3{margin:0 0 2px;font-size:18px}#gBag .sub{font-size:12.5px;color:var(--muted);margin-bottom:8px}#gBag .vit{display:grid;gap:5px;margin:8px 0 10px}#gBag .vb{display:grid;grid-template-columns:34px 1fr 90px;align-items:center;gap:8px;font-size:12px}#gBag .vb .tr{height:10px;border-radius:99px;background:#dfe7e0;overflow:hidden}#gBag .vb i{display:block;height:100%;transition:width .3s}#gBag .vb.hp i{background:linear-gradient(90deg,#e0564a,#ff8a65)}#gBag .vb.mp i{background:linear-gradient(90deg,#2f80ed,#7fb5ff)}#gBag .vb.xp i{background:linear-gradient(90deg,#f5821f,#2e9b45)}#gBag .vb em{font-style:normal;text-align:right;color:var(--muted)}
 #gBag .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;margin:8px 0 10px}#gBag .sl{aspect-ratio:1;border:1.5px dashed var(--line);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;line-height:1.1;background:rgba(127,127,127,.08);position:relative}#gBag .sl.on{border-style:solid;background:rgba(255,255,255,.6)}#gBag .sl small{font-size:10.5px;color:var(--fg);font-weight:700;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#gBag .sl b{position:absolute;right:5px;top:2px;font-size:11px;color:#c2410c}
 #gBag .cmp{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:4px}#gBag .cp{border:1.5px solid var(--line);border-radius:12px;background:transparent;color:var(--fg);padding:4px 2px;display:grid;justify-items:center;gap:1px;cursor:pointer;font-family:inherit}#gBag .cp img,#gBag .cp i{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#fff;display:grid;place-items:center;font-style:normal;font-size:22px}#gBag .cp b{font-size:12px}#gBag .cp small{font-size:10.5px;color:var(--muted)}#gBag .cp.on{border-color:#2e9b45;background:rgba(46,155,69,.14)}#gBag .cp.lk{opacity:.5}#gBag .cp.lk img{filter:grayscale(1)}
+#gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .row{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;margin:4px 0}#gBag .row span{background:rgba(127,127,127,.14);border-radius:99px;padding:2px 10px}#gBag .cl{display:block;margin:12px auto 0;border:0;border-radius:99px;padding:9px 28px;font:800 14px var(--font-ui);color:#fff;background:linear-gradient(90deg,#f5821f,#e0561a);cursor:pointer}
 #gHud .bar{height:7px;border-radius:99px;background:#dfe7e0;overflow:hidden;margin:3px 0 2px}#gHud .bar i{display:block;height:100%;background:linear-gradient(90deg,#f5821f,#2e9b45);width:0;transition:width .4s}
 #gHud .st{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
@@ -8276,15 +8305,16 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
   }
   function talk(k) {
     const df = NPCDEF[k], rq = REQ(), d = D(), mine = rq.npc === k;
-    d.talked = d.talked || []; if (!d.talked.includes(k)) { d.talked.push(k); addAttr('social', compOn('bunny') ? 2 : 1); S.met = S.met || []; if (!S.met.includes(k)) S.met.push(k); save(); refreshAll(); }
+    d.talked = d.talked || []; if (!d.talked.includes(k)) { d.talked.push(k); addFav(k, 2); if (favLv(k) >= 2) S.mp = Math.min(mpMax(), S.mp + 5); addAttr('social', compOn('bunny') ? 2 : 1); S.met = S.met || []; if (!S.met.includes(k)) S.met.push(k); save(); refreshAll(); }
     if (mine && d.req === 0) say(df.name, rq.ask, [{ label: '沒問題，交給我！', pri: true, fn: () => { d.req = 1; if (k === 'jan') L.tapLeak = true; if (rq.give) toast(rq.give); save(); refreshAll(); } }, { label: '我晚點再來' }]);
     else if (mine && d.req === 1) say(df.name, '任務進行中：' + rq.steps[0].name + '，記得去看看喔。', [{ label: '好，我馬上去', pri: true, fn: () => { navStart({ name: rq.steps[0].name, x: rq.steps[0].pos.x, z: rq.steps[0].pos.z, lv: 0 }); } }, { label: '關閉' }]);
-    else if (mine && d.req === 2) say(df.name, rq.thanks, [{ label: '不客氣！', pri: true, fn: () => { d.req = 3; d.help++; addAttr('charm', 2); addAttr('social', 2); addPts(pastOf() === 1 ? 20 : 10, '小志工任務完成'); if (d.help === 1) taskDone('help', '小志工'); save(); refreshAll(); } }]);
+    else if (mine && d.req === 2) say(df.name, rq.thanks, [{ label: '不客氣！', pri: true, fn: () => { d.req = 3; d.help++; addAttr('charm', 2); addAttr('social', 2); addPts(pastOf() === 1 ? 20 : 10, '小志工任務完成'); { const fb = [0, 0, 0, 5, 10][favLv(k)]; if (fb) setTimeout(() => addPts(fb, '好感度加成'), 1300); } addFav(k, 5); if (d.help === 1) taskDone('help', '小志工'); save(); refreshAll(); } }]);
     else if (k === 'nurse') { const left = 2 - (d.heal || 0); say(df.name, mine && d.req === 3 ? '今天真的很謝謝你！累了就來保健室休息一下。' : df.chat[Math.floor(Math.random() * df.chat.length)] + (REQ().npc !== k ? '\n（今天的小請託，可以去找「' + NPCDEF[REQ().npc].name.split(' ')[0] + '」。）' : ''), (left > 0 && S.hp < hpMax() ? [{ label: '🩹 請校護幫我恢復體力（今天還有 ' + left + ' 次）', pri: true, fn: () => { d.heal = (d.heal || 0) + 1; S.hp = hpMax(); S.mp = Math.min(mpMax(), S.mp + 10); save(); refreshAll(); toast('休息一下，體力全滿了！💚', 3000); } }] : []).concat([{ label: '謝謝校護' }])); }
     else say(df.name, mine && d.req === 3 ? '今天真的很謝謝你！明天還有新的任務喔。' : df.chat[Math.floor(Math.random() * df.chat.length)] + (REQ().npc !== k ? '\n（今天的小請託，可以去找「' + NPCDEF[REQ().npc].name.split(' ')[0] + '」。）' : ''));
     if (k === 'nurse' && !dlg.querySelector('.heal')) { const left2 = 2 - (d.heal || 0), bt = dlg.querySelector('.bt');
       if (bt && left2 > 0 && S.hp < hpMax()) { const hb = document.createElement('button'); hb.type = 'button'; hb.className = 'heal'; hb.textContent = '🩹 請校護幫我恢復體力（今天還有 ' + left2 + ' 次）';
         hb.onclick = () => { close(); d.heal = (d.heal || 0) + 1; S.hp = hpMax(); S.mp = Math.min(mpMax(), S.mp + 10); save(); refreshAll(); toast('休息一下，體力全滿了！💚', 3000); }; bt.appendChild(hb); } }
+    favUI(k);
   }
 
   /* ---------- 社團佈告欄與成果展 ---------- */
@@ -8382,6 +8412,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     hud.innerHTML = '<div class="hd"><span>LV.' + lvOf() + ' ' + TITLES[lv][1] + '</span>' + (pastOf() >= 0 ? '<span class="pt" style="margin-left:0" title="前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '">' + PASTS[pastOf()][1] + '</span>' : '<span class="pt" style="margin-left:0;cursor:pointer" onclick="event.stopPropagation();__live.pickPast()">🎲 選身分</span>') + '<span class="pt" style="cursor:pointer" onclick="event.stopPropagation();__live.openBag()" title="背包與角色（B）">🎒</span><span class="pt">' + S.pts + ' 點</span></div><div class="bd">' +
       '<div class="vrow">' + avHtml('hv') + '<div class="vit"><div class="vb hp"><b>HP</b><div class="tr"><i id="gHp"></i></div><em id="gHpT"></em></div><div class="vb mp"><b>MP</b><div class="tr"><i id="gMp"></i></div><em id="gMpT"></em></div><div class="vb xp"><b>EXP</b><div class="tr"><i id="gXp"></i></div><em id="gXpT"></em></div></div></div>' +
       (next ? '<div class="st"><span>距進化「' + TIERS[lv + 1][1] + '・' + next[1] + '」(Lv.' + TIERS[lv + 1][0] + ') 還差 ' + (next[0] - S.pts) + ' 點</span></div>' : '<div class="st"><span>🌟 已是最高階級「' + TIERS[lv][3] + '」</span></div>') +
+      '<div class="st" id="gClk" style="margin:0 0 2px"></div>' +
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
       row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') +
       (function () { const c = COMPS.find(q => q.id === CP().active); if (!c) return ''; if (c.id === 'tbot') { const h = nextHint(); return '<div class="st" style="align-items:center"><span>🤖 小T：' + h.tx + '</span>' + (h.nav ? '<button type="button" data-nav="' + h.nav + '" style="margin-left:auto">📍</button>' : '') + '</div>'; } return '<div class="st"><span>' + c.ic + ' ' + c.name + '陪著你：' + c.eff + '</span></div>'; })() +
@@ -8443,6 +8474,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' +
+      '<div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
@@ -8459,10 +8491,42 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
   L.openBag = openBag; L.closeBag = closeBag; L.bagItems = bagItems; L.updateBars = updateBars;
   bagEl.addEventListener('pointerdown', e => { if (e.target === bagEl) closeBag(); });
   addEventListener('keydown', e => { if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.code === 'KeyB' && !document.body.classList.contains('intro')) { bagOpen ? closeBag() : openBag(); } else if (e.code === 'Escape' && bagOpen) closeBag(); });
+
+  /* 日夜、時鐘、遊玩時間 */
+  function applySky(t) {
+    const th = typeof TH !== 'undefined' && TH.cur && TH.cur !== 'default';
+    const night = t >= 0.5; if (night !== nightFlag) { const first = nightFlag === null; nightFlag = night; isNight = night; applyTime(); classLights(night); lamp.intensity = night ? 1.1 : 0; const bt = document.getElementById('bTime'); if (bt) bt.classList.toggle('on', night); if (!first) toast(night ? '🌙 天黑了，校園的燈亮起來了' : '🌅 天亮了，新的一天開始', 3200); }
+    if (th || Math.abs(t - lastBlend) < 0.01) return; lastBlend = t;
+    const day = new T.Color(0xaed6f0), dusk = new T.Color(0xe9906a), nt = new T.Color(0x0d1626), c = new T.Color();
+    if (t < 0.5) c.copy(day).lerp(dusk, t * 2); else c.copy(dusk).lerp(nt, (t - 0.5) * 2);
+    scene.background = new T.Color(c); if (scene.fog) scene.fog.color.copy(c);
+    hemi.intensity = DAY.hemi + (NIGHT.hemi - DAY.hemi) * t; sun.intensity = DAY.sun + (NIGHT.sun - DAY.sun) * t;
+    sun.color.set(0xfff1d2).lerp(new T.Color(t < 0.6 ? 0xffb070 : 0x8fa8ff), Math.min(1, t * 1.6));
+  }
+  const bTimeBtn = document.getElementById('bTime'); if (bTimeBtn) bTimeBtn.addEventListener('click', () => { gh = isNight ? 21 : 12; applySky(nightAmt(gh)); });
+  function restNow() {
+    if (restOpen) return; restOpen = true; const el = mkEl('div', 'gRest'); let n = 20;
+    el.innerHTML = '<div class="bx"><div class="big">👀 看看遠方</div><p>找一個遠處的東西看 20 秒，讓眼睛放鬆。<br>可以順便站起來動一動、喝口水。</p><div class="cnt">' + n + '</div></div>';
+    const iv = setInterval(() => { n--; const c = el.querySelector('.cnt'); if (c) c.textContent = n > 0 ? n : '✓'; if (n <= 0) { clearInterval(iv); el.querySelector('p').innerHTML = '休息完成！眼睛謝謝你 💚'; const b = document.createElement('button'); b.type = 'button'; b.textContent = '回到遊戲（獲得補給）'; b.onclick = () => { el.remove(); restOpen = false; S.hp = hpMax(); S.mp = Math.min(mpMax(), S.mp + 15); addPts(5, '護眼休息'); save(); refreshAll(); }; el.querySelector('.bx').appendChild(b); } }, 1000);
+  }
+  function remind() {
+    if (dlgOpen || bagOpen || restOpen) return false;
+    say('⏰ 休息提醒', '你已經連續玩了一段時間囉！（今天累計 ' + Math.floor((D().play || 0) / 60) + ' 分鐘）\n每玩 30 分鐘，要讓眼睛休息一下。看看遠方 20 秒，還有補給可以拿！', [{ label: '👀 現在就休息 20 秒', pri: true, fn: () => { nextRemind = playAcc + 1800; restNow(); } }, { label: '再玩 5 分鐘（等一下一定要休息）', fn: () => { nextRemind = playAcc + 300; } }]);
+    return true;
+  }
+  let clkAcc = 0;
+  function clockTick(dt) {
+    if (document.body.classList.contains('intro')) return;
+    gh = (gh + dt / HOUR_SEC) % 24; const t = nightAmt(gh); clkAcc += dt;
+    if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = clockIc(gh) + ' 校園時間 ' + hhmm(gh); }
+    if (document.visibilityState === 'visible' && dt < 1) { playAcc += dt; const d = D(); d.play = (d.play || 0) + dt; if (playAcc >= nextRemind) { if (remind() === false) nextRemind = playAcc + 5; } }
+  }
+  L.clock = { get h() { return gh; }, set h(v) { gh = v; lastBlend = -1; applySky(nightAmt(gh)); }, nightAmt, remind, restNow, addPlay: n => { playAcc += n; D().play = (D().play || 0) + n; }, get playAcc() { return playAcc; }, get nextRemind() { return nextRemind; } };
+  L.fav = { FAVS, favInfo, addFav, likeOf, favLv };
   let vAcc = 0, hpT = 0, mpT = 0;
   const prevTick = window.liveTick;
   window.liveTick = function (dt, now) {
-    prevTick(dt, now); followTick(dt, now);
+    prevTick(dt, now); followTick(dt, now); clockTick(dt);
     vAcc += dt; if (vAcc >= 1) { const sec = Math.floor(vAcc); vAcc -= sec; hpT += sec; mpT += sec;
       const hpS = compOn('sprout') ? 1 : 2, mpS = compOn('bunny') ? 6 : 12;
       if (hpT >= hpS) { const n = Math.floor(hpT / hpS); hpT -= n * hpS; S.hp = Math.min(hpMax(), S.hp + n); }
