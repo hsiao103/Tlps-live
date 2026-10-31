@@ -8517,7 +8517,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   }
 
   /* ---------- 校園人員與小志工請託 ---------- */
-  const NP = {};   // 角色
+  const NP = {}; L.NP = NP;   // 角色
   const REQS = [
     { npc: 'nurse', title: '急救包任務', ask: '剛剛有同學在{P}跌倒擦傷了，我正在看診走不開。\n你可以幫我把急救包送過去，替他貼上 OK 繃嗎？', give: '拿到急救包 🧰', steps: [{ id: 'hurt', icon: '🩹', at: [27, -22], base: '受傷的同學', alts: [[27, -22, '集合場'], [0, -45, '梅花廣場'], [0, -13, '校門口'], [-3, -75, '涼亭・遊戲區']], name: '受傷的同學', verb: '🩹 貼上 OK 繃', done: '同學說謝謝！快回去告訴校護吧。' }], thanks: '謝謝你！同學已經沒事了。你很有愛心喔！' },
     { npc: 'vol', title: '愛心餐籃任務', ask: '今天有愛心點心要發給值班的老師。\n你可以把這個餐籃送到{P}嗎？送到再回來告訴我。', give: '拿到愛心餐籃 🧺', steps: [{ id: 'gazebo', icon: '🧺', at: [6, -44], base: '送餐地點', alts: [[6, -44, '梅花廣場涼亭'], [-3, -75, '涼亭・遊戲區'], [27, -22, '集合場'], [0, -13, '校門口']], name: '梅花廣場涼亭', verb: '🧺 送出餐籃', done: '老師開心地收下了！回去跟志工阿姨說一聲吧。' }], thanks: '辛苦了！老師們都說好吃。你真是我們的小志工！' },
@@ -8541,14 +8541,26 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   const NPCDEF = {
     nurse: { name: '校護 林老師', tag: '👩‍⚕️ 校護', col: '#d9534f', kind: 'girl', h: 1.6, at: [18.4, -3.2], colors: { 'school-shirt': 0xf6f4ee, 'school-sleeve': 0xf6f4ee, 'school-shorts': 0xe7ecef, collar: 0xd9534f, hair: 0x2c2225, shoes: 0xf2f2f2, 'hair-band': 0xd9534f }, chat: ['天氣變化大，記得多喝水。', '受傷了要馬上來健康中心喔！', '洗手要用肥皂搓 20 秒！'] },
     vol: { name: '愛心志工 王媽媽', tag: '💚 愛心志工', col: '#2e9b45', kind: 'girl', h: 1.58, at: [4.4, -9.5], colors: { 'school-shirt': 0x3fae5a, 'school-sleeve': 0xf4f1ea, 'school-shorts': 0x3b4252, collar: 0xf2c230, hair: 0x5b5650, shoes: 0x2b3340, 'hair-band': 0x3fae5a }, chat: ['早安！上學要注意安全喔。', '謝謝你願意當小志工！', '志工服務是最美的事。'] },
-    jan: { name: '工友 阿伯', tag: '🧰 工友', col: '#2f80ed', kind: 'boy', h: 1.68, at: [-32.5, -2.2], colors: { 'school-shirt': 0x3b6fb6, 'school-sleeve': 0x3b6fb6, 'school-shorts': 0x3b4252, collar: 0x3b6fb6, hair: 0x6f6a66, shoes: 0x1b1b1e }, chat: ['學校乾乾淨淨，大家才舒服。', '花要天天澆，不能偷懶啊。', '用完的東西要放回原位。'] }
+    jan: { name: '工友 阿伯', tag: '🧰 工友', col: '#2f80ed', kind: 'boy', h: 1.68, at: [-32.5, -2.2], colors: { 'school-shirt': 0x3b6fb6, 'school-sleeve': 0x3b6fb6, 'school-shorts': 0x3b4252, collar: 0x3b6fb6, hair: 0x6f6a66, shoes: 0x1b1b1e }, chat: ['學校乾乾淨淨，大家才舒服。', '花要天天澆，不能偷懶啊。', '用完的東西要放回原位。'] },
+    cook: { name: '廚工 阿美姨', tag: '🍳 廚工', col: '#e07a1f', kind: 'girl', h: 1.6, at: [-40.5, -17], lv: 0, colors: { 'school-shirt': 0xffffff, 'school-sleeve': 0xffffff, 'school-shorts': 0xcfd6dd, collar: 0xe07a1f, hair: 0x3a2e2a, shoes: 0x2b3340, 'hair-band': 0xe07a1f }, chat: ['營養午餐要吃光光，才會長高高！','青菜也要吃，每一種顏色都有不同營養。','廚房很燙，跑跳的時候要小心喔。'] },
+    qi: { name: '教導主任 小琪', tag: '📋 教導主任', col: '#a259d9', kind: 'girl', h: 1.62, at: [-18, -28], lv: 0, colors: { 'school-shirt': 0x8a5fc7, 'school-sleeve': 0x8a5fc7, 'school-shorts': 0x3b4252, collar: 0xf2f2f2, hair: 0x2a2024, shoes: 0x2b3340, 'hair-band': 0xa259d9 }, chat: ['學習是一輩子的事，今天學到什麼了？','有任何困擾，隨時可以到教導處找我。','守規矩、有禮貌，是同樂人的好習慣！'] },
+    yaya: { name: '總務主任 YAYA', tag: '🐻 總務主任', col: '#8b5a2b', kind: 'boy', h: 1.75, at: [-22, -28], lv: 0, colors: { 'school-shirt': 0x3d7a5a, 'school-sleeve': 0x3d7a5a, 'school-shorts': 0x3b4252, collar: 0x3d7a5a, hair: 0x6b4423, shoes: 0x1b1b1e, skin: 0x9a6a3a }, bear: true, chat: ['嗚～我是 YAYA 熊，學校的設施我最熟！','桌椅壞了、燈不亮，都可以跟我說。','愛惜公物，學校就像我們的家。'] },
+    yuzu: { name: '幼兒園主任 柚子', tag: '🍊 幼兒園主任', col: '#f2a900', kind: 'girl', h: 1.6, at: [-15, -69], lv: 0, colors: { 'school-shirt': 0xf7b733, 'school-sleeve': 0xf7b733, 'school-shorts': 0xf4f1ea, collar: 0xffffff, hair: 0x4a3426, shoes: 0x2b3340, 'hair-band': 0xf2a900 }, chat: ['小朋友們午安～要不要來看看幼兒園？','學弟妹很可愛，要當好榜樣喔！','看到小班的小朋友，記得溫柔打招呼。'] },
+    hua: { name: '小華老師', tag: '🎓 一忠導師', col: '#2f80ed', kind: 'girl', h: 1.62, at: [18, -17], lv: 0, colors: { 'school-shirt': 0x5aa0e0, 'school-sleeve': 0x5aa0e0, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x3a2a22, shoes: 0x2b3340, 'hair-band': 0x2f80ed }, chat: ['我是一忠的導師，功課有問題可以來問我。','上課認真，下課也要記得活動筋骨！'] },
+    ning: { name: '小寧老師', tag: '🎓 二忠導師', col: '#e0568a', kind: 'girl', h: 1.6, at: [36, -18], lv: 0, colors: { 'school-shirt': 0xe887ab, 'school-sleeve': 0xe887ab, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x241a1a, shoes: 0x2b3340, 'hair-band': 0xe0568a }, chat: ['二忠的同學都很有活力呢！','說話要輕聲細語，走路要慢慢走。'] },
+    min: { name: '小敏老師', tag: '🎓 三忠導師', col: '#2e9b45', kind: 'girl', h: 1.6, at: [18, -17], lv: 1, colors: { 'school-shirt': 0x6cbf7a, 'school-sleeve': 0x6cbf7a, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x4a3426, shoes: 0x2b3340, 'hair-band': 0x2e9b45 }, chat: ['三忠教室在二樓，爬樓梯要靠右走喔。','作業寫完了嗎？要檢查有沒有漏掉。'] },
+    zhen: { name: '小珍老師', tag: '🎓 四忠導師', col: '#d9534f', kind: 'girl', h: 1.58, at: [36, -28], lv: 1, colors: { 'school-shirt': 0xe5776f, 'school-sleeve': 0xe5776f, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x2c2225, shoes: 0x2b3340, 'hair-band': 0xd9534f }, chat: ['四忠的同學，今天也要加油喔！','遇到困難先自己想想，再問老師。'] },
+    yu: { name: '小瑜老師', tag: '🎓 五忠導師', col: '#f5821f', kind: 'girl', h: 1.62, at: [18, -26], lv: 1, colors: { 'school-shirt': 0xf59a4a, 'school-sleeve': 0xf59a4a, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x3a2e2a, shoes: 0x2b3340, 'hair-band': 0xf5821f }, chat: ['五忠的大哥哥大姊姊，要照顧學弟妹喔。','高年級要學會負責任。'] },
+    ying: { name: '小英老師', tag: '🎓 六忠導師', col: '#17a2b8', kind: 'girl', h: 1.6, at: [36, -18], lv: 1, colors: { 'school-shirt': 0x4fb7c9, 'school-sleeve': 0x4fb7c9, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x2a2024, shoes: 0x2b3340, 'hair-band': 0x17a2b8 }, chat: ['六忠快畢業了，要好好珍惜在同樂的每一天。','畢業前，把想做的事都做一遍吧！'] },
+    cindy: { name: '英語 Cindy 老師', tag: '🔤 英語老師', col: '#7a4fd1', kind: 'girl', h: 1.66, at: [18, -10], lv: 1, colors: { 'school-shirt': 0x9d7be0, 'school-sleeve': 0x9d7be0, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x8a6a3a, shoes: 0x2b3340, 'hair-band': 0x7a4fd1 }, chat: ['Hello! How are you today?','Practice makes perfect. 多開口說英語就會進步！','Good morning, everyone! See you in English class.'] }
   };
   async function spawnPeople() {
     let assets; try { assets = { boy: await loadGLB('boy'), girl: await loadGLB('girl') }; } catch (e) { console.warn('live npc', e); return; }
     Object.keys(NPCDEF).forEach(k => {
-      const df = NPCDEF[k], pos = snap(df.at[0], df.at[1], { maxR: 6 }) || { x: df.at[0], y: 0, z: df.at[1] };
+      const df = NPCDEF[k], lv0 = df.lv || 0, pos = snap(df.at[0], df.at[1], { maxR: 6, y0: lv0 * 3.4 + 1.2, maxY: lv0 * 3.4 + 1.0 }) || { x: df.at[0], y: lv0 * 3.4, z: df.at[1] };
       const colors = Object.assign({ skin: 0xf0c9a4 }, df.colors), ch = makeChar(assets[df.kind], { h: df.h, colors });
       scene.add(ch.node); ch.node.position.set(pos.x, pos.y, pos.z);
+      if (df.bear) { const bm = gm(0x6b4423), bn = gm(0x3a2a1a), hy = df.h * 0.93, add = (g, m, x, y, z) => { const e = new T.Mesh(g, m); e.position.set(x, y, z); ch.node.add(e); return e; }; add(new T.SphereGeometry(0.075, 12, 10), bm, -0.11, hy + 0.11, 0); add(new T.SphereGeometry(0.075, 12, 10), bm, 0.11, hy + 0.11, 0); add(new T.SphereGeometry(0.07, 12, 10), gm(0xd9b38c), 0, hy - 0.06, 0.12); add(new T.SphereGeometry(0.03, 8, 8), bn, 0, hy - 0.03, 0.18); }
       const o = NP[k] = { k, df, ch, x: pos.x, y: pos.y, z: pos.z, yaw: 0, mark: null };
       sprite(nameTex(df.tag, df.col), [1.9, 0.5], pos.x, pos.y + df.h + 0.75, pos.z, 30);
       o.mark = sprite(emojiTex('❗', '#fff8e1', '#e0a200'), [0.6, 0.6], pos.x, pos.y + df.h + 1.35, pos.z, 31); o.mark.visible = false;
@@ -8875,6 +8887,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   function closeBag() { bagOpen = false; bagEl.classList.remove('show'); }
   L.openBag = openBag; L.closeBag = closeBag; L.bagItems = bagItems; L.updateBars = updateBars;
   bagEl.addEventListener('pointerdown', e => { if (e.target === bagEl) closeBag(); });
+  addEventListener('keydown', e => { if (e.code !== 'Escape') return; if (roomOpen) closeRoom(); else if (bagOpen) closeBag(); else if (dlgOpen) { if (pastOf() >= 0) close(); } else if (document.body.classList.contains('gearopen')) document.body.classList.remove('gearopen'); });
   addEventListener('keydown', e => { if (e.code === 'KeyE') e.stopImmediatePropagation(); }, true);
   addEventListener('keydown', e => { if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.code === 'KeyH' && !document.body.classList.contains('intro') && !dlgOpen) { useMed(); } else if (e.code === 'KeyB' && !document.body.classList.contains('intro')) { bagOpen ? closeBag() : openBag(); } else if (e.code === 'Escape' && bagOpen) closeBag(); });
 
