@@ -7860,6 +7860,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     SAVE_KEY = 'tlps_live_v1:' + (id || 'guest');
     try { const o = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); S = o && o.v === 1 ? Object.assign(fresh(), o) : fresh(); } catch (e) { S = fresh(); }
     if (!S.items) S.items = { med: 3 };
+    try { ownedOK(); } catch (e) { /* 初始化稍後補 */ }
     rollover(true); refreshAll();
   };
   /* ---------- 前世身分（轉生天賦）---------- */
@@ -7928,6 +7929,24 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     { id: 'duanwu', name: '端午節', ic: '🐲', item: '粽子', itemIc: '🍙', day: y => LUNAR.duanwu[y], greet: '端午節快樂！記得吃粽子、掛香包。' }
   ];
   const FEST_N = 6;
+
+  /* ---------- 小屋／社辦：家具資料 ---------- */
+  const FURN = [
+    // [id, 名稱, 圖示, 位置類型, 價格, 舒適度, 限定]
+    ['pic', '掛畫', '🖼️', 'wall', 30, 2], ['win', '小窗戶', '🪟', 'wall', 40, 2], ['clock', '時鐘', '🕰️', 'wall', 35, 2], ['carp', '鯉魚旗', '🎏', 'wall', 50, 3], ['star', '星空海報', '🌌', 'wall', 45, 3], ['cal', '月曆', '📅', 'wall', 25, 1],
+    ['bed', '小床', '🛏️', 'floor', 120, 6], ['chair', '椅子', '🪑', 'floor', 40, 2], ['sofa', '沙發', '🛋️', 'floor', 150, 6], ['plant', '大盆栽', '🪴', 'floor', 60, 3], ['teddy', '大玩偶', '🧸', 'floor', 50, 3], ['rug', '地毯', '🧶', 'floor', 70, 4], ['shelf', '書櫃', '📚', 'floor', 90, 4], ['piano', '電子琴', '🎹', 'floor', 140, 5], ['fish', '魚缸', '🐠', 'floor', 110, 5],
+    ['lamp', '檯燈', '💡', 'desk', 30, 2], ['book', '故事書', '📖', 'desk', 25, 1], ['vase', '花瓶', '🌸', 'desk', 35, 2], ['game', '遊戲機', '🎮', 'desk', 80, 3], ['tea', '茶具', '🍵', 'desk', 30, 1], ['scope', '望遠鏡', '🔭', 'desk', 90, 3], ['phone', '耳機', '🎧', 'desk', 40, 2], ['alarm', '鬧鐘', '⏰', 'desk', 20, 1],
+    // 活動獎勵
+    ['pumpkin', '南瓜燈', '🎃', 'desk', 0, 4, 'r:萬聖節收集完成'], ['tree', '聖誕樹', '🎄', 'floor', 0, 6, 'r:聖誕節收集完成'], ['couplet', '春聯', '🧧', 'wall', 0, 4, 'r:春節收集完成'], ['dragon', '龍舟模型', '🐲', 'desk', 0, 4, 'r:端午節收集完成'],
+    ['owl', '貓頭鷹擺飾', '🦉', 'desk', 0, 5, 'r:解開全部校園傳說'], ['trophy', '學霸獎盃', '🏆', 'desk', 0, 6, 'r:考試平均 90 分以上'],
+    // 社辦專屬
+    ['cup', '成果展獎盃', '🥇', 'desk', 0, 6, 'c:成果展拿到特優'], ['sig_read', '大書架', '📚', 'floor', 0, 5, 'c:加入閱讀社'], ['sig_track', '獎牌牆', '🏅', 'wall', 0, 5, 'c:加入田徑校隊'], ['sig_choir', '麥克風', '🎤', 'desk', 0, 5, 'c:加入合唱團'], ['sig_maker', '工作機器人', '🤖', 'floor', 0, 5, 'c:加入創客社'], ['sig_serve', '愛心箱', '💚', 'desk', 0, 5, 'c:加入志工服務社']
+  ].map(a => ({ id: a[0], name: a[1], ic: a[2], t: a[3], price: a[4], cm: a[5], lock: a[6] || '' }));
+  const FURNI = id => FURN.find(f => f.id === id);
+  const WALLS = [['#fdeccb', '暖黃'], ['#cfe8fb', '天藍'], ['#fbd6e2', '粉紅'], ['#d6efc9', '草綠'], ['#e4dcf8', '淡紫']];
+  const FLOORS = [['#c99a63', '原木'], ['#9fb88a', '草地'], ['#b9a58f', '石磚'], ['#8aa9c4', '藍地毯']];
+  const SLOTS = [['w1', 'wall', 24, 22], ['w2', 'wall', 72, 20], ['d1', 'desk', 36, 52], ['d2', 'desk', 64, 52], ['f1', 'floor', 17, 76], ['f2', 'floor', 46, 82], ['f3', 'floor', 80, 76]];
+  let roomOpen = false;
 
   /* ---------- 考試週 ---------- */
   const SUBJ = ['國語', '數學', '自然', '社會', '英語'];
@@ -8154,6 +8173,18 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gRoom{position:fixed;inset:0;z-index:41;display:none;place-items:center;background:rgba(0,0,0,.4)}#gRoom.show{display:grid}
+#gRoom .pn{box-sizing:border-box;width:min(480px,calc(100vw - 24px));max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow:auto;background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px 14px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+#gRoom h3{margin:0 0 2px;font-size:17px}#gRoom .sub{font-size:12.5px;color:var(--muted);margin:4px 0}
+#gRoom .x{float:right;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;padding:0}
+#gRoom .stage{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;margin:8px 0;background:linear-gradient(to bottom,var(--wall) 0 58%,var(--floor) 58% 100%);border:2px solid rgba(0,0,0,.18)}
+#gRoom .rs{position:absolute;transform:translate(-50%,-50%);border:0;background:transparent;cursor:pointer;padding:0;line-height:1;display:grid;place-items:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+#gRoom .rs.em{border:2px dashed rgba(0,0,0,.28);border-radius:12px;color:rgba(0,0,0,.35);font-size:22px!important;filter:none;background:rgba(255,255,255,.25)}
+#gRoom .rs.sel{outline:3px solid #2f80ed;outline-offset:2px;border-radius:12px}
+#gRoom .tabs{display:flex;gap:6px;margin:6px 0}#gRoom .tabs button{flex:1;border:1.5px solid var(--line);background:transparent;color:var(--fg);border-radius:99px;padding:5px 0;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}#gRoom .tabs button.on{background:#f5821f;border-color:#f5821f;color:#fff}
+#gRoom .fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin:6px 0}#gRoom .fi{border:1.5px solid var(--line);border-radius:12px;background:transparent;color:var(--fg);padding:6px 4px;display:grid;justify-items:center;gap:1px;cursor:pointer;font-family:inherit}#gRoom .fi i{font-style:normal;font-size:26px}#gRoom .fi b{font-size:12px}#gRoom .fi small{font-size:10.5px;color:var(--muted)}#gRoom .fi.own{opacity:.5}#gRoom .fi.rm{border-style:dashed}
+#gRoom .sw{display:flex;gap:8px}#gRoom .sw1{width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,0,0,.2);cursor:pointer}#gRoom .sw1.on{outline:3px solid #2e9b45;outline-offset:2px}
+#gRoom .row{margin-top:8px}#gRoom .rest{width:100%;border:0;border-radius:12px;background:#2e9b45;color:#fff;font-weight:800;padding:9px;font-size:14px;cursor:pointer;font-family:inherit}
 #gBag .lgb{border:1.5px solid #8e5cf5;background:rgba(142,92,245,.12);color:var(--fg);border-radius:99px;font-size:12.5px;padding:3px 12px;cursor:pointer;font-family:inherit}
 #gBag .sl.use{cursor:pointer;border-style:solid;border-color:#e0564a;background:rgba(224,86,74,.1)}
 @media(max-width:600px){#gBag .pn{padding:10px 12px 12px;border-radius:16px}#gBag h3{font-size:16px}#gBag .top{gap:10px;margin-bottom:2px}#gBag .bv{width:60px;height:60px;border-width:2.5px}#gBag .sub{font-size:11.5px;margin-bottom:5px}#gBag .vit{gap:3px;margin:5px 0 4px}#gBag .vb{font-size:11px}#gBag .radar{width:176px;height:auto;margin:0 auto}#gBag .pv{gap:4px;font-size:10.5px;margin:2px 0 5px}#gBag .pv span{padding:1px 8px}#gBag .cmp{gap:4px}#gBag .cp img,#gBag .cp i{width:36px;height:36px;font-size:18px}#gBag .cp b{font-size:11px}#gBag .cp small{font-size:9.5px}#gBag .grid{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin:6px 0}#gBag .row{font-size:11.5px;gap:4px;margin:3px 0}#gBag .row span{padding:1px 8px}#gBag .cl{margin:8px auto 0}}
@@ -8215,7 +8246,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   L.say = say; L.close = close;
 
   /* ---------- 加分與任務完成 ---------- */
-  function addPts(n, why) { const l0 = lvOf(); S.pts += n; toast('+' + n + ' 點　' + (why || ''), 2400); const l1 = lvOf(); if (l1 > l0) { S.hp = hpMax(); S.mp = mpMax(); const t0 = tierOf(l0), t1 = tierOf(l1);
+  function addPts(n, why) { const l0 = lvOf(); S.pts += n; if (n > 0) S.coin = (S.coin === undefined ? 50 : S.coin) + Math.max(1, Math.round(n / 2)); toast('+' + n + ' 點　' + (why || ''), 2400); const l1 = lvOf(); if (l1 > l0) { S.hp = hpMax(); S.mp = mpMax(); const t0 = tierOf(l0), t1 = tierOf(l1);
       if (t1 > t0) setTimeout(() => evolve(t0, t1, l1), 1600); else setTimeout(() => toast('🎉 升到 LV.' + l1 + '！體力與魔力全滿', 4200), 1600); } }
   function evolve(t0, t1, lv) { const a = TIERS[t0], b = TIERS[t1], msg = '你的角色進化了！\n「' + a[1] + '（' + a[2] + '）・' + a[3] + '」→「' + b[1] + '（' + b[2] + '）・' + b[3] + '」\n\n升到 LV.' + lv + '，體力與魔力全滿。之後會解鎖更多造型與能力！'; save(); refreshAll(); if (dlgOpen) { toast('🌟 進化為「' + b[3] + '」！', 5000); return; } say('🌟 進化！', msg, [{ label: '太棒了！', pri: true }], AV(pastOf(), t1)); }
   function taskDone(key, label) {
@@ -8401,7 +8432,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       o.ia = ia({ id: 'fest' + idx, x: c.x, y: c.y, z: c.z, r: 1.8, txt: () => f.ic + ' 撿起' + f.item, act: () => {
         d.fest.push(idx); G.remove(mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); festObjs = festObjs.filter(q => q !== o);
         addPts(3, f.name + f.item + '（' + d.fest.length + '/' + FEST_N + '）');
-        if (d.fest.length >= FEST_N && !d.festDone) { d.festDone = 1; const big = festCur.off === 0 ? 60 : 30; setTimeout(() => { addPts(big, f.name + '收集完成' + (festCur.off === 0 ? '（節日當天 ×2）' : '')); const b = f.ic + ' ' + festCur.year + f.name + '收藏家'; if (!S.badges.includes(b)) { S.badges.push(b); setTimeout(() => toast('🏅 獲得徽章「' + b + '」', 3600), 1500); } S.items.med++; save(); refreshAll(); say(f.ic + ' ' + f.name + '加碼獎勵', '你把校園裡的' + f.item + '都找齊了！\n獲得 ' + big + ' 點、補血包 ×1、徽章「' + b + '」。', [{ label: '節日快樂！', pri: true }]); }, 900); }
+        if (d.fest.length >= FEST_N && !d.festDone) { d.festDone = 1; const big = festCur.off === 0 ? 60 : 30; setTimeout(() => { addPts(big, f.name + '收集完成' + (festCur.off === 0 ? '（節日當天 ×2）' : '')); const b = f.ic + ' ' + festCur.year + f.name + '收藏家'; if (!S.badges.includes(b)) { S.badges.push(b); setTimeout(() => toast('🏅 獲得徽章「' + b + '」', 3600), 1500); } S.items.med++; giveItem({ halloween: 'pumpkin', christmas: 'tree', newyear: 'couplet', duanwu: 'dragon' }[f.id]); save(); refreshAll(); say(f.ic + ' ' + f.name + '加碼獎勵', '你把校園裡的' + f.item + '都找齊了！\n獲得 ' + big + ' 點、補血包 ×1、徽章「' + b + '」。', [{ label: '節日快樂！', pri: true }]); }, 900); }
         save(); refreshAll(); } });
       festObjs.push(o);
     });
@@ -8436,7 +8467,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
           S.legends = S.legends || {}; S.legends[l.id] = dayKey(); const n = legendCount();
           G.remove(o.mark); const k = IA.indexOf(o.ia); if (k >= 0) IA.splice(k, 1); legendObjs = legendObjs.filter(q => q !== o);
           addAttr('idea', 2, true); addAttr('study', 1, true); addPts(15 + (free ? 5 : 0), '發現傳說「' + l.name + '」');
-          const fin = n >= LEGENDS.length; if (fin && !S.badges.includes('🌙 傳說解謎家')) { S.badges.push('🌙 傳說解謎家'); setTimeout(() => addPts(50, '集滿全部校園傳說'), 1500); }
+          const fin = n >= LEGENDS.length; if (fin && !S.badges.includes('🌙 傳說解謎家')) { S.badges.push('🌙 傳說解謎家'); giveItem('owl'); setTimeout(() => addPts(50, '集滿全部校園傳說'), 1500); }
           save(); refreshAll();
           say('🔍 真相大白！', l.truth + '\n\n已收進「校園傳說圖鑑」（' + n + ' / ' + LEGENDS.length + '）。' + (n === 3 && !S.comp.have.includes('cat') ? '' : '') + (fin ? '\n🏅 全部解開了，獲得徽章「傳說解謎家」！' : ''), [{ label: '原來如此！', pri: true }]);
         } }, { label: '先不要' }]);
@@ -8554,7 +8585,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     const post = new T.Mesh(new T.BoxGeometry(1.5, 1.1, 0.12), gm(0xf5d58a)); post.position.set(CLUBP.x, CLUBP.y + 1.2, CLUBP.z); G.add(post);
     const leg = new T.Mesh(new T.BoxGeometry(0.12, 0.7, 0.12), gm(0x7a5a3a)); leg.position.set(CLUBP.x, CLUBP.y + 0.35, CLUBP.z); G.add(leg); }
   function clubJoin(c) {
-    S.club = { id: c.id, n: 0, since: dayKey() }; addAttr(c.k, 5, true); addPts(10, '加入' + c.name); save(); refreshAll();
+    S.club = { id: c.id, n: 0, since: dayKey() }; giveItem('sig_' + c.id, true); addAttr(c.k, 5, true); addPts(10, '加入' + c.name); save(); refreshAll();
     say('社團佈告欄', '歡迎加入「' + c.name + '」' + c.ic + '！\n每天可以參加 1 次社團活動（體力 6、魔力 5），累積次數就會升階；每週還有「成果展」可以報名。', [{ label: '好，開始吧！', pri: true }]);
   }
   function clubActivity() {
@@ -8564,7 +8595,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     if (S.mp < 5) { toast('魔力不足，完成任務或休息一下再來吧 ✨', 3000); return; }
     if (!spend(6)) return;
     S.mp -= 5; d.club = 1; w.cl = (w.cl || 0) + 1; const r0 = clubRank(); S.club.n++; const r1 = clubRank();
-    addAttr(c.k, 2); addAttr('social', 1); addPts(8, c.name + '活動');
+    addAttr(c.k, 2); addAttr('social', 1); addPts(8 + Math.floor(decorScore('club') / 10), c.name + '活動');
     if (r1 > r0) setTimeout(() => say('社團升階', c.ic + ' 恭喜！你在「' + c.name + '」升為「' + RANKS[r1][1] + '」！\n成果展的得分也會提高。', [{ label: '太棒了', pri: true }]), 900);
     save(); refreshAll();
   }
@@ -8574,9 +8605,9 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     if ((w.cl || 0) < 2) { say('社團成果展', '要先在這週參加至少 2 次社團活動，才有作品可以展出。\n目前：' + (w.cl || 0) + ' / 2', [{ label: '好，我去練習' }]); return; }
     if (S.mp < 10) { toast('魔力不足（需要 10）', 3000); return; }
     S.mp -= 10;
-    const score = clubRank() * 10 + (w.cl || 0) * 5 + Math.floor(S.attr[c.k] / 5) + Math.floor(Math.random() * 10), a = AWARDS.find(x => score >= x[0]);
+    const score = clubRank() * 10 + (w.cl || 0) * 5 + Math.floor(S.attr[c.k] / 5) + Math.floor(decorScore('club') / 4) + Math.floor(Math.random() * 10), a = AWARDS.find(x => score >= x[0]);
     w.show = a[1]; addPts(a[2], c.name + '成果展・' + a[1]); S.mp = Math.min(mpMax(), S.mp + 0);
-    if (a[1] === '特優') { const b = c.name + '特優'; if (!S.badges.includes(b)) S.badges.push(b); }
+    if (a[1] === '特優') { const b = c.name + '特優'; if (!S.badges.includes(b)) S.badges.push(b); giveItem('cup'); }
     save(); refreshAll();
     say('🏆 社團成果展', a[3] + ' 「' + c.name + '」成果展：' + a[1] + '！\n綜合得分 ' + score + '（社團階級＋本週活動＋屬性），獲得 ' + a[2] + ' 點。' + (a[1] === '特優' ? '\n拿到徽章「' + c.name + '特優」！' : '\n想拿更高名次：多參加活動、提升階級與屬性。'), [{ label: '謝謝大家', pri: true }]);
   }
@@ -8642,11 +8673,63 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     function claimExam(c, ex) {
       const avg = Math.round(ex.sc.reduce((a, b) => a + (b || 0), 0) / 5), big = c.kind === 'fin' ? 60 : 40;
       ex.claimed = 1; S.items.med += 2; addPts(big, c.name + '慶功'); const bd = avg >= 90 ? '📚 ' + c.key.slice(0, 4) + c.name.replace('第一學期', '上學期').replace('第二學期', '下學期') + '學霸' : '';
-      if (bd && !S.badges.includes(bd)) S.badges.push(bd); save(); refreshAll();
+      if (bd && !S.badges.includes(bd)) S.badges.push(bd); if (bd) giveItem('trophy'); save(); refreshAll();
       say('🎉 ' + c.name + '慶功', '五科全部考完了！平均 ' + avg + ' 分（' + gradeOf(avg) + '）\n慶功獎勵：' + big + ' 點、補血包 ×2' + (bd ? '、徽章「' + bd + '」' : '（平均 90 分以上可得學霸徽章）') + '。\n好好休息，下一階段再加油！', [{ label: '謝謝老師！', pri: true }]);
     }
     ia({ id: 'exam', x: EXAMP.x, y: EXAMP.y, z: EXAMP.z, r: 2.8, txt: () => examTxt() || '📝 考試公告欄', act: examBoard });
     L.exam = { examNow, examBoard, runExam, EXS, Q, SUBJ, nthMonday, setDate: d => { examDate = d; refreshAll(); }, EXAMP, claim: claimExam };
+    /* ---------- 小屋（宿舍）與社辦 ---------- */
+    const roomOf = w => { S.room = S.room || { wall: 0, floor: 0, slots: {} }; S.croom = S.croom || { wall: 1, floor: 0, slots: {} }; return w === 'club' ? S.croom : S.room; };
+    const ownedOK = () => { S.own = S.own || {}; if (S.coin === undefined) { S.coin = 50; S.own.bed = 1; S.own.lamp = 1; roomOf('dorm').slots.f2 = 'bed'; roomOf('dorm').slots.d1 = 'lamp'; } return S.own; };
+    const decorScore = w => { const r = roomOf(w); return Object.keys(r.slots).reduce((a, k) => a + ((FURNI(r.slots[k]) || {}).cm || 0), 0) + (r.wall ? 1 : 0) + (r.floor ? 1 : 0); };
+    function giveItem(id, quiet) { ownedOK(); const f = FURNI(id); if (!f || S.own[id]) return; S.own[id] = 1; if (!quiet) toast('🎁 獲得家具「' + f.ic + ' ' + f.name + '」！到小屋或社辦佈置吧', 4200);
+      if (id.indexOf('sig_') === 0 || id === 'cup') { const r = roomOf('club'), sl = SLOTS.find(x => x[1] === f.t && !r.slots[x[0]]); if (sl) r.slots[sl[0]] = id; } }
+    function placeItem(w, slot, id) { ownedOK(); ['dorm', 'club'].forEach(k => { const r = roomOf(k); Object.keys(r.slots).forEach(sk => { if (r.slots[sk] === id) delete r.slots[sk]; }); }); if (id) roomOf(w).slots[slot] = id; else delete roomOf(w).slots[slot]; save(); }
+    const roomEl = mkEl('div', 'gRoom'); let roomW = 'dorm', roomSel = null, roomTab = 'place';
+    function renderRoom() {
+      ownedOK(); const r = roomOf(roomW), club = roomW === 'club', cl = clubOf(), sc = decorScore(roomW);
+      const title = club ? (cl ? cl.ic + ' ' + cl.name + '社辦' : '🎪 社辦') : '🏠 我的小屋';
+      const slotsHtml = SLOTS.map(sl => { const f = FURNI(r.slots[sl[0]]), sz = sl[1] === 'wall' ? 54 : sl[1] === 'desk' ? 40 : 64; return '<button type="button" class="rs' + (roomSel === sl[0] ? ' sel' : '') + (f ? '' : ' em') + '" data-s="' + sl[0] + '" style="left:' + sl[2] + '%;top:' + sl[3] + '%;width:' + sz + 'px;height:' + sz + 'px;font-size:' + Math.round(sz * 0.72) + 'px" title="' + (f ? f.name : (sl[1] === 'wall' ? '牆面' : sl[1] === 'desk' ? '桌面' : '地面') + '空位') + '">' + (f ? f.ic : '＋') + '</button>'; }).join('');
+      let body = '';
+      if (roomTab === 'place') {
+        if (!roomSel) body = '<div class="sub">點上面的位置（＋），再選要放的家具。</div>';
+        else { const sl = SLOTS.find(x => x[0] === roomSel), mine = FURN.filter(f => S.own[f.id] && f.t === sl[1] && (!f.id.startsWith('sig_') && f.id !== 'cup' || club)); body = '<div class="sub">' + (sl[1] === 'wall' ? '牆面' : sl[1] === 'desk' ? '桌面' : '地面') + '位置：選一件家具（已放在別處的會移過來）</div><div class="fg">' + mine.map(f => '<button type="button" class="fi" data-p="' + f.id + '"><i>' + f.ic + '</i><b>' + f.name + '</b><small>舒適 +' + f.cm + '</small></button>').join('') + (r.slots[roomSel] ? '<button type="button" class="fi rm" data-p="">收起來</button>' : '') + '</div>' + (mine.length ? '' : '<div class="sub">還沒有這一類的家具，去「商店」買一件吧。</div>'); }
+      } else if (roomTab === 'shop') {
+        body = '<div class="sub">🪙 ' + S.coin + ' 星幣（做任務會自動獲得）</div><div class="fg">' + FURN.filter(f => f.price > 0).map(f => '<button type="button" class="fi' + (S.own[f.id] ? ' own' : '') + '" data-b="' + f.id + '"><i>' + f.ic + '</i><b>' + f.name + '</b><small>' + (S.own[f.id] ? '已擁有' : '🪙 ' + f.price + '・舒適 +' + f.cm) + '</small></button>').join('') + '</div><div class="sub">🎁 活動獎勵家具：' + FURN.filter(f => f.price === 0).map(f => (S.own[f.id] ? f.ic : '❔') + ' ' + f.lock.slice(2)).join('、') + '</div>';
+      } else {
+        body = '<div class="sub">牆紙</div><div class="fg sw">' + WALLS.map((c, i) => '<button type="button" class="sw1' + (r.wall === i ? ' on' : '') + '" data-w="' + i + '" style="background:' + c[0] + '" title="' + c[1] + '"></button>').join('') + '</div><div class="sub">地板</div><div class="fg sw">' + FLOORS.map((c, i) => '<button type="button" class="sw1' + (r.floor === i ? ' on' : '') + '" data-f="' + i + '" style="background:' + c[0] + '" title="' + c[1] + '"></button>').join('') + '</div>';
+      }
+      const dd = D(), perk = club ? '社辦佈置分數 ' + sc + '：社團活動 +' + Math.floor(sc / 10) + ' 點、成果展得分 +' + Math.floor(sc / 4) : '小屋舒適度 ' + sc + '：休息時魔力 +' + Math.min(20, 5 + Math.floor(sc / 5));
+      roomEl.innerHTML = '<div class="pn"><button type="button" class="x">✕</button><h3>' + title + '</h3><div class="sub" style="margin:0">🪙 ' + S.coin + '　' + perk + '</div>' +
+        '<div class="stage" style="--wall:' + WALLS[r.wall][0] + ';--floor:' + FLOORS[r.floor][0] + '">' + slotsHtml + '</div>' +
+        '<div class="tabs">' + [['place', '佈置'], ['shop', '商店'], ['style', '牆紙地板']].map(t => '<button type="button" data-t="' + t[0] + '" class="' + (roomTab === t[0] ? 'on' : '') + '">' + t[1] + '</button>').join('') + '</div>' + body +
+        (club ? '' : '<div class="row"><button type="button" class="rest">😴 在小屋休息（' + (dd.rest ? '今天已休息' : 'HP 補滿・MP +' + Math.min(20, 5 + Math.floor(sc / 5))) + '）</button></div>') + '</div>';
+      roomEl.querySelector('.x').onclick = closeRoom;
+      roomEl.querySelectorAll('.rs').forEach(b => b.onclick = () => { roomSel = roomSel === b.dataset.s ? null : b.dataset.s; roomTab = 'place'; renderRoom(); });
+      roomEl.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { roomTab = b.dataset.t; renderRoom(); });
+      roomEl.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { placeItem(roomW, roomSel, b.dataset.p); renderRoom(); });
+      roomEl.querySelectorAll('[data-b]').forEach(b => b.onclick = () => { const f = FURNI(b.dataset.b); if (S.own[f.id]) { toast('已經有了，到「佈置」放進房間吧', 2400); return; } if (S.coin < f.price) { toast('星幣不足（需要 ' + f.price + '），做任務可以賺星幣', 3000); return; } S.coin -= f.price; S.own[f.id] = 1; save(); toast('🛒 買了「' + f.ic + ' ' + f.name + '」！', 2600); renderRoom(); refreshAll(); });
+      roomEl.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { r.wall = +b.dataset.w; save(); renderRoom(); });
+      roomEl.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { r.floor = +b.dataset.f; save(); renderRoom(); });
+      const rb = roomEl.querySelector('.rest'); if (rb) rb.onclick = () => { if (dd.rest) { toast('今天已經休息過了，明天再來吧 💤', 2600); return; } dd.rest = 1; const m = Math.min(20, 5 + Math.floor(sc / 5)); S.hp = hpMax(); S.mp = Math.min(mpMax(), S.mp + m); save(); refreshAll(); renderRoom(); toast('😴 好好休息了一下：HP 補滿，MP +' + m, 3200); };
+    }
+    function openRoom(w) { if (dlgOpen || bagOpen) return; if (w === 'club' && !clubOf()) { say('社辦', '這是社團的專屬空間。加入社團後，就能在這裡佈置自己的社辦！\n（到「社團佈告欄」LV.10 起可加入）', [{ label: '好' }]); return; } roomW = w; roomSel = null; roomTab = 'place'; roomOpen = true; renderRoom(); roomEl.classList.add('show'); }
+    function closeRoom() { roomOpen = false; roomEl.classList.remove('show'); }
+    roomEl.addEventListener('pointerdown', e => { if (e.target === roomEl) closeRoom(); });
+    addEventListener('keydown', e => { if (e.code === 'Escape' && roomOpen) closeRoom(); });
+    function cabin(x, y, z, wall, roof, label, col) {
+      const g = new T.Group(); g.position.set(x, y, z); G.add(g);
+      const b = new T.Mesh(new T.BoxGeometry(3.4, 2.2, 3), gm(wall)); b.position.y = 1.1; g.add(b);
+      const r = new T.Mesh(new T.ConeGeometry(2.9, 1.5, 4), gm(roof)); r.position.y = 2.95; r.rotation.y = Math.PI / 4; g.add(r);
+      const d = new T.Mesh(new T.BoxGeometry(0.8, 1.4, 0.1), gm(0x7a5a3a)); d.position.set(0, 0.7, 1.55); g.add(d);
+      sprite(nameTex(label, col), [2.2, 0.58], x, y + 4.3, z, 30);
+    }
+    const DORMP = snap(-14, 10, { maxR: 6 }) || { x: -14, y: 0.03, z: 10 }, CLUBR = snap(14, 10, { maxR: 6 }) || { x: 14, y: 0.03, z: 10 };
+    cabin(DORMP.x, DORMP.y, DORMP.z - 0.3, 0xf6e3b8, 0xd9534f, '🏠 我的小屋', '#d9534f');
+    cabin(CLUBR.x, CLUBR.y, CLUBR.z - 0.3, 0xcfe8fb, 0x2f80ed, '🎪 社辦', '#2f80ed');
+    ia({ id: 'dorm', x: DORMP.x, y: DORMP.y, z: DORMP.z + 1.8, r: 2.6, txt: () => '🏠 進入我的小屋', act: () => openRoom('dorm') });
+    ia({ id: 'clubroom', x: CLUBR.x, y: CLUBR.y, z: CLUBR.z + 1.8, r: 2.6, txt: () => '🎪 進入社辦', act: () => openRoom('club') });
+    L.room = { FURN, openRoom, closeRoom, giveItem, placeItem, decorScore, roomOf, ownedOK, DORMP, CLUBR, get open() { return roomOpen; } };
   ia({ id: 'club', x: CLUBP.x, y: CLUBP.y, z: CLUBP.z, r: 2.8, txt: () => '🎪 社團佈告欄', act: clubDlg });
   L.CLUBS = CLUBS; L.clubOf = clubOf; L.clubDlg = clubDlg; L.clubActivity = clubActivity; L.clubShow = clubShow; L.clubJoin = clubJoin; L.CLUBP = CLUBP;
 
@@ -8673,7 +8756,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     }
     return best;
   }
-  function doAct() { if (dlgOpen || bagOpen) return; if (cur) cur.act(); }
+  function doAct() { if (dlgOpen || bagOpen || roomOpen) return; if (cur) cur.act(); }
   act.onclick = doAct;
   addEventListener('keydown', e => { if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.code === 'KeyF' || e.code === 'Enter') { if (dlgOpen) { const p = dlg.querySelector('button.pri') || dlg.querySelector('button'); if (p && e.code === 'Enter') p.click(); } else doAct(); } });
   let acc = 0;
@@ -8705,7 +8788,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       (festCur ? '<div class="st"><span>' + festCur.f.ic + ' ' + festCur.f.name + '活動中・' + festTxt(festCur) + '</span></div>' : '') +
       (function () { const c = clubOf(); if (c) { const w = W(); return '<div class="st"><span>' + c.ic + ' ' + c.name + '・' + RANKS[clubRank()][1] + '（本週活動 ' + (w.cl || 0) + ' 次' + (w.show ? '，成果展已參加' : '') + '）</span></div>'; } return lvOf() >= CLUB_LV ? '<div class="st"><span>🎪 可以去社團佈告欄加入社團了！</span></div>' : '<div class="st"><span>🎪 LV.' + CLUB_LV + ' 開放加入社團</span></div>'; })() +
       '<div class="sec">♻️ 本週活動：資源回收週</div>' + row(w.done, '分類回收物', Math.min(w.sorted, 10) + '/10', 'recy') +
-      (pastOf() >= 0 ? '<div class="st"><span>' + PASTS[pastOf()][1] + ' 前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '</span></div>' : '') + '<div class="st"><button type="button" data-med="1" style="border:1px solid var(--line);background:#fff;border-radius:99px;font-size:12px;padding:1px 9px;cursor:pointer" title="使用補血包（H）">🩹 補血包 ×' + ((S.items && S.items.med) || 0) + '</button><span>💧 水桶 ' + S.can + '/' + canMax() + '</span><span>♻️ 回收物 ' + w.bag.length + '/' + bagCap() + '</span><span>🌸 花朵 ' + Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0) + '</span><span>🏅 ' + S.badges.length + '</span></div></div>';
+      (pastOf() >= 0 ? '<div class="st"><span>' + PASTS[pastOf()][1] + ' 前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '</span></div>' : '') + '<div class="st"><button type="button" data-med="1" style="border:1px solid var(--line);background:#fff;border-radius:99px;font-size:12px;padding:1px 9px;cursor:pointer" title="使用補血包（H）">🩹 補血包 ×' + ((S.items && S.items.med) || 0) + '</button><span>🪙 ' + (S.coin === undefined ? 50 : S.coin) + '</span><span>💧 水桶 ' + S.can + '/' + canMax() + '</span><span>♻️ 回收物 ' + w.bag.length + '/' + bagCap() + '</span><span>🌸 花朵 ' + Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0) + '</span><span>🏅 ' + S.badges.length + '</span></div></div>';
     hud.querySelector('.hd').onclick = () => hud.classList.toggle('min');
     updateBars();
     hud.querySelectorAll('[data-med]').forEach(b => b.onclick = e => { e.stopPropagation(); useMed(); });
