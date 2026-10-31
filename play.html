@@ -7895,6 +7895,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
 #gDlg .bt button.pri{background:#2e9b45;color:#fff}
 #gToast{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:40;max-width:min(92vw,520px);background:rgba(20,28,24,.92);color:#fff;border-radius:14px;padding:10px 16px;font:700 14.5px/1.5 var(--font-ui);display:none;text-align:center}
 #gToast.show{display:block}
+@media (min-width:1101px){body.live #search{width:44px;height:44px;padding:0;border-radius:999px;overflow:hidden}body.live #search .sbox{height:44px}body.live #sBtn{left:5px;width:34px;pointer-events:auto;color:var(--fg)}body.live #sBtn svg{width:22px;height:22px}body.live #search input{opacity:0;pointer-events:none;height:44px;border:0;padding:0 14px 0 44px}body.live #search.open{width:300px;height:auto;border-radius:14px;overflow:visible;padding:0 4px 4px}body.live #search.open input{opacity:1;pointer-events:auto}body.live #sres{padding:0 6px}}
 #gBadge{position:fixed;right:12px;bottom:14px;z-index:20;font:600 12px var(--font-ui);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
 @media (max-width:700px){#gHud{top:76px;width:232px}#gAct{bottom:150px}#gBadge{display:none}}
 `;
@@ -7905,6 +7906,8 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
   if (innerWidth < 700) hud.classList.add('min');
   // 版面避讓：搜尋列在左上時任務板排在其下；雲端標籤避開小地圖；開場卡出現時任務板先收合，避免重疊
   let introMin = false;
+  { const sb = document.getElementById('sBtn'), se = document.getElementById('search'), qi = document.querySelector('#search input'), qr = document.getElementById('sres');
+    if (sb && se) sb.onclick = () => { const o = se.classList.toggle('open'); if (o) { if (qi) qi.focus(); } else { if (qr) qr.classList.remove('show'); if (qi) qi.blur(); } }; }
   function place() {
     const q = id => document.getElementById(id), vis = e => e && e.offsetWidth > 0 && e.offsetHeight > 0;
     if (innerWidth >= 700) {
