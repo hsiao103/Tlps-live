@@ -10,9 +10,9 @@
 | `index.html` | 登入頁：說明遊戲、Google 登入（限 `@tmail.ilc.edu.tw`、`@smail.ilc.edu.tw`），登入後按「進入遊戲」 |
 | `play.html` | 遊戲本體（未登入會被送回 `index.html`） |
 | `auth-config.js` | Google 登入設定（Client ID、允許網域） |
-| `live-config.js` | 雲端存檔設定（Supabase；不填也能玩，進度只存在本機瀏覽器） |
-| `auth.js` `gate.js` `acct.js` `sb.js` `save.js` | 登入、把關、登出鈕、Supabase 連線、存檔同步（不必修改） |
-| `supabase.sql` | 在 Supabase 執行一次，建立存檔資料表與權限 |
+| `live-config.js` | 雲端存檔設定（Firebase；不填也能玩，進度只存在本機瀏覽器） |
+| `auth.js` `gate.js` `acct.js` `fb.js` `save.js` | 登入、把關、登出鈕、Firebase 連線、存檔同步（不必修改） |
+| `firestore.rules` | 貼到 Firebase Firestore「規則」，限制每人只能讀寫自己的存檔 |
 
 ## 遊玩規則（第一版）
 - **視角**：預設第三人稱；右上可切第一人稱／鳥瞰。電腦 WASD 移動、Shift 跑、空白鍵跳、**F 互動**；手機左搖桿，靠近目標出現橘色互動鈕。
@@ -29,16 +29,18 @@
 1. 建立新的 repository（例如 `tlps-live`），把本資料夾**全部檔案**上傳到根目錄。
 2. Settings → Pages → Branch：`main` / `(root)`。網址：`https://hsiao103.github.io/tlps-live/`。
 3. **Google 登入**：沿用 `auth-config.js` 內已設好的 Client ID 即可——「已授權的 JavaScript 來源」是網域層級（`https://hsiao103.github.io`），同一網域下的新 repo 不必再改。
-4. （選用）**雲端存檔**：
-   1. Supabase → SQL Editor：貼上並執行 `supabase.sql`。
-   2. Authentication → Providers → Google：啟用；Client ID 填與 `auth-config.js` 相同；開啟「Skip nonce checks」。
-   3. Project Settings → API：把 Project URL 與 anon public key 填進 `live-config.js` 後重新上傳。
-   4. 玩家登入後，進度會自動同步；右下角顯示「☁ 已同步」。未設定時顯示「本機存檔」。
+4. （選用）**雲端存檔（Firebase，免費額度即可）**：
+   1. Firebase 主控台建立專案（可用「新增 Firebase 到現有 Google Cloud 專案」選你的 TLPS-3D）。
+   2. Authentication → 登入方式 → 啟用「Google」；在 Google 設定的「Web SDK 設定」→「允許的外部用戶端 ID」加入 `auth-config.js` 的 clientId。
+   3. Firestore Database → 建立資料庫（正式版模式）→「規則」貼上 `firestore.rules` 並發布。
+   4. 專案設定 → 一般 → 新增 Web 應用程式，把 `apiKey` 與 `projectId` 填進 `live-config.js` 後重新上傳。
+   5. Authentication → 設定 → 已授權網域：確認有 `hsiao103.github.io`。
+   6. 玩家登入後進度自動同步，右下角顯示「☁ 已同步」；未設定時顯示「本機存檔」。
 
 ## 安全性與限制（請務必了解）
 - 登入是**純前端把關**：能擋一般使用者，但 `play.html` 檔案本身是公開網址，懂技術者可繞過登入直接遊玩。遊戲內容不含機密，影響有限。
-- 點數與進度存在使用者端，**無法防止同學自行修改**；若要用來正式評量或競賽，需改成由伺服器（Supabase Edge Function／資料庫規則）計分。
-- 雲端存檔有 RLS：每個人只能讀寫自己的資料。若要讓老師看全班進度，見 `supabase.sql` 末段的選用規則（請只列特定老師帳號）。
+- 點數與進度存在使用者端，**無法防止同學自行修改**；若要用來正式評量或競賽，需改成由伺服器（Firebase Cloud Functions／安全規則）計分。
+- 雲端存檔有 Firestore 規則：每個人只能讀寫自己的資料。若要讓老師看全班進度，見 `firestore.rules` 內的選用規則（請只列特定老師帳號）。
 - Google 登入無法在 claude.ai 預覽網域使用，需在自己的 GitHub Pages 網址測試。
 
 ## 之後可擴充

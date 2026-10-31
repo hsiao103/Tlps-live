@@ -59,10 +59,10 @@ footer{margin-top:30px;font-size:12.5px;color:var(--muted)}
   </div>
   <footer>Tlps-live ｜ 3D 校園與人物基底致謝：瓦特老師 water64.tw、Quaternius（CC0）</footer>
 </div>
-<script src="auth-config.js"></script><script src="live-config.js"></script><script src="auth.js"></script><script src="sb.js"></script>
+<script src="auth-config.js"></script><script src="live-config.js"></script><script src="auth.js"></script><script src="fb.js"></script>
 <script>
 (function () {
-  const A = window.TLAUTH, B = window.TLSB, C = A.cfg, $ = id => document.getElementById(id), play = C.fullPage || 'play.html';
+  const A = window.TLAUTH, B = window.TLCLOUD, C = A.cfg, $ = id => document.getElementById(id), play = C.fullPage || 'play.html';
   const msg = t => { $('msg').textContent = t; $('msg').classList.add('show'); };
   function render() {
     const s = A.configured() ? A.session() : null, box = $('act'); box.textContent = ''; $('msg').classList.remove('show');
@@ -79,7 +79,7 @@ footer{margin-top:30px;font-size:12.5px;color:var(--muted)}
     const g = document.createElement('div'); g.id = 'gbtn'; box.appendChild(g);
     A.init(async (sess, err, cred) => {
       if (!sess) { msg(err === 'domain' ? '這個帳號不在允許名單內。請使用 @tmail.ilc.edu.tw 或 @smail.ilc.edu.tw 登入。' : '登入驗證失敗，請再試一次。'); return; }
-      if (B && B.configured()) { try { await B.exchange(cred); } catch (e) { console.warn('supabase', e); } }
+      if (B && B.configured()) { try { await B.exchange(cred); } catch (e) { console.warn('cloud', e); } }
       render();
     }).then(() => A.render(g, 'zh')).catch(() => msg('Google 登入暫時無法載入，請檢查網路後重新整理。'));
   }
