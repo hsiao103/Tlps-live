@@ -7893,7 +7893,7 @@ function liftTick(dt) {
 body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bChar{display:none!important}
 #gHud{position:fixed;left:12px;top:92px;z-index:20;width:268px;max-width:calc(100vw - 24px);font-family:var(--font-ui);color:var(--fg);background:var(--panel);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.14);overflow:hidden;backdrop-filter:blur(6px)}
 #gHud .hd{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;background:linear-gradient(90deg,#f5821f,#2e9b45);color:#fff;font-weight:800;font-size:14px}
-#gHud .hd .pt{margin-left:auto;font-weight:700;font-size:12.5px;background:rgba(255,255,255,.22);padding:2px 9px;border-radius:99px}
+#gHud .hd .pt:last-child{margin-left:auto}#gHud .hd .pt{font-weight:700;font-size:12.5px;background:rgba(255,255,255,.22);padding:2px 9px;border-radius:99px}
 #gHud .bd{padding:8px 12px 10px;font-size:13px;line-height:1.5}
 #gHud.min .bd{display:none}
 #gHud .sec{font-size:11.5px;color:var(--muted);margin:7px 0 3px;font-weight:700}
@@ -8212,7 +8212,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     const d = D(), w = W(), rq = REQ(), lv = level(), next = TITLES[lv + 1];
     const row = (ok, tx, n, nav) => '<div class="t' + (ok ? ' ok' : '') + '"><span class="ck">' + (ok ? '✓' : '') + '</span><span class="tx">' + tx + '</span><span class="n">' + n + '</span>' + (nav && !ok ? '<button type="button" data-nav="' + nav + '">📍</button>' : '') + '</div>';
     const reqTx = d.req === 0 ? '找「' + NPCDEF[rq.npc].name.split(' ')[0] + '」幫忙：' + rq.title : d.req === 1 ? rq.title + '：' + rq.steps[0].name : d.req === 2 ? '回去向「' + NPCDEF[rq.npc].name.split(' ')[0] + '」回報' : rq.title + '（已完成）';
-    hud.innerHTML = '<div class="hd"><span>⭐ ' + TITLES[lv][1] + '</span><span class="pt">' + S.pts + ' 點</span></div><div class="bd">' +
+    hud.innerHTML = '<div class="hd"><span>⭐ ' + TITLES[lv][1] + '</span>' + (pastOf() >= 0 ? '<span class="pt" style="margin-left:0">' + PASTS[pastOf()][1] + ' ' + PASTS[pastOf()][0] + '</span>' : '<span class="pt" style="margin-left:0;cursor:pointer" onclick="event.stopPropagation();__live.pickPast()">🎲 選前世身分</span>') + '<span class="pt">' + S.pts + ' 點</span></div><div class="bd">' +
       (next ? '<div class="bar"><i style="width:' + Math.min(100, (S.pts - TITLES[lv][0]) / (next[0] - TITLES[lv][0]) * 100) + '%"></i></div><div class="st"><span>距「' + next[1] + '」還差 ' + (next[0] - S.pts) + ' 點</span></div>' : '') +
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
       row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') +
