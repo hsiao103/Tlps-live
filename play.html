@@ -7916,6 +7916,20 @@ window.__tlCompanions=[["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBD
   }
   const level = () => tierOf(lvOf());
 
+  /* ---------- 社團 ---------- */
+  const CLUBS = [
+    { id: 'read', name: '閱讀社', ic: '📚', k: 'study', say: '一起讀書、分享好書，學業會一直進步。' },
+    { id: 'track', name: '田徑校隊', ic: '🏃', k: 'body', say: '跑步、跳遠、接力，體能越練越強。' },
+    { id: 'choir', name: '合唱團', ic: '🎵', k: 'charm', say: '用歌聲和舞台練習表達，魅力大增。' },
+    { id: 'maker', name: '創客社', ic: '🔧', k: 'idea', say: '動手做、玩科學，點子永遠用不完。' },
+    { id: 'serve', name: '志工服務社', ic: '💚', k: 'social', say: '幫助別人、認識朋友，社交力最強。' }
+  ];
+  const RANKS = [[0, '見習社員'], [3, '正式社員'], [8, '資深社員'], [15, '幹部'], [25, '社長']];
+  const CLUB_LV = 10;
+  const clubOf = () => S.club && CLUBS.find(c => c.id === S.club.id);
+  const clubRank = () => { const n = (S.club && S.club.n) || 0; let r = 0; RANKS.forEach((x, i) => { if (n >= x[0]) r = i; }); return r; };
+  const AWARDS = [[60, '特優', 80, '🥇'], [40, '優等', 45, '🥈'], [25, '佳作', 25, '🥉'], [0, '參加獎', 10, '🎗️']];
+
   /* ---------- 夥伴 ---------- */
   const flowerTotal = () => Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0);
   const COMPS = [
@@ -7965,6 +7979,8 @@ window.__tlCompanions=[["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBD
     if (d.clean < 5) return { tx: '撿垃圾打掃校園（' + d.clean + '/5）', nav: 'litter' };
     if (d.help < 1) return { tx: d.req === 0 ? '找人接今天的小請託' : d.req === 1 ? '請託進行中：' + REQ().steps[0].name : '回去向委託人回報', nav: d.req === 1 ? 'step' : 'npc' };
     if (!w.done) return { tx: '做資源回收分類（' + Math.min(w.sorted, 10) + '/10）', nav: 'recy' };
+    if (S.club && !d.club) return { tx: '去社團佈告欄做今天的社團活動', nav: 'club' };
+    if (!S.club && lvOf() >= CLUB_LV) return { tx: '到社團佈告欄加入一個社團', nav: 'club' };
     return { tx: '今天的任務都完成了，好棒！', nav: '' };
   }
   L.COMPS = COMPS; L.compOn = compOn; L.setComp = setComp; L.checkComps = checkComps;
@@ -8271,6 +8287,54 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
         hb.onclick = () => { close(); d.heal = (d.heal || 0) + 1; S.hp = hpMax(); S.mp = Math.min(mpMax(), S.mp + 10); save(); refreshAll(); toast('休息一下，體力全滿了！💚', 3000); }; bt.appendChild(hb); } }
   }
 
+  /* ---------- 社團佈告欄與成果展 ---------- */
+  const CLUBP = snap(6, 10, { maxR: 6 }) || { x: 6, y: 0.03, z: 10 };
+  { const mk = sprite(emojiTex('🎪', '#fff8e1', '#f5821f'), [1.1, 1.1], CLUBP.x, CLUBP.y + 2.2, CLUBP.z, 31); bob.push({ s: mk, y: CLUBP.y + 2.2 });
+    sprite(nameTex('🎪 社團佈告欄', '#f5821f'), [2.1, 0.55], CLUBP.x, CLUBP.y + 3.0, CLUBP.z, 30);
+    const post = new T.Mesh(new T.BoxGeometry(1.5, 1.1, 0.12), gm(0xf5d58a)); post.position.set(CLUBP.x, CLUBP.y + 1.2, CLUBP.z); G.add(post);
+    const leg = new T.Mesh(new T.BoxGeometry(0.12, 0.7, 0.12), gm(0x7a5a3a)); leg.position.set(CLUBP.x, CLUBP.y + 0.35, CLUBP.z); G.add(leg); }
+  function clubJoin(c) {
+    S.club = { id: c.id, n: 0, since: dayKey() }; addAttr(c.k, 5, true); addPts(10, '加入' + c.name); save(); refreshAll();
+    say('社團佈告欄', '歡迎加入「' + c.name + '」' + c.ic + '！\n每天可以參加 1 次社團活動（體力 6、魔力 5），累積次數就會升階；每週還有「成果展」可以報名。', [{ label: '好，開始吧！', pri: true }]);
+  }
+  function clubActivity() {
+    const c = clubOf(), d = D(), w = W(); if (!c) return;
+    if (d.club) { say('社團佈告欄', '今天的社團活動已經參加過了，明天再來吧！', [{ label: '好' }]); return; }
+    if (S.mp < 5) { toast('魔力不足，完成任務或休息一下再來吧 ✨', 3000); return; }
+    if (!spend(6)) return;
+    S.mp -= 5; d.club = 1; w.cl = (w.cl || 0) + 1; const r0 = clubRank(); S.club.n++; const r1 = clubRank();
+    addAttr(c.k, 2); addAttr('social', 1); addPts(8, c.name + '活動');
+    if (r1 > r0) setTimeout(() => say('社團升階', c.ic + ' 恭喜！你在「' + c.name + '」升為「' + RANKS[r1][1] + '」！\n成果展的得分也會提高。', [{ label: '太棒了', pri: true }]), 900);
+    save(); refreshAll();
+  }
+  function clubShow() {
+    const c = clubOf(), w = W(); if (!c) return;
+    if (w.show) { say('社團成果展', '本週的成果展你已經參加過了（' + w.show + '）。下週再來挑戰更高的名次！', [{ label: '好' }]); return; }
+    if ((w.cl || 0) < 2) { say('社團成果展', '要先在這週參加至少 2 次社團活動，才有作品可以展出。\n目前：' + (w.cl || 0) + ' / 2', [{ label: '好，我去練習' }]); return; }
+    if (S.mp < 10) { toast('魔力不足（需要 10）', 3000); return; }
+    S.mp -= 10;
+    const score = clubRank() * 10 + (w.cl || 0) * 5 + Math.floor(S.attr[c.k] / 5) + Math.floor(Math.random() * 10), a = AWARDS.find(x => score >= x[0]);
+    w.show = a[1]; addPts(a[2], c.name + '成果展・' + a[1]); S.mp = Math.min(mpMax(), S.mp + 0);
+    if (a[1] === '特優') { const b = c.name + '特優'; if (!S.badges.includes(b)) S.badges.push(b); }
+    save(); refreshAll();
+    say('🏆 社團成果展', a[3] + ' 「' + c.name + '」成果展：' + a[1] + '！\n綜合得分 ' + score + '（社團階級＋本週活動＋屬性），獲得 ' + a[2] + ' 點。' + (a[1] === '特優' ? '\n拿到徽章「' + c.name + '特優」！' : '\n想拿更高名次：多參加活動、提升階級與屬性。'), [{ label: '謝謝大家', pri: true }]);
+  }
+  function clubDlg() {
+    const c = clubOf(), lv = lvOf(), w = W();
+    if (!c) {
+      if (lv < CLUB_LV) { say('社團佈告欄', '社團招生中！\n要 LV.' + CLUB_LV + ' 才能加入，你目前 LV.' + lv + '。多做每日任務就會升級喔。\n\n' + CLUBS.map(x => x.ic + ' ' + x.name + '（' + ATTR.find(a => a[0] === x.k)[1] + '）').join('\n'), [{ label: '好，我繼續努力' }]); return; }
+      say('社團佈告欄', '選一個想加入的社團吧！每個社團會強化不同屬性，加入後也能再退社轉社（階級會歸零）。', CLUBS.map(x => ({ label: x.ic + ' ' + x.name + '・' + ATTR.find(a => a[0] === x.k)[1], fn: () => say(x.name, x.ic + ' ' + x.name + '\n' + x.say + '\n強化屬性：' + ATTR.find(a => a[0] === x.k)[1], [{ label: '加入！', pri: true, fn: () => clubJoin(x) }, { label: '再看看', fn: clubDlg }]) })).concat([{ label: '先不要' }])); return;
+    }
+    const d = D(), nx = RANKS[clubRank() + 1];
+    say('社團佈告欄', c.ic + ' ' + c.name + '・' + RANKS[clubRank()][1] + '\n累計活動 ' + S.club.n + ' 次' + (nx ? '（再 ' + (nx[0] - S.club.n) + ' 次升「' + nx[1] + '」）' : '（已是社長！）') + '\n本週活動 ' + (w.cl || 0) + ' 次・成果展：' + (w.show || '尚未參加'), [
+      { label: d.club ? '🎯 社團活動（今天已完成）' : '🎯 參加社團活動（體力 6・魔力 5）', pri: !d.club, fn: clubActivity },
+      { label: w.show ? '🏆 成果展（本週已參加：' + w.show + '）' : '🏆 報名本週成果展（魔力 10）', pri: !!d.club && !w.show, fn: clubShow },
+      { label: '退社／轉社', fn: () => say('退出社團', '確定要退出「' + c.name + '」嗎？階級與活動次數會歸零，已得到的屬性不會減少。', [{ label: '確定退社', fn: () => { S.club = null; save(); refreshAll(); toast('已退出社團，可以再選一個！'); } }, { label: '我再想想' }]) },
+      { label: '關閉' }]);
+  }
+  ia({ id: 'club', x: CLUBP.x, y: CLUBP.y, z: CLUBP.z, r: 2.8, txt: () => '🎪 社團佈告欄', act: clubDlg });
+  L.CLUBS = CLUBS; L.clubOf = clubOf; L.clubDlg = clubDlg; L.clubActivity = clubActivity; L.clubShow = clubShow; L.clubJoin = clubJoin; L.CLUBP = CLUBP;
+
   /* ---------- 時光門 ---------- */
   const PORTAL = snap(-7, -44, { maxR: 5 }) || { x: -7, y: 0.03, z: -44 };
   { const grp = new T.Group(); grp.position.set(PORTAL.x, PORTAL.y, PORTAL.z); G.add(grp);
@@ -8321,6 +8385,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
       '<div class="sec">📅 今日任務（連續 ' + S.streak + ' 天）</div>' +
       row(d.plant >= 1, '🌱 種花', Math.min(d.plant, 1) + '/1', 'garden') + row(d.water >= 3, '💧 澆水', Math.min(d.water, 3) + '/3', 'tap') + row(d.clean >= 5, '🧹 打掃校園', Math.min(d.clean, 5) + '/5', 'litter') + row(d.help >= 1, '💚 ' + reqTx, d.help >= 1 ? '1/1' : '0/1', d.req === 1 ? 'step' : d.req === 2 || d.req === 0 ? 'npc' : '') +
       (function () { const c = COMPS.find(q => q.id === CP().active); if (!c) return ''; if (c.id === 'tbot') { const h = nextHint(); return '<div class="st" style="align-items:center"><span>🤖 小T：' + h.tx + '</span>' + (h.nav ? '<button type="button" data-nav="' + h.nav + '" style="margin-left:auto">📍</button>' : '') + '</div>'; } return '<div class="st"><span>' + c.ic + ' ' + c.name + '陪著你：' + c.eff + '</span></div>'; })() +
+      (function () { const c = clubOf(); if (c) { const w = W(); return '<div class="st"><span>' + c.ic + ' ' + c.name + '・' + RANKS[clubRank()][1] + '（本週活動 ' + (w.cl || 0) + ' 次' + (w.show ? '，成果展已參加' : '') + '）</span></div>'; } return lvOf() >= CLUB_LV ? '<div class="st"><span>🎪 可以去社團佈告欄加入社團了！</span></div>' : '<div class="st"><span>🎪 LV.' + CLUB_LV + ' 開放加入社團</span></div>'; })() +
       '<div class="sec">♻️ 本週活動：資源回收週</div>' + row(w.done, '分類回收物', Math.min(w.sorted, 10) + '/10', 'recy') +
       (pastOf() >= 0 ? '<div class="st"><span>' + PASTS[pastOf()][1] + ' 前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '</span></div>' : '') + '<div class="st"><span>💧 水桶 ' + S.can + '/' + canMax() + '</span><span>♻️ 回收物 ' + w.bag.length + '/' + bagCap() + '</span><span>🌸 花朵 ' + Object.keys(S.flowers).reduce((a, k) => a + S.flowers[k], 0) + '</span><span>🏅 ' + S.badges.length + '</span></div></div>';
     hud.querySelector('.hd').onclick = () => hud.classList.toggle('min');
@@ -8328,6 +8393,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
     hud.querySelectorAll('[data-nav]').forEach(b => b.onclick = e => { e.stopPropagation(); const k = b.dataset.nav; let p = null;
       if (k === 'garden') p = { name: '菜園', x: beds[2].x, z: beds[2].z + 3 }; else if (k === 'tap') p = { name: '水龍頭', x: TAP.x, z: TAP.z }; else if (k === 'recy') p = { name: '資源回收站', x: RECY.x, z: RECY.z + 2 };
       else if (k === 'litter') { const o = litterObjs[0] || recObjs[0]; if (o) p = { name: '垃圾', x: o.p ? o.p.x : o.mesh.position.x, z: o.p ? o.p.z : o.mesh.position.z }; else toast('垃圾都撿完了！'); }
+      else if (k === 'club') p = { name: '社團佈告欄', x: CLUBP.x, z: CLUBP.z + 1.5 };
       else if (k === 'npc') { const n = NP[rq.npc]; if (n) p = { name: n.df.name, x: n.x, z: n.z + 1.5 }; }
       else if (k === 'step') p = { name: rq.steps[0].name, x: rq.steps[0].pos.x, z: rq.steps[0].pos.z };
       if (p) navStart({ name: p.name, x: p.x, z: p.z, lv: 0 }); });
@@ -8378,7 +8444,7 @@ body.live #gStyle,body.live #gTheme,body.live #bVR,body.live #bIso,body.live #bC
       '<div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
-      '<div class="row"><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
+      '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
     bagEl.querySelector('.cl').onclick = closeBag; updateBars2();
