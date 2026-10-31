@@ -8112,7 +8112,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     cSp.visible = true; cTex = tex;
   }
   function followTick(dt, now) {
-    if (!cSp || !cSp.visible) return;
+    if (!cSp || !cSp.visible) { if (cBadge) cBadge.s.visible = false; return; }
     const fx = -Math.sin(PL.yaw), fz = -Math.cos(PL.yaw), rx = Math.cos(PL.yaw), rz = -Math.sin(PL.yaw);
     const tx = PL.x + fx * 0.4 + rx * 1.3, tz = PL.z + fz * 0.4 + rz * 1.3;
     const far = Math.hypot(tx - cSp.position.x, tz - cSp.position.z);
@@ -8120,7 +8120,10 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     else { const k = 1 - Math.exp(-dt * 4); cSp.position.x += (tx - cSp.position.x) * k; cSp.position.z += (tz - cSp.position.z) * k; }
     const g = groundAt(cSp.position.x, PL.y + 1.2, cSp.position.z), gy = isFinite(g) ? g : PL.y;
     cSp.position.y += (gy + 1.15 + Math.sin(now / 1000 * 3) * 0.1 - cSp.position.y) * (1 - Math.exp(-dt * 8));
+    if (cBadge) { cBadge.s.visible = true; cBadge.s.position.set(cSp.position.x, cSp.position.y + 0.68, cSp.position.z); }
+    if (compIA) { compIA.x = cSp.position.x; compIA.y = PL.y; compIA.z = cSp.position.z; }
   }
+  let cBadge = null, compIA = null;
   function nextHint() {
     const d = D(), w = W();
     if (d.plant < 1) return { tx: '去菜園種一顆花', nav: 'garden' };
@@ -8771,7 +8774,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     let best = null, bd = 1e9;
     for (const o of IA) {
       const t = o.txt(); if (!t) continue; const dx = PL.x - o.x, dz = PL.z - o.z, dy = Math.abs(PL.y - o.y), d = Math.hypot(dx, dz);
-      if (d < o.r && dy < 2.6 && d < bd) { bd = d; best = o; o._t = t; }
+      if (d < o.r && dy < 2.6 && d + (o.pen || 0) < bd) { bd = d + (o.pen || 0); best = o; o._t = t; }
     }
     return best;
   }
@@ -9005,11 +9008,38 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     if (document.body.classList.contains('intro') || !L.ready || dt > 1) return;
     const c = CP(); careAcc += dt;
     c.have.forEach(id => { const st = csOf(id), cr = CARE[id], was = st.full; if (!cr) return; st.full = Math.max(0, st.full - dt / 60 * cr.rate * (c.active === id ? 1 : 0.25)); if (was > 0 && st.full <= 0) { st.bond = Math.max(0, st.bond - 2); const x = COMPS.find(q => q.id === id); toast('😢 ' + x.name + '餓扁了，能力暫時失效！到 B 面板餵牠吧', 4200); save(); refreshAll(); } });
-    if (careAcc >= 1) { careAcc = 0; { const e = document.getElementById('gCmpSt'), a = c.active && COMPS.find(q => q.id === c.active); if (e) { if (!a) e.textContent = ''; else { const f = csOf(a.id).full, m = f > 60 ? '😋' : f > 30 ? '🙂' : f > 0 ? '😟 餓了' : '😢 餓扁'; e.textContent = a.ic + ' ' + m + ' ' + CARE[a.id].food[0] + Math.round(f) + '% 💞' + csOf(a.id).bond; e.style.color = f <= 30 ? '#d9534f' : ''; e.title = a.name + '：點一下開啟背包照顧牠'; } } } document.querySelectorAll('[data-fc]').forEach(e => { const st = csOf(e.dataset.fc); e.style.width = st.full + '%'; }); }
+    if (careAcc >= 1) { careAcc = 0; drawBadge(); { const e = document.getElementById('gCmpSt'), a = c.active && COMPS.find(q => q.id === c.active); if (e) { if (!a) e.textContent = ''; else { const f = csOf(a.id).full, m = f > 60 ? '😋' : f > 30 ? '🙂' : f > 0 ? '😟 餓了' : '😢 餓扁'; e.textContent = a.ic + ' ' + m + ' ' + CARE[a.id].food[0] + Math.round(f) + '% 💞' + csOf(a.id).bond; e.style.color = f <= 30 ? '#d9534f' : ''; e.title = a.name + '：點一下開啟背包照顧牠'; } } } document.querySelectorAll('[data-fc]').forEach(e => { const st = csOf(e.dataset.fc); e.style.width = st.full + '%'; }); }
     if (!c.active || dlgOpen || bagOpen || roomOpen || document.visibilityState !== 'visible') return;
     nextSpeak -= dt; if (nextSpeak <= 0) { compSpeak(); nextSpeak = (70 + Math.random() * 110) * (CARE[c.active] ? CARE[c.active].gap : 1); }
   }
-  L.care = { CARE, csOf, careFeed, careTalk, careBuy, compSpeak, gainBond, careTick, bondLv };
+  /* 夥伴頭上的狀態牌＋觸碰互動 */
+  function drawBadge() {
+    const c = CP(), id = c.active; if (!id || !cSp) return;
+    if (!cBadge) { const cv = document.createElement('canvas'); cv.width = 256; cv.height = 96; const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding; cBadge = { cv, tex, key: '', s: sprite(tex, [1.2, 0.45], PL.x, PL.y + 2, PL.z, 32) }; }
+    const st = csOf(id), cr = CARE[id], key = id + ':' + Math.round(st.full) + ':' + st.bond; if (key === cBadge.key) return; cBadge.key = key;
+    const g = cBadge.cv.getContext('2d'), w = 256, h = 96; g.clearRect(0, 0, w, h);
+    g.fillStyle = 'rgba(255,255,255,.92)'; g.strokeStyle = st.full <= 30 ? '#d9534f' : 'rgba(0,0,0,.25)'; g.lineWidth = 4; g.beginPath(); g.moveTo(14, 4); g.arcTo(w - 4, 4, w - 4, h - 4, 18); g.arcTo(w - 4, h - 4, 4, h - 4, 18); g.arcTo(4, h - 4, 4, 4, 18); g.arcTo(4, 4, w - 4, 4, 18); g.closePath(); g.fill(); g.stroke();
+    g.font = '30px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textBaseline = 'middle'; g.fillText(cr.food[0], 12, 28); g.fillText('💞', 12, 69);
+    const bar = (y, v, col) => { g.fillStyle = 'rgba(0,0,0,.14)'; g.fillRect(58, y - 9, 140, 18); g.fillStyle = col; g.fillRect(58, y - 9, 140 * v / 100, 18); };
+    bar(28, st.full, st.full <= 30 ? '#d9534f' : '#f5a623'); bar(69, st.bond, '#e0568a');
+    g.fillStyle = '#333'; g.font = 'bold 22px sans-serif'; g.textAlign = 'left'; g.fillText(Math.round(st.full), 206, 29); g.fillText(Math.round(st.bond), 206, 70);
+    cBadge.tex.needsUpdate = true;
+  }
+  function touchComp() {
+    const id = CP().active; if (!id) return; const st = csOf(id);
+    if (st.full < 50 && st.food > 0) careFeed(id); else careTalk(id);
+  }
+  { const cdom = renderer.domElement; let dn = null;
+    cdom.addEventListener('pointerdown', e => { dn = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+    cdom.addEventListener('pointerup', e => {
+      if (!dn) return; const mv = Math.hypot(e.clientX - dn.x, e.clientY - dn.y), tt = performance.now() - dn.t; dn = null;
+      if (mv > 10 || tt > 600 || !cSp || !cSp.visible || dlgOpen || bagOpen || roomOpen) return;
+      const r = cdom.getBoundingClientRect(), v = cSp.position.clone().project(camera); if (v.z > 1) return;
+      const sx = (v.x + 1) / 2 * r.width + r.left, sy = (1 - v.y) / 2 * r.height + r.top;
+      if (Math.hypot(e.clientX - sx, e.clientY - sy) <= 44) touchComp();
+    }); }
+  compIA = ia({ id: 'comp', x: 0, y: 0, z: 0, r: 2.4, pen: 50, txt: () => { const id = CP().active; return id && cSp && cSp.visible && L.ready ? '💬 摸摸' + COMPS.find(q => q.id === id).name + '（聊天／餵食）' : null; }, act: () => touchComp() });
+  L.care = { drawBadge, touchComp, CARE, csOf, careFeed, careTalk, careBuy, compSpeak, gainBond, careTick, bondLv };
   let clkAcc = 0, festAcc = 0;
   const timePill = mkEl('div', 'gTime');
   function clockTick(dt) {
