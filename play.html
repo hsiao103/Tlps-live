@@ -7839,7 +7839,9 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
 
   /* ---------- 日期、亂數 ---------- */
   const pad = n => String(n).padStart(2, '0');
-  const dayKey = (d) => { d = d || new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  const realKey = (d) => { d = d || new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  /* dayKey()：不帶參數＝「遊戲日」（現實日期＋遊戲 06:00 重置次數）；帶日期參數＝現實日期 */
+  const dayKey = (d) => { const b = realKey(d); if (d) return b; let g = null; try { g = S && S.gd; } catch (e) { /* S 尚未建立 */ } return g && g.d === b && g.n ? b + '#' + g.n : b; };
   const weekKeyOf = (d) => { d = new Date(d || Date.now()); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return dayKey(d); };   // 該週星期一
   function rng(seed) { let h = 2166136261; for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); } return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function shuffled(a, r) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -7910,11 +7912,12 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   const D = () => { const k = dayKey(); if (!S.days[k]) S.days[k] = { plant: 0, water: 0, clean: 0, help: 0, litter: [], req: 0, done: false }; return S.days[k]; };
   const W = () => { const k = weekKeyOf(); if (!S.week || S.week.key !== k) S.week = { key: k, taken: [], bag: [], sorted: 0, wrong: 0, done: false }; return S.week; };
   function rollover(force) {
+    { const rk = realKey(); if (!S.gd || S.gd.d !== rk) { S.gd = { d: rk, n: 0 }; S.gseq = (S.gseq || 0) + 1; } }
     const k = dayKey(); if (!force && rollover.k === k) return; rollover.k = k;
     D(); W();
-    if (S.vday !== k) { S.vday = k; S.hp = hpMax(); S.mp = Math.max(S.mp, Math.round(mpMax() * 0.5)); }
+    if (S.vday !== realKey()) { S.vday = realKey(); S.hp = hpMax(); S.mp = Math.max(S.mp, Math.round(mpMax() * 0.5)); }
     S.hp = Math.min(S.hp, hpMax()); S.mp = Math.min(S.mp, mpMax());
-    Object.keys(S.days).sort().slice(0, -14).forEach(x => delete S.days[x]);
+    Object.keys(S.days).slice(0, -40).forEach(x => delete S.days[x]);
     if (typeof festSync === 'function') { festCur = festNow(); }
     if (typeof buildLitter === 'function') { buildLitter(); buildRecycle(); if (typeof buildChests === 'function') buildChests(); if (typeof buildFest === 'function') buildFest(); if (typeof buildLegends === 'function') buildLegends(); if (typeof placeSteps === 'function') placeSteps(); }
   }
@@ -8086,7 +8089,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     { id: 'bunny', i: 4, name: '兔兔咪', ic: '🐰', eff: 'MP 恢復速度 ×2，與人聊天社交 +1', need: '和所有同樂人物都聊過天', prog: () => Math.min(Object.keys(NP).length, (S.met || []).filter(k => NP[k]).length) + '/' + Object.keys(NP).length, ok: () => Object.keys(NP).length > 0 && Object.keys(NP).every(k => (S.met || []).includes(k)), say: '多認識一些朋友，心情就會變好～' }
   ];
   const CP = () => { if (!S.comp || !Array.isArray(S.comp.have)) S.comp = { have: ['tbot'], active: 'tbot' }; if (!S.comp.have.includes('tbot')) S.comp.have.push('tbot'); if (!S.met) S.met = []; return S.comp; };
-  const compOn = id => { const c = S.comp; return !!(c && c.active === id && c.have && c.have.includes(id)); };
+  const compOn = id => { const c = S.comp; return !!(c && c.active === id && c.have && c.have.includes(id) && csOf(id).full > 0); };
   const compImg = (c, t) => { const a = window.__tlCompanions && window.__tlCompanions[c.i]; return a ? a[t === undefined ? level() : t] || '' : ''; };
   function checkComps() {
     if (!L.ready) return; const c = CP(); let got = null;
@@ -8173,6 +8176,10 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gCS{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:33;display:none;align-items:center;gap:10px;max-width:min(440px,calc(100vw - 24px));background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:8px 14px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px;line-height:1.5;cursor:pointer}#gCS.show{display:flex}#gCS i{font-style:normal;font-size:30px}#gCS b{display:block;font-size:12px;color:var(--muted)}
+#gBag .care{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin:4px 0 6px}#gBag .care .ch{display:flex;justify-content:space-between;gap:6px;font-size:13px;margin-bottom:4px}#gBag .care .ch span{font-size:11.5px;color:var(--muted)}
+#gBag .care .cb{display:flex;align-items:center;gap:6px;margin:3px 0}#gBag .care .cb em{font-style:normal;font-size:12px;width:62px;flex:none}#gBag .care .tr{flex:1;height:9px;border-radius:9px;background:rgba(0,0,0,.12);overflow:hidden}#gBag .care .tr i{display:block;height:100%;background:#f5a623;border-radius:9px;transition:width .4s}#gBag .care .tr i.bd{background:#e0568a}
+#gBag .care .cbt{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}#gBag .care .cbt button{flex:1;min-width:80px;border:1.5px solid var(--line);background:transparent;color:var(--fg);border-radius:99px;padding:5px 6px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
 #gRoom{position:fixed;inset:0;z-index:41;display:none;place-items:center;background:rgba(0,0,0,.4)}#gRoom.show{display:grid}
 #gRoom .pn{box-sizing:border-box;width:min(480px,calc(100vw - 24px));max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow:auto;background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px 14px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 10px 40px rgba(0,0,0,.35)}
 #gRoom h3{margin:0 0 2px;font-size:17px}#gRoom .sub{font-size:12.5px;color:var(--muted);margin:4px 0}
@@ -8252,8 +8259,8 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   function taskDone(key, label) {
     addPts(5, label + '完成！'); S.mp = Math.min(mpMax(), S.mp + 8); const d = D();
     if (!d.done && d.plant >= 1 && d.water >= 3 && d.clean >= 5 && d.help >= 1) {
-      d.done = true; S.doneDays = (S.doneDays || 0) + 1; addAttr('idea', 3); const yest = dayKey(new Date(Date.now() - 864e5));
-      S.streak = S.lastAll === yest ? S.streak + 1 : 1; S.lastAll = dayKey(); S.best = Math.max(S.best, S.streak);
+      d.done = true; S.doneDays = (S.doneDays || 0) + 1; addAttr('idea', 3); const yest = realKey(new Date(Date.now() - 864e5)), rk0 = realKey();
+      S.streak = S.lastAll === rk0 ? Math.max(1, S.streak) : S.lastAll === yest ? S.streak + 1 : 1; S.lastAll = rk0; S.best = Math.max(S.best, S.streak);
       setTimeout(() => { addPts(10, '今日任務全部完成！連續 ' + S.streak + ' 天'); save(); refreshAll(); say('今日小志工證', '🎉 今天的任務全部完成！\n連續完成 ' + S.streak + ' 天，目前身分：' + TITLES[level()][1] + '。\n明天會有新的垃圾、新的小請託，記得回來照顧你的花！'); }, 900);
     }
   }
@@ -8523,7 +8530,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     { npc: 'vol', title: '愛心餐籃任務', ask: '今天有愛心點心要發給值班的老師。\n你可以把這個餐籃送到{P}嗎？送到再回來告訴我。', give: '拿到愛心餐籃 🧺', steps: [{ id: 'gazebo', icon: '🧺', at: [6, -44], base: '送餐地點', alts: [[6, -44, '梅花廣場涼亭'], [-3, -75, '涼亭・遊戲區'], [27, -22, '集合場'], [0, -13, '校門口']], name: '梅花廣場涼亭', verb: '🧺 送出餐籃', done: '老師開心地收下了！回去跟志工阿姨說一聲吧。' }], thanks: '辛苦了！老師們都說好吃。你真是我們的小志工！' },
     { npc: 'jan', title: '水龍頭漏水', ask: '菜園的水龍頭一直在漏水，浪費水資源。\n你可以去幫我把它關緊嗎？關好了再回來找我。', give: '', steps: [{ id: 'tap', icon: '🔧', at: null, name: '菜園水龍頭', verb: '🔧 關緊水龍頭', done: '水龍頭關緊了！回去跟工友伯伯說一聲吧。' }], thanks: '太好了，省下好多水！謝謝你，小志工！' }
   ];
-  const REQ = () => { const k = dayKey(); const n = (parseInt(k.slice(5, 7)) * 31 + parseInt(k.slice(8))) % REQS.length; return REQS[n]; };
+  const REQ = () => { const k = dayKey(); const n = (parseInt(k.slice(5, 7)) * 31 + parseInt(k.slice(8, 10)) + ((S.gd && S.gd.n) || 0)) % REQS.length; return REQS[n]; };
   function placeSteps() {
     REQS.forEach(rq => rq.steps.forEach(st => {
       if (!st.alts || !st.mk) return;
@@ -8861,6 +8868,14 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     g += ATTR.map((a, i) => { const p = pt(i, 1.32); return '<text x="' + p[0].toFixed(1) + '" y="' + p[1].toFixed(1) + '" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">' + a[2] + ' ' + a[1] + ' ' + v[i] + '</text>'; }).join('');
     return '<svg class="radar" viewBox="0 0 240 215" width="240" height="215" role="img" aria-label="五角屬性">' + g + '</svg>';
   }
+  function careHtml() {
+    const c = CP(), id = (csSel && c.have.includes(csSel)) ? csSel : (c.active || ''); if (!id) return ''; const x = COMPS.find(q => q.id === id), cr = CARE[id], st = csOf(id), bl = bondLv(id);
+    return '<div class="care"><div class="ch"><b>' + x.ic + ' ' + x.name + '</b><span>個性：' + cr.tone + '・親密 Lv.' + bl + '</span></div>' +
+      '<div class="cb"><em>' + cr.food[0] + ' 飽足</em><div class="tr"><i data-fc="' + id + '" style="width:' + st.full + '%"></i></div></div>' +
+      '<div class="cb"><em>💞 親密</em><div class="tr"><i class="bd" style="width:' + st.bond + '%"></i></div></div>' +
+      (st.full <= 0 ? '<div class="sub" style="color:#d9534f">餓扁了，能力暫停！</div>' : '') +
+      '<div class="cbt"><button type="button" data-feed="' + id + '">' + cr.food[0] + ' 餵' + cr.food[1] + '×' + st.food + '</button><button type="button" data-buy="' + id + '">🪙' + BUY_FOOD + ' 買' + cr.food[1] + '</button><button type="button" data-talk="' + id + '">💬 聊聊</button></div></div>';
+  }
   function renderBag() {
     const A = window.TLAUTH, ss = A && A.session && A.session(), nm = (ss && (ss.name || ss.email)) || '同學';
     const lv = lvOf(), items = bagItems(), cap = Math.max(bagCap(), items.length + 1), pa = pastOf() >= 0 ? PASTS[pastOf()] : null;
@@ -8869,7 +8884,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     bagEl.innerHTML = '<div class="pn"><button type="button" class="x" aria-label="關閉">✕</button><div class="top">' + avHtml('bv') + '<div><h3>' + (pa ? pa[1] + ' ' : '') + nm + '</h3><div class="sub" style="margin:0">LV.' + lv + '・' + TIERS[level()][1] + '（' + TIERS[level()][2] + '）・' + TITLES[level()][1] + (pa ? '<br>前世：' + pa[0] + '【' + pa[2] + '】' : '<br>尚未選擇前世身分') + '</div></div></div>' +
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
-      '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' +
+      '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
       '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
@@ -8877,7 +8892,8 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
     bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
-    bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) setComp(x.id); else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
+    bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
+    bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
   }
   function updateBars2() {
     const lv = lvOf(), a = lvNeed(lv), b = lvNeed(lv + 1), set = (id, p, t) => { const e = document.getElementById(id), f = document.getElementById(id + 'T'); if (e) e.style.width = Math.max(0, Math.min(100, p)) + '%'; if (f) f.textContent = t; };
@@ -8923,11 +8939,83 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
     if (walkAcc >= 20) { const n = Math.floor(walkAcc / 20); walkAcc -= n * 20; S.hp = Math.max(0, S.hp - n); if (S.hp <= 12 && !lowWarn) { lowWarn = true; toast('⚠️ 體力快用完了！停下來休息、喝水，或按 H 使用補血包', 4200); } if (S.hp > 30) lowWarn = false; updateBars(); }
   }
   L.moving = () => movingT > 0;
+  function newGameDay() {
+    if (!S.gd) S.gd = { d: realKey(), n: 0 }; S.gd.n++; S.gseq = (S.gseq || 0) + 1; rollover(true); save(); refreshAll();
+    toast('🌅 早上 6:00，新的一天開始了！每日任務、寶箱與請託都已重置', 5200);
+  }
+  L.newGameDay = newGameDay;
+
+  /* ---------- 夥伴養成：飢餓、親密度、個性對話 ---------- */
+  const CARE = {
+    dog: { tone: '熱情忠誠', rate: 1.3, food: ['🦴', '骨頭'], gap: 0.8,
+      hungry: ['汪嗚…肚子扁扁的，我可以吃骨頭嗎？', '汪！我快餓昏了，主人～'], hp: ['汪！你的 HP 只剩 {hp} 了，快去找校護！', '主人你流血了嗎？！先休息一下啦！'], mp: ['汪，你看起來沒力氣了，休息一下吧！'], long: ['汪！玩這麼久了，我們去看看遠方好不好？'], night: ['汪汪！晚上巡邏我最在行！'],
+      pre: '汪汪！', suf: '，衝啊！', chat: ['今天也要跟主人一起努力！', '我最喜歡跟你一起散步了～', '汪！我聞到花香了！', '不管去哪裡，我都會跟著你。'], fed: ['汪！好吃好吃！最愛主人了！'] },
+    tbot: { tone: '理性嚴謹', rate: 0.6, food: ['🔋', '電池'], gap: 1,
+      hungry: ['電量低於 30%，請補充電池。', '警告：能源即將耗盡，建議立即補給。'], hp: ['警告：HP {hp}/{max}，建議使用補血包（H）或找校護。', '生命值偏低，請避免繼續走動。'], mp: ['魔力過低，建議暫停消耗魔力的行動。'], long: ['已連續遊玩一段時間，建議休息 20 秒以保護視力。'], night: ['現在是夜間，可能有校園傳說出現，請注意安全。'],
+      pre: '【提示】', suf: '。', chat: ['統計：今天的效率不錯。', '我正在整理你的任務清單。', '資料顯示，補水能提高專注力。', '有需要隨時叫我。'], fed: ['電量補充完畢，運作效率 +100%。'] },
+    cat: { tone: '傲嬌獨立', rate: 0.9, food: ['🐟', '小魚乾'], gap: 1.4,
+      hungry: ['…哼，我才不是餓了，只是想吃小魚乾而已。', '喵…肚子叫了，別誤會，不是在跟你要吃的。'], hp: ['哼，才這樣就喘了？HP 只剩 {hp}，快去保健室啦。', '…別逞強，我可不想看你倒下。'], mp: ['你看起來很累。…才不是關心你。'], long: ['喵，玩這麼久了，不休息一下嗎？才不是擔心你。'], night: ['喵～夜晚才是我的時間。', '月光很美，要不要去找傳說？'],
+      pre: '…喵。', suf: '，別拖拖拉拉。', chat: ['別一直盯著我看啦。', '今天天氣…還行吧。', '我只是剛好經過而已。', '…要是累了，可以靠過來一下。'], fed: ['…還不錯。謝謝。（尾巴搖了一下）'] },
+    sprout: { tone: '溫柔細心', rate: 1.0, food: ['💧', '營養水'], gap: 1,
+      hungry: ['好渴喔…可以給我一點營養水嗎？', '葉子有點垂下來了…'], hp: ['你受傷了嗎？先坐下來休息，好不好？', 'HP 只剩 {hp} 了，我好擔心你…'], mp: ['你看起來有點累了，深呼吸一下吧。'], long: ['玩了好久喔，起來動一動、看看遠方吧～'], night: ['夜裡有點涼，記得多穿一點喔。'],
+      pre: '呢…', suf: '，慢慢來就好～', chat: ['今天的陽光好舒服。', '花開的時候，我也會很開心。', '你今天有好好吃飯嗎？', '大家都很努力呢。'], fed: ['謝謝你，好好喝！我又長高一點了。'] },
+    bunny: { tone: '害羞黏人', rate: 1.1, food: ['🥕', '紅蘿蔔'], gap: 1.1,
+      hungry: ['那個…我有一點餓了…可以吃紅蘿蔔嗎？', '肚子咕嚕咕嚕叫…對不起…'], hp: ['你……你還好嗎？HP 只剩 {hp} 了…要不要找校護老師？', '請你不要受傷…我會擔心的。'], mp: ['你好像很累了…要、要不要休息一下？'], long: ['玩了好久了…我們休息一下好不好？'], night: ['晚上有點可怕…我可以靠近你一點嗎？'],
+      pre: '那、那個…', suf: '，我陪你一起去…', chat: ['今天跟大家聊天了嗎？我…有點緊張。', '你在的時候，我就不怕了。', '嘿嘿，今天也能跟你在一起。', '同樂的大家都好溫柔。'], fed: ['好好吃…謝謝你，我最喜歡你了！'] }
+  };
+  const BUY_FOOD = 8;
+  function csOf(id) { if (!S.cs) S.cs = {}; if (!S.cs[id]) S.cs[id] = { full: 80, bond: 0, food: 2, tk: '' }; return S.cs[id]; }
+  const bondLv = id => Math.min(4, Math.floor(csOf(id).bond / 25));
+  const csBubble = mkEl('div', 'gCS'); let csT = 0, csSel = '', nextSpeak = 70, careAcc = 0;
+  csBubble.onclick = () => csBubble.classList.remove('show');
+  function csSay(x, text) { csBubble.innerHTML = '<i>' + x.ic + '</i><div><b>' + x.name + '</b>' + text + '</div>'; csBubble.classList.add('show'); clearTimeout(csT); csT = setTimeout(() => csBubble.classList.remove('show'), 8000); }
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const fillTx = t => t.replace('{hp}', Math.round(S.hp)).replace('{max}', hpMax());
+  function compSpeak(force) {
+    const c = CP(), x = COMPS.find(q => q.id === c.active); if (!x || !L.ready) return false; const cr = CARE[x.id], st = csOf(x.id), r = Math.random();
+    let t;
+    if (st.full < 30 && (force || r < 0.7)) t = pick(cr.hungry) + (st.food > 0 ? '（到 B 面板餵我吧）' : '（記得去 B 面板買點心）');
+    else if (S.hp / hpMax() < 0.4 && (force || r < 0.8)) t = pick(cr.hp);
+    else if (S.mp / mpMax() < 0.25 && r < 0.5) t = pick(cr.mp);
+    else if (playAcc > 1500 && r < 0.4) t = pick(cr.long);
+    else if (nightFlag && r < 0.3) t = pick(cr.night);
+    else if (r < 0.55 || force === 'task') { const h = nextHint(); t = h && h.tx ? cr.pre + h.tx.replace(/（.*?）/g, '') + cr.suf : pick(cr.chat); }
+    else t = pick(cr.chat);
+    csSay(x, fillTx(t)); return true;
+  }
+  function careFeed(id) {
+    const x = COMPS.find(q => q.id === id), st = csOf(id), cr = CARE[id];
+    if (st.food <= 0) { toast(cr.food[0] + ' 沒有' + cr.food[1] + '了，可以花 🪙' + BUY_FOOD + ' 買一份', 3000); return; }
+    if (st.full >= 98) { toast(x.name + '已經吃得飽飽的了', 2200); return; }
+    st.food--; st.full = Math.min(100, st.full + 40); gainBond(id, st.full < 45 ? 4 : 3); save(); renderBag(); csSay(x, pick(cr.fed)); refreshAll();
+  }
+  function gainBond(id, n) {
+    const st = csOf(id), x = COMPS.find(q => q.id === id), b0 = Math.floor(st.bond / 25); st.bond = Math.min(100, st.bond + n); const b1 = Math.floor(st.bond / 25);
+    if (b1 > b0) { const nm = ['', '熟悉', '信賴', '摯友', '靈魂伴侶'][b1], rw = b1 * 15; S.coin = (S.coin || 0) + rw; setTimeout(() => toast('💞 與' + x.name + '的親密度升級為「' + nm + '」！獲得 🪙' + rw, 4200), 600); }
+  }
+  function careTalk(id) {
+    const x = COMPS.find(q => q.id === id), st = csOf(id), cr = CARE[id], dk = dayKey(); let msg = pick(cr.chat);
+    if (st.tk !== dk) { st.tk = dk; gainBond(id, 2); msg += '（親密度 +2）'; } save(); renderBag(); csSay(x, msg);
+  }
+  function careBuy(id) {
+    const st = csOf(id), cr = CARE[id]; if ((S.coin || 0) < BUY_FOOD) { toast('星幣不足（需要 ' + BUY_FOOD + '）', 2400); return; }
+    S.coin -= BUY_FOOD; st.food++; save(); renderBag(); refreshAll(); toast(cr.food[0] + ' 買了一份' + cr.food[1], 1800);
+  }
+  function careTick(dt) {
+    if (document.body.classList.contains('intro') || !L.ready || dt > 1) return;
+    const c = CP(); careAcc += dt;
+    c.have.forEach(id => { const st = csOf(id), cr = CARE[id], was = st.full; if (!cr) return; st.full = Math.max(0, st.full - dt / 60 * cr.rate * (c.active === id ? 1 : 0.25)); if (was > 0 && st.full <= 0) { st.bond = Math.max(0, st.bond - 2); const x = COMPS.find(q => q.id === id); toast('😢 ' + x.name + '餓扁了，能力暫時失效！到 B 面板餵牠吧', 4200); save(); refreshAll(); } });
+    if (careAcc >= 1) { careAcc = 0; document.querySelectorAll('[data-fc]').forEach(e => { const st = csOf(e.dataset.fc); e.style.width = st.full + '%'; }); }
+    if (!c.active || dlgOpen || bagOpen || roomOpen || document.visibilityState !== 'visible') return;
+    nextSpeak -= dt; if (nextSpeak <= 0) { compSpeak(); nextSpeak = (70 + Math.random() * 110) * (CARE[c.active] ? CARE[c.active].gap : 1); }
+  }
+  L.care = { CARE, csOf, careFeed, careTalk, careBuy, compSpeak, gainBond, careTick, bondLv };
   let clkAcc = 0, festAcc = 0;
   const timePill = mkEl('div', 'gTime');
   function clockTick(dt) {
     if (document.body.classList.contains('intro')) return;
-    gh = (gh + dt / HOUR_SEC) % 24; const t = nightAmt(gh); clkAcc += dt;
+    { const g0 = gh; gh = (gh + dt / HOUR_SEC) % 24; if (g0 < 6 && gh >= 6 && L.ready) newGameDay(); }
+    const t = nightAmt(gh); clkAcc += dt;
     if (clkAcc >= 0.25) { clkAcc = 0; applySky(t); const e = document.getElementById('gClk'); if (e) e.textContent = '📅 ' + dateStr() + '　' + clockIc(gh) + ' 校園時間 ' + hhmm(gh); const tp = document.getElementById('gTime'); if (tp) tp.textContent = (new Date().getMonth() + 1) + '/' + new Date().getDate() + '（' + WD[new Date().getDay()] + '）' + clockIc(gh) + ' ' + hhmm(gh); chestObjs.forEach(o => { o.mark.visible = Math.hypot(PL.x - o.x, PL.z - o.z) < 28 && Math.abs(PL.y - o.y) < 4.5; }); { const ec = examNow(); const on = !!ec; if (L.examMk) { L.examMk.visible = on && Math.hypot(PL.x - EXAMP.x, PL.z - EXAMP.z) < 45; L.examLab.visible = L.examMk.visible; } } legendObjs.forEach(o => { o.mark.visible = !!nightFlag && Math.hypot(PL.x - o.x, PL.z - o.z) < 40; }); }
     moveTick(dt); festAcc += dt; if (festAcc > 20) { festAcc = 0; festSync(); }
     if (document.visibilityState === 'visible' && dt < 1) { playAcc += dt; const d = D(); d.play = (d.play || 0) + dt; if (playAcc >= nextRemind) { if (remind() === false) nextRemind = playAcc + 5; } }
@@ -8937,7 +9025,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   let vAcc = 0, hpT = 0, mpT = 0;
   const prevTick = window.liveTick;
   window.liveTick = function (dt, now) {
-    prevTick(dt, now); followTick(dt, now); clockTick(dt);
+    prevTick(dt, now); followTick(dt, now); clockTick(dt); careTick(dt);
     vAcc += dt; if (vAcc >= 1) { const sec = Math.floor(vAcc); vAcc -= sec; hpT += sec; mpT += sec;
       const hpS = compOn('sprout') ? 1 : 2, mpS = compOn('bunny') ? 6 : 12;
       if (hpT >= hpS) { const n = Math.floor(hpT / hpS); hpT -= n * hpS; if (movingT <= 0) S.hp = Math.min(hpMax(), S.hp + n); }
