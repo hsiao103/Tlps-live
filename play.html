@@ -9170,7 +9170,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       b2.onclick = () => { S.noSfx = S.noSfx ? 0 : 1; save(); sync2(); if (!S.noSfx) SFX.play('ok', 0); }; sync2(); m.insertBefore(r2, m.querySelector('#gView') ? m.querySelector('#gView').nextSibling : null);
       const r3 = document.createElement('div'); r3.className = 'row'; r3.id = 'gBgmRow'; r3.innerHTML = '<span class="lab">背景音樂</span><button type="button" id="bBgm"></button>';
       const b3 = r3.querySelector('#bBgm'), sync3 = () => { b3.textContent = S.noBgm ? '🎵 已關閉（點此開啟）' : '🎵 開啟（點此關閉）'; b3.className = S.noBgm ? '' : 'on'; };
-      b3.onclick = () => { S.noBgm = S.noBgm ? 0 : 1; save(); sync3(); BGM.refresh(); }; sync3(); r2.parentNode ? r2.parentNode.insertBefore(r3, r2.nextSibling) : m.appendChild(r3);
+      b3.onclick = () => { S.noBgm = S.noBgm ? 0 : 1; save(); sync3(); BGM.refresh(); };
+      const r4 = document.createElement('div'); r4.className = 'row'; r4.id = 'gSndTest'; r4.innerHTML = '<span class="lab">聲音測試</span><button type="button" id="bSnd">🔔 測試聲音</button>';
+      r4.querySelector('#bSnd').onclick = () => { auUnlock(); const st = L.audioState(); setTimeout(() => { SFX.play('levelup', 0); toast(st === 'running' ? '🔊 如果聽到鈴聲就正常。沒聲音請檢查：裝置音量、手機靜音鍵（iPhone 請撥到有聲）、瀏覽器分頁是否被靜音' : '🔇 聲音尚未啟用（' + st + '），請再點一次此按鈕；iPhone 請關閉靜音鍵', 6500); }, 150); }; sync3(); r2.parentNode ? (r2.parentNode.insertBefore(r3, r2.nextSibling), r3.parentNode.insertBefore(r4, r3.nextSibling)) : m.appendChild(r3);
       const at = m.querySelector('#gTheme'); if (at && at.nextSibling) m.insertBefore(r, at.nextSibling); else m.appendChild(r);
     }
     setTimeout(festSync, 300);
@@ -9210,7 +9212,26 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       toast(m) { m = String(m || ''); this.play(/失敗|不足|不夠|沒有|請先|無法|還不能|不能/.test(m) ? 'error' : /進化|覺醒/.test(m) ? 'evo' : /🎁|🪙|\+\d|獲得|收穫|完成|成為|解鎖/.test(m) ? 'coin' : 'pop', 150); }
     };
   })();
-  document.addEventListener('pointerdown', () => { if (!S.noSfx) SFX.ctx(); }, { capture: true });
+  /* 解鎖音訊：手機瀏覽器（尤其 iPhone Safari）要在「觸碰結束／點擊」手勢內 resume；並用無聲 <audio> 讓 iPhone 靜音鍵不擋 WebAudio */
+  const AU = { el: null, ok: false };
+  function auUnlock() {
+    try {
+      const a = SFX.ctx(); if (!a) return;
+      if (a.state !== 'running') a.resume().catch(() => {});
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* 忽略 */ }
+      if (AU.ios === undefined) AU.ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (AU.ios) { /* 只有 iOS 需要：播放一段真正有長度的無聲音檔，讓靜音撥片不擋 WebAudio */
+        if (!AU.el) { const n = 4410, u = new Uint8Array(44 + n * 2), dv = new DataView(u.buffer), w = (o, t) => { for (let i = 0; i < t.length; i++) u[o + i] = t.charCodeAt(i); }; w(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 44100, true); dv.setUint32(28, 88200, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, n * 2, true); AU.el = new Audio(URL.createObjectURL(new Blob([u], { type: 'audio/wav' }))); AU.el.loop = true; AU.el.setAttribute('playsinline', ''); }
+        if (AU.el.paused) AU.el.play().catch(() => {});
+      }
+      const b = a.createBuffer(1, 1, 22050), sr = a.createBufferSource(); sr.buffer = b; sr.connect(a.destination); sr.start(0);
+      if (a.state === 'running') AU.ok = true;
+    } catch (e) { /* 忽略 */ }
+  }
+  ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (!S.noSfx || !S.noBgm) auUnlock(); }, { capture: true, passive: true }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(auUnlock, 50); });
+  setInterval(() => { try { const a = SFX.ctx(); } catch (e) { /* 忽略 */ } }, 5000);
+  L.audioState = () => { const a = SFX.ctx(); return a ? a.state : 'none'; };
   document.addEventListener('click', e => { const b = e.target && e.target.closest && e.target.closest('button'); if (!b || b.closest('#tbtns,#joyL,#joyR,#gGear')) return; SFX.play(b.classList.contains('pri') || b.id === 'iGo' ? 'ok' : 'click', 40); }, true);
   { const stp = { t: 0 }; let px = null, pz = null, pvy = 0, pt = 0; setInterval(() => { try { if (S.noSfx || document.body.classList.contains('intro') || !L.ready) { px = null; return; } const now = performance.now(), dt = (now - pt) / 1000; pt = now; if (px !== null && dt > 0 && dt < 0.5) { const sp = Math.hypot(PL.x - px, PL.z - pz) / dt, ground = Math.abs(PL.vy) < 0.05; if (pvy === 0 && PL.vy > 4) SFX.play('jump', 200); else if (pvy < -3 && PL.vy === 0) SFX.play('land', 150); if (ground && sp > 1 && sp < 30 && now - stp.t > (sp > 6 ? 260 : 380)) { stp.t = now; SFX.play('step', 120); } } px = PL.x; pz = PL.z; pvy = PL.vy; } catch (e) { /* 忽略 */ } }, 50); }
   /* ---------- 背景音樂：日系冒險風，全部原創、WebAudio 即時合成（無取樣、無他人旋律，沒有版權問題）---------- */
