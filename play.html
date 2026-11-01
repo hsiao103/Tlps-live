@@ -9168,6 +9168,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const r2 = document.createElement('div'); r2.className = 'row'; r2.id = 'gSfxRow'; r2.innerHTML = '<span class="lab">音效</span><button type="button" id="bSfx"></button>';
       const b2 = r2.querySelector('#bSfx'), sync2 = () => { b2.textContent = S.noSfx ? '🔇 已關閉（點此開啟）' : '🔊 開啟（點此關閉）'; b2.className = S.noSfx ? '' : 'on'; };
       b2.onclick = () => { S.noSfx = S.noSfx ? 0 : 1; save(); sync2(); if (!S.noSfx) SFX.play('ok', 0); }; sync2(); m.insertBefore(r2, m.querySelector('#gView') ? m.querySelector('#gView').nextSibling : null);
+      const r3 = document.createElement('div'); r3.className = 'row'; r3.id = 'gBgmRow'; r3.innerHTML = '<span class="lab">背景音樂</span><button type="button" id="bBgm"></button>';
+      const b3 = r3.querySelector('#bBgm'), sync3 = () => { b3.textContent = S.noBgm ? '🎵 已關閉（點此開啟）' : '🎵 開啟（點此關閉）'; b3.className = S.noBgm ? '' : 'on'; };
+      b3.onclick = () => { S.noBgm = S.noBgm ? 0 : 1; save(); sync3(); BGM.refresh(); }; sync3(); r2.parentNode ? r2.parentNode.insertBefore(r3, r2.nextSibling) : m.appendChild(r3);
       const at = m.querySelector('#gTheme'); if (at && at.nextSibling) m.insertBefore(r, at.nextSibling); else m.appendChild(r);
     }
     setTimeout(festSync, 300);
@@ -9210,6 +9213,93 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   document.addEventListener('pointerdown', () => { if (!S.noSfx) SFX.ctx(); }, { capture: true });
   document.addEventListener('click', e => { const b = e.target && e.target.closest && e.target.closest('button'); if (!b || b.closest('#tbtns,#joyL,#joyR,#gGear')) return; SFX.play(b.classList.contains('pri') || b.id === 'iGo' ? 'ok' : 'click', 40); }, true);
   { const stp = { t: 0 }; let px = null, pz = null, pvy = 0, pt = 0; setInterval(() => { try { if (S.noSfx || document.body.classList.contains('intro') || !L.ready) { px = null; return; } const now = performance.now(), dt = (now - pt) / 1000; pt = now; if (px !== null && dt > 0 && dt < 0.5) { const sp = Math.hypot(PL.x - px, PL.z - pz) / dt, ground = Math.abs(PL.vy) < 0.05; if (pvy === 0 && PL.vy > 4) SFX.play('jump', 200); else if (pvy < -3 && PL.vy === 0) SFX.play('land', 150); if (ground && sp > 1 && sp < 30 && now - stp.t > (sp > 6 ? 260 : 380)) { stp.t = now; SFX.play('step', 120); } } px = PL.x; pz = PL.z; pvy = PL.vy; } catch (e) { /* 忽略 */ } }, 50); }
+  /* ---------- 背景音樂：日系冒險風，全部原創、WebAudio 即時合成（無取樣、無他人旋律，沒有版權問題）---------- */
+  const BGM = (() => {
+    const mf = n => 440 * Math.pow(2, (n - 69) / 12);
+    const CH = (b, t) => ({ b, t });
+    const TR = {
+      /* 白天校園：C 大調五聲音階、輕快的冒險感 */
+      field: { bpm: 118, vol: 1, ins: 'tri', drums: 'soft', arp: [0, 1, 2, 3, 2, 1, 2, 1], bass: [0, 6, 8, 12],
+        prog: [CH(36, [60, 64, 67, 72]), CH(31, [59, 62, 67, 71]), CH(33, [60, 64, 69, 72]), CH(28, [59, 64, 67, 71]), CH(29, [60, 65, 69, 72]), CH(36, [60, 64, 67, 72]), CH(29, [60, 65, 69, 72]), CH(31, [59, 62, 67, 71])],
+        lead: [[[0, 76, 3], [3, 79, 3], [6, 81, 2], [8, 79, 4], [12, 76, 4]], [[0, 74, 4], [4, 76, 2], [6, 74, 2], [8, 71, 6], [14, 74, 2]], [[0, 72, 3], [3, 76, 3], [6, 79, 2], [8, 81, 6], [14, 79, 2]], [[0, 79, 4], [4, 76, 4], [8, 74, 4], [12, 76, 4]],
+          [[0, 77, 3], [3, 81, 3], [6, 84, 2], [8, 81, 4], [12, 77, 4]], [[0, 76, 4], [4, 79, 4], [8, 84, 4], [12, 79, 4]], [[0, 77, 4], [4, 79, 2], [6, 81, 2], [8, 84, 6], [14, 81, 2]], [[0, 83, 4], [4, 81, 2], [6, 79, 2], [8, 74, 8]]] },
+      /* 夜晚校園：A 小調、八音盒般的靜謐 */
+      night: { bpm: 74, vol: 0.9, ins: 'box', drums: 'none', arp: [0, 1, 2, 3, 2, 1, 3, 2], bass: [0, 8],
+        prog: [CH(33, [57, 60, 64, 67]), CH(29, [57, 60, 65, 69]), CH(36, [55, 60, 64, 67]), CH(31, [55, 59, 62, 67]), CH(33, [57, 60, 64, 67]), CH(29, [57, 60, 65, 69]), CH(38, [57, 62, 65, 69]), CH(28, [56, 59, 64, 68])],
+        lead: [[[0, 81, 6], [8, 76, 4], [12, 79, 4]], [[0, 77, 6], [8, 72, 4], [12, 76, 4]], [[0, 79, 6], [8, 76, 4], [12, 72, 4]], [[0, 74, 6], [8, 71, 4], [12, 74, 4]],
+          [[0, 81, 4], [4, 84, 4], [8, 81, 4], [12, 76, 4]], [[0, 77, 4], [4, 81, 4], [8, 77, 4], [12, 72, 4]], [[0, 74, 4], [4, 77, 4], [8, 81, 4], [12, 77, 4]], [[0, 76, 6], [8, 80, 4], [12, 83, 4]]] },
+      /* 片頭：D 大調、壯闊的序曲，鐘聲與弦樂 */
+      title: { bpm: 88, vol: 1, ins: 'bell', drums: 'timp', arp: [0, 1, 2, 3, 2, 3, 2, 1], bass: [0, 8],
+        prog: [CH(38, [62, 66, 69, 74]), CH(33, [61, 64, 69, 73]), CH(35, [62, 66, 69, 74]), CH(31, [62, 67, 71, 74]), CH(38, [62, 66, 69, 74]), CH(33, [61, 64, 69, 73]), CH(31, [62, 67, 71, 74]), CH(33, [61, 64, 69, 73])],
+        lead: [[[0, 74, 6], [8, 78, 4], [12, 81, 4]], [[0, 81, 4], [4, 80, 2], [6, 81, 2], [8, 85, 8]], [[0, 83, 6], [8, 81, 4], [12, 78, 4]], [[0, 79, 6], [8, 81, 4], [12, 83, 4]],
+          [[0, 86, 8], [8, 83, 4], [12, 81, 4]], [[0, 81, 4], [4, 83, 2], [6, 85, 2], [8, 88, 8]], [[0, 86, 6], [8, 83, 4], [12, 79, 4]], [[0, 85, 12], [12, 81, 4]]] },
+      /* 一般戰鬥：E 小調、疾走感 */
+      battle: { bpm: 150, vol: 0.95, ins: 'sq', drums: 'rock', arp: null, bass: [0, 2, 4, 6, 8, 10, 12, 14], oct: 1,
+        prog: [CH(40, [64, 67, 71, 76]), CH(36, [64, 67, 72, 76]), CH(38, [62, 66, 69, 74]), CH(35, [63, 66, 71, 75]), CH(40, [64, 67, 71, 76]), CH(36, [64, 67, 72, 76]), CH(33, [60, 64, 69, 72]), CH(35, [63, 66, 71, 75])],
+        lead: [[[0, 76, 2], [2, 79, 2], [4, 83, 2], [6, 79, 2], [8, 76, 4], [12, 74, 2], [14, 76, 2]], [[0, 72, 2], [2, 76, 2], [4, 79, 2], [6, 76, 2], [8, 84, 4], [12, 83, 2], [14, 79, 2]], [[0, 74, 2], [2, 78, 2], [4, 81, 2], [6, 78, 2], [8, 86, 4], [12, 81, 2], [14, 78, 2]], [[0, 75, 2], [2, 78, 2], [4, 83, 4], [8, 82, 2], [10, 83, 2], [12, 78, 4]],
+          [[0, 88, 3], [3, 86, 1], [4, 83, 4], [8, 79, 2], [10, 83, 2], [12, 86, 4]], [[0, 84, 3], [3, 83, 1], [4, 79, 4], [8, 76, 2], [10, 79, 2], [12, 84, 4]], [[0, 81, 2], [2, 84, 2], [4, 88, 4], [8, 84, 2], [10, 81, 2], [12, 76, 4]], [[0, 75, 2], [2, 78, 2], [4, 81, 2], [6, 83, 2], [8, 87, 6], [14, 83, 2]]] },
+      /* BOSS 戰：D 小調、緊迫而壯烈 */
+      boss: { bpm: 164, vol: 0.95, ins: 'saw', drums: 'heavy', arp: null, bass: [0, 2, 3, 6, 8, 10, 11, 14], oct: 1,
+        prog: [CH(38, [62, 65, 69, 74]), CH(34, [62, 65, 70, 74]), CH(36, [60, 64, 67, 72]), CH(33, [61, 64, 69, 73]), CH(38, [62, 65, 69, 74]), CH(34, [62, 65, 70, 74]), CH(31, [62, 67, 70, 74]), CH(33, [61, 64, 69, 73])],
+        lead: [[[0, 74, 2], [2, 77, 2], [4, 81, 2], [6, 77, 2], [8, 86, 6], [14, 84, 2]], [[0, 82, 2], [2, 81, 2], [4, 77, 2], [6, 74, 2], [8, 82, 6], [14, 81, 2]], [[0, 84, 2], [2, 79, 2], [4, 76, 2], [6, 79, 2], [8, 84, 4], [12, 88, 4]], [[0, 85, 2], [2, 81, 2], [4, 85, 2], [6, 88, 2], [8, 89, 6], [14, 88, 2]],
+          [[0, 86, 4], [4, 89, 4], [8, 93, 4], [12, 89, 4]], [[0, 82, 4], [4, 86, 4], [8, 89, 4], [12, 86, 4]], [[0, 79, 2], [2, 82, 2], [4, 86, 2], [6, 82, 2], [8, 91, 6], [14, 89, 2]], [[0, 85, 2], [2, 88, 2], [4, 91, 2], [6, 88, 2], [8, 93, 8]]] }
+    };
+    const nbufs = new WeakMap();
+    function noiseBuf(ac) { let b = nbufs.get(ac); if (!b) { b = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const a = b.getChannelData(0); for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1; nbufs.set(ac, b); } return b; }
+    function V(ac, dest, type, f, t, d, v, o) { o = o || {}; const os = ac.createOscillator(), g = ac.createGain(); os.type = type; os.frequency.value = f; if (o.det) os.detune.value = o.det; const a = o.a || 0.006, e = Math.max(a + 0.02, d); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + e); let out = g; if (o.lp) { const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = o.lp; os.connect(fl); fl.connect(g); } else os.connect(g); g.connect(dest); os.start(t); os.stop(t + e + 0.05); }
+    function N(ac, dest, t, d, v, ft, f) { const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = noiseBuf(ac); fl.type = ft; fl.frequency.value = f; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); s.connect(fl); fl.connect(g); g.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + d + 0.03); }
+    function kick(ac, dest, t, v) { const os = ac.createOscillator(), g = ac.createGain(); os.frequency.setValueAtTime(150, t); os.frequency.exponentialRampToValueAtTime(42, t + 0.12); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2); os.connect(g); g.connect(dest); os.start(t); os.stop(t + 0.25); }
+    function sched(c, st, t, spb) {
+      const T = c.T, ac = c.ac, D = c.g, bar = Math.floor(st / 16), s = st % 16, ch = T.prog[bar % T.prog.length], vol = T.vol;
+      /* 主旋律 */
+      (T.lead[bar % T.lead.length] || []).forEach(n => { if (n[0] !== s) return; let m = n[1]; if (m > 88) m -= 12; const f = mf(m), d = n[2] * spb;
+        leadVoice(ac, D, T.ins, f, t, d, vol); });
+      /* 琶音 */
+      if (T.arp && s % 2 === 0) { const nn = ch.t[T.arp[s / 2] % ch.t.length]; V(ac, D, T.ins === 'box' ? 'sine' : 'triangle', mf(nn), t, spb * 3.2, T.ins === 'box' ? 0.035 : 0.045, { lp: 2400 }); }
+      /* 低音 */
+      if (T.bass.indexOf(s) >= 0) { let m = ch.b; if (T.oct && s % 4 === 2) m += 12; V(ac, D, T.ins === 'saw' || T.ins === 'sq' ? 'sawtooth' : 'triangle', mf(m), t, spb * (T.oct ? 1.6 : 4.5), T.oct ? 0.11 : 0.14, { lp: 600 }); }
+      /* 和弦墊 */
+      if (s === 0) ch.t.forEach((m, i) => V(ac, D, T.ins === 'saw' ? 'sawtooth' : 'triangle', mf(m - 12), t, spb * 15.5, T.ins === 'saw' || T.ins === 'sq' ? 0.02 : 0.03, { a: spb * (T.ins === 'bell' ? 3 : 2), lp: 1100, det: i * 3 - 4 }));
+      /* 節奏 */
+      const dr = T.drums;
+      if (dr === 'soft') { if (s === 0 || s === 8) kick(ac, D, t, 0.12); if (s % 2 === 0) N(ac, D, t, 0.04, s % 4 === 2 ? 0.05 : 0.025, 'highpass', 7000); if (s === 4 || s === 12) N(ac, D, t, 0.05, 0.05, 'bandpass', 2400); }
+      else if (dr === 'timp') { if (s === 0 || (s === 8 && bar % 2 === 1)) kick(ac, D, t, 0.2); if (s === 12 && bar % 4 === 3) kick(ac, D, t, 0.14); }
+      else if (dr === 'rock') { if (s === 0 || s === 8 || s === 10) kick(ac, D, t, 0.2); if (s === 4 || s === 12) N(ac, D, t, 0.12, 0.13, 'bandpass', 1800); if (s % 2 === 0) N(ac, D, t, 0.03, 0.04, 'highpass', 8000); }
+      else if (dr === 'heavy') { if (s === 0 || s === 3 || s === 8 || s === 10 || s === 11) kick(ac, D, t, 0.24); if (s === 4 || s === 12) N(ac, D, t, 0.15, 0.17, 'bandpass', 1600); N(ac, D, t, 0.025, s % 2 ? 0.025 : 0.045, 'highpass', 8000); if (s === 0 && bar % 4 === 0) N(ac, D, t, 0.9, 0.06, 'highpass', 5000); }
+    }
+    function leadVoice(ac, D, I, f, t, d, vol) {
+      if (I === 'tri') { V(ac, D, 'triangle', f, t, d * 1.05, 0.11 * vol, { lp: 3500 }); V(ac, D, 'sine', f * 2, t, d * 0.8, 0.025 * vol); }
+      else if (I === 'box') { V(ac, D, 'sine', f, t, Math.max(d, 0.5), 0.1 * vol, { a: 0.004 }); V(ac, D, 'sine', f * 3.01, t, 0.25, 0.03 * vol); V(ac, D, 'sine', f * 5.04, t, 0.12, 0.012 * vol); }
+      else if (I === 'bell') { V(ac, D, 'sine', f, t, Math.max(d, 1.2), 0.09 * vol, { a: 0.01 }); V(ac, D, 'sine', f * 2.01, t, 0.9, 0.04 * vol); V(ac, D, 'triangle', f, t, d, 0.04 * vol, { a: 0.08, lp: 2200 }); }
+      else if (I === 'sq') { V(ac, D, 'square', f, t, d * 0.95, 0.045 * vol, { lp: 2800 }); V(ac, D, 'square', f, t, d * 0.9, 0.03 * vol, { det: 7, lp: 2800 }); }
+      else { V(ac, D, 'sawtooth', f, t, d * 0.95, 0.05 * vol, { lp: 3000 }); V(ac, D, 'square', f / 2, t, d * 0.9, 0.025 * vol, { lp: 1200 }); }
+    }
+    let ac = null, bus = null, cur = null, timer = null, started = false, paused = false;
+    const api = { force: null, name: () => cur && cur.name, started: () => started };
+    function init() { ac = SFX.ctx(); if (!ac) return false; if (!bus) { bus = ac.createGain(); bus.gain.value = 0.9; bus.connect(ac.destination); } return true; }
+    function pump() { if (!cur || S.noBgm) return; const spb = 60 / cur.T.bpm / 4, len = cur.T.lead.length * 16; if (cur.next < ac.currentTime - 0.3) cur.next = ac.currentTime + 0.05; while (cur.next < ac.currentTime + 0.18) { sched(cur, cur.step, cur.next, spb); cur.next += spb; cur.step = (cur.step + 1) % len; } }
+    function stopCur(fade) { if (!cur) return; const o = cur, t = ac.currentTime; try { o.g.gain.cancelScheduledValues(t); o.g.gain.setValueAtTime(o.g.gain.value, t); o.g.gain.linearRampToValueAtTime(0.0001, t + fade); } catch (e) { /* 忽略 */ } setTimeout(() => { try { o.g.disconnect(); } catch (e) { /* 忽略 */ } }, fade * 1000 + 300); cur = null; }
+    function play(name) {
+      if (!init()) return; if (cur && cur.name === name) return; const T = TR[name]; if (!T) return;
+      stopCur(0.9); const g = ac.createGain(); g.gain.setValueAtTime(0.0001, ac.currentTime); g.gain.linearRampToValueAtTime(1, ac.currentTime + 0.8); g.connect(bus);
+      cur = { name, T, ac, g, step: 0, next: ac.currentTime + 0.12 };
+      if (!timer) timer = setInterval(() => { try { if (paused) return; pump(); } catch (e) { /* 忽略 */ } }, 30);
+    }
+    function want() { return api.force || (typeof isNight !== 'undefined' && isNight ? 'night' : 'field'); }
+    function refresh() { try { if (!started) return; if (S.noBgm || paused) { if (cur) stopCur(0.5); return; } play(want()); } catch (e) { /* 忽略 */ } }
+    setInterval(refresh, 400);
+    document.addEventListener('visibilitychange', () => { paused = document.hidden; if (paused) { if (cur) stopCur(0.3); } else refresh(); });
+    api.start = () => { started = true; if (!S.noBgm) { init(); refresh(); } };
+    api.refresh = refresh; api.has = () => !!cur;
+    /* 離線渲染（測試用）：回傳峰值與均方根，確認不爆音、有聲音 */
+    api.render = async (name, secs, raw) => {
+      const T = TR[name], sr = 22050, oc = new OfflineAudioContext(1, sr * secs, sr), bs = oc.createGain(); bs.gain.value = 0.9; bs.connect(oc.destination);
+      const c = { name, T, ac: oc, g: (() => { const g = oc.createGain(); g.connect(bs); return g; })() }, spb = 60 / T.bpm / 4, len = T.lead.length * 16;
+      for (let i = 0, t = 0.05; t < secs; i = (i + 1) % len, t += spb) sched(c, i, t, spb);
+      const b = await oc.startRendering(), d = b.getChannelData(0); let pk = 0, sq = 0; for (let i = 0; i < d.length; i++) { const a = Math.abs(d[i]); if (a > pk) pk = a; sq += d[i] * d[i]; } return { peak: +pk.toFixed(3), rms: +Math.sqrt(sq / d.length).toFixed(4), data: raw ? Array.from(d, x => Math.round(x * 32767)) : undefined };
+    };
+    return api;
+  })();
   /* ---------- 開場劇情＋新手教學＋回合制戰鬥 ---------- */
   let opActive = false, opSkip = false, opWait = null, opAu = null;
   const opEl = mkEl('div', 'gOp'), riftEl = mkEl('div', 'gRift'), batEl = mkEl('div', 'gBat'), tutEl = mkEl('div', 'gTut'), sloEl = mkEl('div', 'gSlo');
@@ -9240,12 +9330,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         tx.style.opacity = 0; await sleep(700);
       }
       const lg = document.querySelector('img.lg'), st = []; for (let i = 0; i < 46; i++) st.push('<i style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 100).toFixed(1) + '%;animation-delay:' + (Math.random() * 3).toFixed(2) + 's;width:' + (1 + Math.random() * 2.5).toFixed(1) + 'px;height:' + (1 + Math.random() * 2.5).toFixed(1) + 'px"></i>');
-      opEl.innerHTML = '<div class="stars">' + st.join('') + '</div><div class="ttl">' + (lg && lg.src ? '<img class="l1" src="' + lg.src + '" alt="">' : '<div class="l1 tp">Project: TLPS Youth</div>') + '<h1 class="l2">關於我轉生到<br>同樂宇宙這檔事</h1><p class="l3">TLPS Universe ・ 宜蘭縣員山鄉</p></div><button type="button" class="sk">略過片頭 ⏭</button>';
+      BGM.force = 'title'; opEl.innerHTML = '<div class="stars">' + st.join('') + '</div><div class="ttl">' + (lg && lg.src ? '<img class="l1" src="' + lg.src + '" alt="">' : '<div class="l1 tp">Project: TLPS Youth</div>') + '<h1 class="l2">關於我轉生到<br>同樂宇宙這檔事</h1><p class="l3">TLPS Universe ・ 宜蘭縣員山鄉</p></div><button type="button" class="sk">略過片頭 ⏭</button>';
       opEl.querySelector('.sk').onclick = () => { opSkip = true; }; opEl.classList.add('ttlon');
       bell(523, 0.6); bell(659, 0.9); bell(784, 1.2);
       await sleep(full ? 5200 : 3600);
       opEl.classList.remove('on'); await sleep(1100);
-    } finally { opEl.classList.remove('show', 'on', 'ttlon'); opEl.innerHTML = ''; opSkip = false; opActive = false; }
+    } finally { BGM.force = null; opEl.classList.remove('show', 'on', 'ttlon'); opEl.innerHTML = ''; opSkip = false; opActive = false; }
   }
   function riftOn() { riftEl.innerHTML = '<div class="vx"></div>'; riftEl.classList.add('on'); document.body.classList.add('gShake'); setTimeout(() => document.body.classList.remove('gShake'), 1400); tone(70, 1.8, 0.3, 'sawtooth'); tone(94, 1.6, 0.15, 'triangle', 0.1); }
   function riftOff() { riftEl.classList.remove('on'); }
@@ -9278,6 +9368,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   L.SYN = SYN;
   function battle(cfg) {
     return new Promise(res => {
+      BGM.force = cfg.boss ? 'boss' : 'battle';
       const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, awm = 1 + 0.25 * (S.awk || 0) + 0.3 * (S.evo ? 1 : 0), sk = PSKILL[pk].map((v, i) => i >= 2 ? Math.round(v * awm) : i === 0 && S.evo ? '極・' + v : v), gS = 1 + 0.08 * ((S.gear || {}).sword || 0), gB = 1 - 0.06 * ((S.gear || {}).bag || 0), gE = 4 * ((S.gear || {}).shoe || 0);
       const allies = cfg.allies || [0], party = [pk].concat(allies.filter(k => k !== pk)), safe = cfg.tutorial || cfg.safe;
       const elig = () => cfg.tutorial ? SYN.filter(s => s.id === 'burst') : SYN.filter(s => s.req.every(r => party.indexOf(r) >= 0));
@@ -9372,7 +9463,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         E.forEach(e => { if (e.stun > 0) e.stun--; else if (e.brk > 0) e.brk--; }); if (buff > 0) buff--; if (guard > 0) guard--;
         dodging = false; turn++; if (php <= 0 || (cfg.lib && turn >= cfg.lib.turns && books < 3)) { finish(false); return; } if (cfg.lib && !alive().length) wave(); if (E[tgt].hp <= 0) tgt = Math.max(0, first()); log = dm ? '敵人共造成 ' + (hp0 - php) + ' 傷害。輪到你了！' : '輪到你了！'; draw(); busy = false;
       }
-      function finish(win) { if (fin) return; fin = true; SFX.play(win ? 'win' : 'lose', 300); batEl.classList.remove('show'); batEl.innerHTML = ''; res(win); }
+      function finish(win) { if (fin) return; fin = true; BGM.force = null; SFX.play(win ? 'win' : 'lose', 300); batEl.classList.remove('show'); batEl.innerHTML = ''; res(win); }
       tgt = 0; batEl.classList.add('show'); draw();
     });
   }
@@ -9699,10 +9790,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     } finally { opActive = false; riftOff(); opSetTut(''); batEl.classList.remove('show'); sloEl.classList.remove('show'); opEl.classList.remove('show'); if (pastOf() < 0) { S.opening = 1; setTimeout(pickPast, 400); } }
   }
   function opTick() { if (opWait && Math.hypot(PL.x - opWait.x, PL.z - opWait.z) < opWait.r) { const r = opWait.res; opWait = null; r(); } if (opActive && opSkip && opWait) { const r = opWait.res; opWait = null; r(); } }
+  L.bgm = BGM;
   L.opening = { start: startOpening, battle, practice: synPractice, get active() { return opActive; }, applyPast };
   { const st = document.createElement('style'); st.id = 'gLand'; st.textContent = "@media (max-height:500px) and (orientation:landscape){\n#joyL,#joyR{bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;width:104px;height:104px}#joyL .knob,#joyR .knob{left:32px;top:32px}#tbtns{flex-direction:row!important;right:calc(24px + 104px + 14px)!important;bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;gap:12px!important}#tbtns button{width:58px;height:58px}#gAct{bottom:calc(36px + env(safe-area-inset-bottom,0px))!important}\nbody.intro #gHud{display:none}\n#intro{bottom:8px;left:8px;padding:10px 16px;width:min(460px,calc(100vw - 16px));max-height:calc(100vh - 16px)}#intro h2{font-size:20px;margin:2px 0 6px}#intro p{font-size:12.5px;margin:0 0 6px;line-height:1.5}#intro .go{margin:8px 0}#intro .go button{min-height:36px;font-size:14px}#intro .eb{font-size:13px}\n#gDlg{max-height:calc(100dvh - 12px);overflow:auto}#gDlg .av{width:44px;height:44px}#gDlg .tx{font-size:13.5px;line-height:1.5}\n#gBag .pn,#gBag>div{max-height:calc(100dvh - 10px);overflow:auto}\n#gBat .bp{width:min(780px,calc(100vw - 16px));max-height:calc(100dvh - 8px);padding:8px;display:grid;grid-template-columns:1fr 1fr;column-gap:10px;row-gap:4px;align-content:start}\n#gBat .bh{grid-column:1/-1;margin:0}#gBat .be{grid-column:1;grid-row:2;margin:0}#gBat .ba{grid-column:1;grid-row:3;margin:0}#gBat .bc{grid-column:2;grid-row:2;margin:0;font-size:12px;padding:4px 8px}#gBat .bm{grid-column:2;grid-row:3;min-height:0;margin:0;font-size:12.5px}#gBat .bb{grid-column:2;grid-row:4}#gBat .be .en i{font-size:28px}#gBat .en b,#gBat .en small{font-size:11px}#gBat .al img,#gBat .al .pe{width:34px;height:34px;font-size:20px}#gBat .bb button{padding:8px 2px}#gBat .bl{grid-template-columns:70px 1fr 44px}\n#gJob .jp{max-height:calc(100dvh - 10px);overflow:auto;padding:8px}#gJob .jc{font-size:22px;padding:5px 0}#gJob .jg{gap:5px}\n#gRoom .pn{max-height:calc(100dvh - 8px)}\n}\n"; document.head.appendChild(st); }  /* 手機橫式（矮螢幕）排版，放最後以覆蓋前面樣式 */
   if (pastOf() >= 0 && !S.opening) S.opening = 1;
-  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); const nw = pastOf() < 0 && !S.opening, tt = nw ? !S.noTitle : (!S.noTitle && !S.ttlSeen); (tt ? playTitle(nw) : Promise.resolve()).then(() => { if (tt) { S.ttlSeen = 1; save(); } if (nw) setTimeout(() => startOpening(false, tt), 400); else if (pastOf() < 0) setTimeout(pickPast, 500); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); }); });
+  const go = $('iGo'); if (go) go.addEventListener('click', () => { try { BGM.start(); } catch (e) { /* 忽略 */ } view.third = true; view.iso = false; setMode('walk'); const nw = pastOf() < 0 && !S.opening, tt = nw ? !S.noTitle : (!S.noTitle && !S.ttlSeen); (tt ? playTitle(nw) : Promise.resolve()).then(() => { if (tt) { S.ttlSeen = 1; save(); } if (nw) setTimeout(() => startOpening(false, tt), 400); else if (pastOf() < 0) setTimeout(pickPast, 500); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); }); });
   L.TIERS = TIERS; setTimeout(() => { CP(); applyComp(); }, 0);
   L.TIERS = TIERS; L.tier = level; L.lvNeed = lvNeed; L.addPts = addPts;
   L.ready = true;
