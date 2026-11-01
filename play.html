@@ -8954,12 +8954,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
-      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button><button type="button" class="lgb wks">🔧 同樂工坊</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -9210,7 +9210,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   L.SYN = SYN;
   function battle(cfg) {
     return new Promise(res => {
-      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, sk = PSKILL[pk];
+      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, awm = 1 + 0.25 * (S.awk || 0), sk = PSKILL[pk].map((v, i) => i >= 2 ? Math.round(v * awm) : v), gS = 1 + 0.08 * ((S.gear || {}).sword || 0), gB = 1 - 0.06 * ((S.gear || {}).bag || 0), gE = 4 * ((S.gear || {}).shoe || 0);
       const allies = cfg.allies || [0], party = [pk].concat(allies.filter(k => k !== pk)), safe = cfg.tutorial || cfg.safe;
       const elig = () => cfg.tutorial ? SYN.filter(s => s.id === 'burst') : SYN.filter(s => s.req.every(r => party.indexOf(r) >= 0));
       let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false, buff = 0, guard = 0, pick = false, phase = 'me', actI = -1, actE = -1, hurtP = false, fl = {}, bossPh = 0, snap0 = 0, cyc = 0, cd = 0, dark = false, dodging = false, books = 0;
@@ -9231,17 +9231,17 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         batEl.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { if (!busy) { pick = false; act('syn', es[+b.dataset.s]); } });
         batEl.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (busy || b.disabled) return; if (b.dataset.a === 'syn' && elig().length > 1) { pick = !pick; draw(); } else act(b.dataset.a, elig()[0]); });
       }
-      const hit = (e, d) => { d = Math.round(d * (e.brk > 0 ? 1.5 : 1) * (buff > 0 ? 1.3 : 1)); if (e.shield > 0) e.shield = Math.max(0, e.shield - d); else e.hp = Math.max(0, e.hp - d); e.hurt = 1; fl[E.indexOf(e)] = (fl[E.indexOf(e)] || 0) + d; return d; };
+      const hit = (e, d) => { d = Math.round(d * (e.brk > 0 ? 1.5 : 1) * (buff > 0 ? 1.3 : 1) * gS); if (e.shield > 0) e.shield = Math.max(0, e.shield - d); else e.hp = Math.max(0, e.hp - d); e.hurt = 1; fl[E.indexOf(e)] = (fl[E.indexOf(e)] || 0) + d; return d; };
       const flash = () => { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); };
       async function act(a, s) {
         busy = true; phase = 'me'; actI = 0; const lines = []; let t = E[tgt] && E[tgt].hp > 0 ? E[tgt] : E[first()];
         if (a === 'dodge') { dodging = true; en = Math.min(100, en + 25); lines.push('你和夥伴擺出閃避姿勢！（連攜能量 +25）'); }
         else if (a === 'search') { en = Math.min(100, en + 30); if (Math.random() < 0.75) { books++; lines.push('📘 找到一本轉生文獻！（' + books + '/3）'); } else lines.push('翻了翻書堆，什麼也沒找到……'); }
-        else if (a === 'atk') { const d = hit(t, 10 + Math.floor(Math.random() * 4)); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50); tone(440, 0.25, 0.18, 'square'); }
+        else if (a === 'atk') { const d = hit(t, 10 + Math.floor(Math.random() * 4)); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50 + gE); tone(440, 0.25, 0.18, 'square'); }
         else if (a === 'skill') {
           lines.push(PASTS[pk][1] + ' ' + sk[0] + '！'); if (cfg.boss) { if (pk === 0 && E[0].tele) { E[0].tele = null; lines.push('⚔️ 勇氣突進，打斷了鐘樓怪人的招式！'); } if (pk === 4 && E[0].shield > 0) { E[0].shield = 0; lines.push('🔮 魔法彈擊碎了時間護罩！'); } }
           if (pk === 1 || pk === 2) alive().forEach(e => hit(e, sk[2])); else if (pk === 4) shuffled(alive(), Math.random).slice(0, 2).forEach(e => hit(e, sk[2])); else hit(t, sk[2]);
-          if (sk[3]) { php = Math.min(100, php + sk[3]); lines.push('隊伍回復 ' + sk[3] + ' HP！'); } en = Math.min(100, en + 50); tone(660, 0.35, 0.2, 'triangle');
+          if (sk[3]) { php = Math.min(100, php + sk[3]); lines.push('隊伍回復 ' + sk[3] + ' HP！'); } en = Math.min(100, en + 50 + gE); tone(660, 0.35, 0.2, 'triangle');
         } else {
           flash(); bell(523, 0); bell(784, 0.1); bell(1047, 0.2);
           batEl.querySelector('.bm').innerHTML = '<span class="big">' + s.name + '</span>' + s.desc; await sleep(2800);
@@ -9273,7 +9273,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
           draw(); await sleep(1500);
         }
         if (B.tele === 'hand') {
-          if (dodging) log = '💨 你們閃過了巨大時針！'; else { php = Math.max(0, php - 15); hurtP = true; tone(120, 0.3, 0.25, 'sawtooth'); log = '🕰 巨大時針劃過全場，隊伍受到 15 傷害！'; }
+          if (dodging) log = '💨 你們閃過了巨大時針！'; else { php = Math.max(0, php - Math.round(15 * gB)); hurtP = true; tone(120, 0.3, 0.25, 'sawtooth'); log = '🕰 巨大時針劃過全場，隊伍受到 15 傷害！'; }
           B.tele = null; draw(); await sleep(900);
         }
         if (ph === 1) { if (turn % 2 === 0) { B.tele = 'hand'; log = '⚠️ 鐘樓怪人舉起了巨大的時針！'; } if (E.filter(e => e.hp > 0 && e.n === '秒針飛鏢').length < 2 && E.length < 4 && turn % 3 === 1) { E.push({ n: '秒針飛鏢', ic: '🎯', hp: 15, mx: 15, atk: 3, brk: 0, stun: 0 }); log += ' 召喚了秒針飛鏢！'; } draw(); await sleep(700); }
@@ -9285,7 +9285,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         for (let i = 0; i < E.length; i++) {
           const e = E[i]; if (e.hp <= 0) continue;
           if (e.stun > 0) { actE = i; log = e.n + ' 眩暈中，無法行動！'; draw(); await sleep(600); continue; }
-          let d = e.atk + Math.floor(Math.random() * 3); if (guard > 0) d = Math.round(d / 2); if (dodging) d = Math.round(d * 0.3);
+          let d = Math.max(1, Math.round((e.atk + Math.floor(Math.random() * 3)) * gB)); if (guard > 0) d = Math.round(d / 2); if (dodging) d = Math.round(d * 0.3);
           actE = i; php = Math.max(safe ? 1 : 0, php - d); dm += d; hurtP = true; tone(150, 0.2, 0.2, 'sawtooth');
           log = e.n + ' 攻擊隊伍，造成 ' + d + ' 傷害！' + (guard > 0 ? '（霸體減傷）' : ''); draw(); await sleep(750); if (php <= 0) break;
         }
@@ -9344,7 +9344,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function reward(i) {
     const c = ch1(), st = CH1[i], first = !c.c[i], today = dayKey();
     if (first) { c.c[i] = 1; c.n = Math.max(c.n, i + 1); addPts(st.rw.pts, '第一章 ' + st.n + ' 首通'); S.coin = (S.coin || 0) + st.rw.coin; Object.keys(st.rw.mat).forEach(k => matAdd(k, st.rw.mat[k])); toast('🎁 首通獎勵：🪙' + st.rw.coin + '　' + Object.keys(st.rw.mat).map(k => MATS.find(m => m[0] === k)[1] + '×' + st.rw.mat[k]).join(' '), 5200); }
-    else if (c.d[i] !== today) { c.d[i] = today; addPts(10, '重複挑戰'); S.coin = (S.coin || 0) + 10; toast('今日重複挑戰獎勵：+10 點、🪙+10', 3200); }
+    else if (c.d[i] !== today) { c.d[i] = today; addPts(10, '重複挑戰'); S.coin = (S.coin || 0) + 10; const rp = [{ book: 1 }, { stone: 1, seed: 1 }, { stone: 1, shard: 1 }][i]; Object.keys(rp).forEach(k => matAdd(k, rp[k])); if (i === 2 && Math.random() < 0.34) { matAdd('purple', 1); rp.purple = 1; } toast('今日重複挑戰：+10 點、🪙+10　' + Object.keys(rp).map(k => MATS.find(m => m[0] === k)[1] + '×' + rp[k]).join(' '), 4200); }
     else toast('今日已領過重複挑戰獎勵囉', 2400);
     save(); refreshAll();
   }
@@ -9375,13 +9375,49 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (opActive || dlgOpen) return; if (pastOf() < 0) { toast('請先選擇前世身分', 2400); return; }
     const c = ch1();
     say('🌀 宇宙裂隙・第一章', '【舊校舍的失控時鐘塔】\n隊伍：你與 5 位夥伴（含汪汪／小T）全員出動，連攜技全開！\n材料：' + matStr() + '\n首通有豐厚獎勵，之後每天各關可領一次小獎勵。',
-      CH1.map((st, i) => ({ label: (c.c[i] ? '✅ ' : c.n >= i ? '' : '🔒 ') + st.n, fn: () => { if (c.n < i) { setTimeout(() => say('尚未解鎖', '請先通關「' + CH1[i - 1].n + '」。', [{ label: '好' }], AV(4)), 120); } else setTimeout(() => runStage(i), 150); } })).concat([{ label: '關閉' }]), AV(4));
+      CH1.map((st, i) => ({ label: (c.c[i] ? '✅ ' : c.n >= i ? '' : '🔒 ') + st.n, fn: () => { if (c.n < i) { setTimeout(() => say('尚未解鎖', '請先通關「' + CH1[i - 1].n + '」。', [{ label: '好' }], AV(4)), 120); } else setTimeout(() => runStage(i), 150); } })).concat([{ label: '🔧 同樂工坊（使用材料）', fn: () => setTimeout(workshop, 150) }, { label: '關閉' }]), AV(4));
   }
   L.chapter = { menu: chapterMenu, run: runStage };
   { const RP = snap(9, -44, { maxR: 5 }) || { x: 9, y: 0.03, z: -44 }; const grp = new T.Group(); grp.position.set(RP.x, RP.y + 1.6, RP.z); G.add(grp);
     const ring = new T.Mesh(new T.TorusGeometry(1.2, 0.18, 12, 36), new T.MeshBasicMaterial({ color: 0xb46bff })); grp.add(ring); const core = new T.Mesh(new T.CircleGeometry(1.05, 24), new T.MeshBasicMaterial({ color: 0x3a1d8f, transparent: true, opacity: 0.8, side: T.DoubleSide })); grp.add(core);
     sprite(nameTex('🌀 宇宙裂隙・第一章', '#6a3fd0'), [2.4, 0.55], RP.x, RP.y + 3.6, RP.z, 30);
     ia({ id: 'rift1', x: RP.x, y: RP.y, z: RP.z, r: 2.8, txt: () => '🌀 進入宇宙裂隙', act: chapterMenu }); L.riftPortal = grp; }
+  /* ---------- 同樂工坊：材料用途 ---------- */
+  const GEARS = [['sword', '🗡', '同樂木劍', '我方傷害 +8% / 級'], ['bag', '🎒', '守護書包', '受到傷害 −6% / 級'], ['shoe', '👟', '疾風運動鞋', '每次行動連攜能量 +4 / 級']];
+  const AWK = [[0, 0], [2, 1], [4, 2], [6, 3]];
+  const gearLv = k => ((S.gear || {})[k] || 0), awkLv = () => S.awk || 0, has = k => (S.mat || {})[k] || 0;
+  const costM = (k, n) => { S.mat[k] -= n; };
+  function workshop() {
+    if (opActive || dlgOpen) return; if (pastOf() < 0) { toast('請先選擇前世身分', 2400); return; }
+    const pk = pastOf();
+    say('🔧 同樂工坊', '材料：' + matStr() + '　🪙' + (S.coin || 0) + '\n' + GEARS.map(g => g[1] + g[2] + ' Lv' + gearLv(g[0])).join('　') + '\n前世覺醒：' + PASTS[pk][0] + ' Lv' + awkLv() + '（主動技威力 +' + awkLv() * 25 + '%）',
+      [{ label: '📘 使用初級經驗書（+30 點）', fn: () => setTimeout(useBook, 120) }, { label: '🔩 強化裝備', fn: () => setTimeout(gearMenu, 120) }, { label: '🌱 用芽芽種子餵夥伴', fn: () => setTimeout(feedSeed, 120) }, { label: '💠 前世覺醒', fn: () => setTimeout(awaken, 120) }, { label: '關閉' }], AV(2));
+  }
+  function useBook() { if (has('book') < 1) { say('同樂工坊', '沒有初級經驗書了。通關「宇宙裂隙」可以獲得！', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(2)); return; } costM('book', 1); addPts(30, '使用初級經驗書'); save(); refreshAll(); setTimeout(workshop, 300); }
+  function gearMenu() {
+    say('🔩 強化裝備', '每級需要 🔩 強化石 與 🪙 代幣（下一級所需：石頭＝新等級、代幣＝新等級×10），最高 Lv5。\n你有 🔩' + has('stone') + '　🪙' + (S.coin || 0),
+      GEARS.map(g => { const lv = gearLv(g[0]); return { label: g[1] + g[2] + ' Lv' + lv + (lv >= 5 ? '（已滿）' : ' → ' + (lv + 1) + '　需🔩' + (lv + 1) + '＋🪙' + (lv + 1) * 10) + '｜' + g[3], fn: () => setTimeout(() => upGear(g), 120) }; }).concat([{ label: '返回', fn: () => setTimeout(workshop, 120) }]), AV(2));
+  }
+  function upGear(g) {
+    const lv = gearLv(g[0]), n = lv + 1;
+    if (lv >= 5) { toast('已經強化到最高等級了', 2200); return setTimeout(gearMenu, 300); }
+    if (has('stone') < n || (S.coin || 0) < n * 10) { toast('材料或代幣不足（需🔩' + n + '＋🪙' + n * 10 + '）', 2800); return setTimeout(gearMenu, 300); }
+    costM('stone', n); S.coin -= n * 10; S.gear = S.gear || {}; S.gear[g[0]] = n; save(); refreshAll(); toast(g[1] + g[2] + ' 強化到 Lv' + n + '！', 2600); setTimeout(gearMenu, 300);
+  }
+  function feedSeed() {
+    const id = CP().active, x = COMPS.find(q => q.id === id);
+    if (!x) { say('同樂工坊', '請先在背包帶一位夥伴同行，再來餵食。', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(2)); return; }
+    if (has('seed') < 1) { say('同樂工坊', '沒有芽芽種子了。通關「宇宙裂隙」第 1-2 關可以獲得！', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(2)); return; }
+    const st = csOf(id); costM('seed', 1); st.full = Math.min(100, st.full + 50); st.bond = (st.bond || 0) + 3; save(); refreshAll(); toast(x.ic + ' ' + x.name + ' 吃了發芽的種子！飽足 +50、好感 +3', 3200); setTimeout(workshop, 400);
+  }
+  function awaken() {
+    const lv = awkLv(), pk = pastOf();
+    if (lv >= 3) { say('💠 前世覺醒', '「' + PASTS[pk][0] + '」已經完全覺醒（Lv3）！', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(pk)); return; }
+    const need = AWK[lv + 1];
+    say('💠 前世覺醒', PASTS[pk][1] + ' ' + PASTS[pk][0] + ' Lv' + lv + ' → Lv' + (lv + 1) + '\n需要：💠前世記憶碎片×' + need[0] + '、🟣紫色裝備材料×' + need[1] + '\n你有：💠' + has('shard') + ' 🟣' + has('purple') + '\n覺醒後，前世主動技威力 +25%（可累積）。',
+      [{ label: '覺醒！', pri: true, fn: () => { if (has('shard') < need[0] || has('purple') < need[1]) { toast('材料不足', 2400); return setTimeout(workshop, 300); } costM('shard', need[0]); costM('purple', need[1]); S.awk = lv + 1; save(); refreshAll(); toast('✨ 前世覺醒 Lv' + (lv + 1) + '！主動技威力 +' + (lv + 1) * 25 + '%', 4200); setTimeout(workshop, 400); } }, { label: '返回', fn: () => setTimeout(workshop, 120) }], AV(pk));
+  }
+  L.workshop = workshop;
   /* 開場主流程 */
   async function startOpening(replay) {
     if (opActive || dlgOpen) return; opActive = true; opSkip = false;
