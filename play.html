@@ -8233,7 +8233,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
 #gBat .ba{display:flex;gap:10px;align-items:center;margin-bottom:8px}#gBat .al{display:grid;justify-items:center;font-size:11px;gap:2px}#gBat .al img{width:48px;height:48px;border-radius:50%;border:2px solid #fff;object-fit:cover;background:#fff}#gBat .bg{flex:1;display:grid;gap:6px}#gBat .bl{display:grid;grid-template-columns:78px 1fr 48px;align-items:center;gap:6px;font-size:11.5px}#gBat .bl em{font-style:normal}#gBat .bl small{text-align:right;color:#cfc8ff}
 #gBat .bc{background:rgba(255,213,74,.16);border:1.5px solid #ffd54a;border-radius:10px;padding:6px 10px;font-size:13.5px;line-height:1.6;margin-bottom:6px}#gBat .bm{min-height:34px;font-size:13.5px;line-height:1.6;color:#e7e3ff;margin-bottom:6px}#gBat .bm .big{display:block;font-size:20px;font-weight:900;color:#ffd54a;letter-spacing:.08em}
 #gBat .ba.sm .al img,#gBat .ba.sm .al .pe{width:38px;height:38px;font-size:22px}#gBat .ba.sm .bg{flex-basis:100%}#gBat .ba{flex-wrap:wrap}#gBat .al .pe{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#fff;font-style:normal;font-size:28px}#gBat .tg{display:block;color:#ffd54a;font-style:normal;font-size:12px}#gBat .sp{display:block;width:100%;text-align:left;margin-bottom:5px;border:1.5px solid #ffd54a;border-radius:10px;background:rgba(255,213,74,.12);color:#fff;padding:6px 10px;font-family:inherit;cursor:pointer}#gBat .sp b{display:block;font-size:14px}#gBat .sp small{color:#e7e3ff;font-size:12px}
-#gBat .tn{padding:2px 10px;border-radius:99px;font-weight:800;font-size:12.5px}#gBat .tn.me{background:#2f9e5b;color:#fff}#gBat .tn.foe{background:#d4453a;color:#fff}
+#gBat .tc{color:#bcb3ff;font-size:12px;margin-left:4px}#gBat .bp.dark{filter:brightness(.72) saturate(.8)}#gBat .bh b{font-size:13.5px;flex:1 1 auto}#gBat .bh{gap:6px;align-items:center}#gBat .bb button{font-size:12.5px;padding:10px 2px}#gBat .tn{padding:2px 10px;border-radius:99px;font-weight:800;font-size:12.5px}#gBat .tn.me{background:#2f9e5b;color:#fff}#gBat .tn.foe{background:#d4453a;color:#fff}
 #gBat .phme .ba{box-shadow:0 0 0 2px #4fcf6a;border-radius:12px;padding:4px}#gBat .phfoe .be{box-shadow:0 0 0 2px #ff6a5a;border-radius:12px;padding:4px}#gBat .phfoe .ba,#gBat .phme .be{opacity:.78}#gBat .phfoe .bb{opacity:.45;pointer-events:none}
 #gBat .act{transform:translateY(-6px) scale(1.07);filter:drop-shadow(0 0 8px #ffd54a)}#gBat .en.act{border-color:#ff6a5a;background:rgba(255,106,90,.22)}#gBat .al.act img,#gBat .al.act .pe{border-color:#ffd54a;box-shadow:0 0 12px #ffd54a}
 #gBat .hurt{animation:hit .42s}@keyframes hit{0%,100%{transform:translateX(0)}15%{transform:translateX(-9px)}35%{transform:translateX(8px)}55%{transform:translateX(-6px)}75%{transform:translateX(4px)}}
@@ -8954,12 +8954,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
-      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -9213,63 +9213,85 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, sk = PSKILL[pk];
       const allies = cfg.allies || [0], party = [pk].concat(allies.filter(k => k !== pk)), safe = cfg.tutorial || cfg.safe;
       const elig = () => cfg.tutorial ? SYN.filter(s => s.id === 'burst') : SYN.filter(s => s.req.every(r => party.indexOf(r) >= 0));
-      let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false, buff = 0, guard = 0, pick = false, phase = 'me', actI = -1, actE = -1, hurtP = false, fl = {};
-      const alive = () => E.filter(e => e.hp > 0), first = () => E.findIndex(e => e.hp > 0), an = k => PM[k][0];
-      const coach = () => { if (!cfg.tutorial) return ''; if (en >= 100) return '④ 連攜能量滿了！按下「連攜技」，和' + an(allies[0]) + '一起發動必殺技！'; if (turn === 0) return '① 先按「普攻」攻擊墨水怪（點敵人可以換目標）。'; if (turn === 1) return '② 這是你的「前世主動技」：' + sk[0] + '！每次行動都會累積連攜能量。'; return '③ 再行動一次，連攜能量就會滿了！'; };
+      let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false, buff = 0, guard = 0, pick = false, phase = 'me', actI = -1, actE = -1, hurtP = false, fl = {}, bossPh = 0, snap0 = 0, cyc = 0, cd = 0, dark = false, dodging = false, books = 0;
+      if (cfg.php0) php = cfg.php0;
+      const alive = () => { if (cfg.boss && E[0].hp <= 0) E.forEach(e => { e.hp = 0; }); return E.filter(e => e.hp > 0); }, wave = () => { E.length = 0; for (let i = 0; i < 3; i++) E.push({ n: '飛翔書本怪', ic: '📖', hp: 25, mx: 25, atk: 3, brk: 0, stun: 0 }); tgt = 0; }, cleared = () => { if (cfg.lib) { if (!alive().length) wave(); return false; } return !alive().length; }, first = () => E.findIndex(e => e.hp > 0), an = k => PM[k][0];
+      const coach = () => { if (cfg.boss) { const B = E[0]; if (bossPh === 3) return '⏰ 午夜十二點倒數 ' + cd + ' 回合！小T：攢滿連攜能量，用連攜技一擊必殺！'; if (B.tele) return '⚠️ 鐘樓怪人舉起巨大時針！按「💨 閃避」，或用勇者技「斷招」！'; if (bossPh === 2 && B.shield > 0) return '🛡 時間護罩 ' + B.shield + '！用魔法師的技或【光輝破魔爆裂陣】可一擊破盾，否則會時間倒流！'; return ''; } if (cfg.lib) return '📚 找齊 3 本轉生文獻（已找到 ' + books + '/3），同時別讓小知被書本怪打倒！限時 ' + cfg.lib.turns + ' 回合。'; if (!cfg.tutorial) return ''; if (en >= 100) return '④ 連攜能量滿了！按下「連攜技」，和' + an(allies[0]) + '一起發動必殺技！'; if (turn === 0) return '① 先按「普攻」攻擊墨水怪（點敵人可以換目標）。'; if (turn === 1) return '② 這是你的「前世主動技」：' + sk[0] + '！每次行動都會累積連攜能量。'; return '③ 再行動一次，連攜能量就會滿了！'; };
       const face = k => k === 'p' ? '<i class="pe">🐶</i>' : (AV(k) ? '<img src="' + AV(k) + '">' : '<i class="pe">' + PM[k][1] + '</i>');
       function draw() {
         const es = elig(), tg = (buff > 0 ? ' ⚡攻擊↑' : '') + (guard > 0 ? ' 🛡霸體' : '');
-        batEl.innerHTML = '<div class="bp ph' + phase + '"><div class="bh"><b>' + cfg.title + '</b><span class="tn ' + phase + '">' + (phase === 'me' ? '▶ 我方回合' : '◀ 敵方回合') + '・第 ' + (turn + 1) + ' 回合</span></div>' +
-          '<div class="be">' + E.map((e, i) => '<button type="button" class="en' + (e.hp <= 0 ? ' dead' : '') + (i === tgt && e.hp > 0 && phase === 'me' ? ' sel' : '') + (i === actE ? ' act' : '') + (e.hurt ? ' hurt' : '') + '" data-t="' + i + '">' + (fl[i] ? '<u class="dn">-' + fl[i] + '</u>' : '') + '<i>' + e.ic + '</i><b>' + e.n + (e.brk > 0 ? ' 💥破防' : '') + (e.stun > 0 ? ' 💫眩暈' : '') + '</b><div class="hb"><s style="width:' + Math.max(0, e.hp / e.mx * 100) + '%"></s></div><small>' + Math.max(0, e.hp) + '/' + e.mx + '</small></button>').join('') + '</div>' +
+        batEl.innerHTML = '<div class="bp ph' + phase + (dark ? ' dark' : '') + '"><div class="bh"><b>' + cfg.title + '</b><span class="tn ' + phase + '">' + (phase === 'me' ? '▶ 我方' : '◀ 敵方') + '</span><span class="tc">' + (cfg.lib ? '第 ' + Math.min(turn + 1, cfg.lib.turns) + '/' + cfg.lib.turns : '第 ' + (turn + 1)) + ' 回合</span></div>' +
+          '<div class="be">' + E.map((e, i) => '<button type="button" class="en' + (e.hp <= 0 ? ' dead' : '') + (i === tgt && e.hp > 0 && phase === 'me' ? ' sel' : '') + (i === actE ? ' act' : '') + (e.hurt ? ' hurt' : '') + '" data-t="' + i + '">' + (fl[i] ? '<u class="dn">-' + fl[i] + '</u>' : '') + '<i>' + e.ic + '</i><b>' + e.n + (e.shield > 0 ? ' 🛡' + e.shield : '') + (e.tele ? ' ⚠️' : '') + (e.brk > 0 ? ' 💥破防' : '') + (e.stun > 0 ? ' 💫眩暈' : '') + '</b><div class="hb"><s style="width:' + Math.max(0, e.hp / e.mx * 100) + '%"></s></div><small>' + Math.max(0, e.hp) + '/' + e.mx + '</small></button>').join('') + '</div>' +
           '<div class="ba' + (party.length > 3 ? ' sm' : '') + (hurtP ? ' hurt' : '') + '">' + party.map((k, i) => '<div class="al' + (i === actI ? ' act' : '') + '">' + face(k) + '<span>' + (i ? an(k) : '你') + '</span></div>').join('') +
-          '<div class="bg"><div class="bl"><em>❤️ 隊伍 HP</em><div class="hb p"><s style="width:' + php + '%"></s></div><small>' + php + '/100</small></div><div class="bl"><em>🤝 連攜能量</em><div class="hb e' + (en >= 100 ? ' full' : '') + '"><s style="width:' + en + '%"></s></div><small>' + en + '/100</small></div></div></div>' +
+          '<div class="bg"><div class="bl"><em>' + (cfg.lib ? '📚 小知 HP' : '❤️ 隊伍 HP') + '</em><div class="hb p"><s style="width:' + php + '%"></s></div><small>' + php + '/100</small></div><div class="bl"><em>🤝 連攜能量</em><div class="hb e' + (en >= 100 ? ' full' : '') + '"><s style="width:' + en + '%"></s></div><small>' + en + '/100</small></div></div></div>' +
           (coach() ? '<div class="bc">' + coach() + '</div>' : '') + '<div class="bm">' + (pick ? es.map((s, i) => '<button type="button" class="sp" data-s="' + i + '"><b>' + s.name + '</b><small>' + s.brief + '</small></button>').join('') : (log || '') + (tg ? '<em class="tg">' + tg + '</em>' : '')) + '</div>' +
-          '<div class="bb"><button type="button" data-a="atk" class="' + (cfg.tutorial && turn === 0 && en < 100 ? 'hint' : '') + '">⚔️ 普攻</button><button type="button" data-a="skill" class="' + (cfg.tutorial && turn === 1 && en < 100 ? 'hint' : '') + '">' + PASTS[pk][1] + ' ' + sk[0] + '</button><button type="button" data-a="syn" ' + (en >= 100 && es.length ? 'class="hint syn"' : 'disabled') + '>🤝 連攜技' + (es.length > 1 ? '(' + es.length + ')' : '') + '</button></div></div>';
+          '<div class="bb"><button type="button" data-a="atk" class="' + (cfg.tutorial && turn === 0 && en < 100 ? 'hint' : '') + '">⚔️ 普攻</button><button type="button" data-a="skill" class="' + (cfg.tutorial && turn === 1 && en < 100 ? 'hint' : '') + '">' + PASTS[pk][1] + ' ' + sk[0] + '</button><button type="button" data-a="syn" ' + (en >= 100 && es.length ? 'class="hint syn"' : 'disabled') + '>🤝 連攜技' + (es.length > 1 ? '(' + es.length + ')' : '') + '</button>' + (cfg.boss || cfg.dodge ? '<button type="button" data-a="dodge">💨 閃避</button>' : '') + (cfg.lib ? '<button type="button" data-a="search">📖 搜尋 ' + books + '/3</button>' : '') + '</div></div>';
         hurtP = false; E.forEach(e => { e.hurt = 0; }); fl = {};
         batEl.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { if (!busy && E[+b.dataset.t].hp > 0) { tgt = +b.dataset.t; draw(); } });
         batEl.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { if (!busy) { pick = false; act('syn', es[+b.dataset.s]); } });
         batEl.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (busy || b.disabled) return; if (b.dataset.a === 'syn' && elig().length > 1) { pick = !pick; draw(); } else act(b.dataset.a, elig()[0]); });
       }
-      const hit = (e, d) => { d = Math.round(d * (e.brk > 0 ? 1.5 : 1) * (buff > 0 ? 1.3 : 1)); e.hp = Math.max(0, e.hp - d); e.hurt = 1; fl[E.indexOf(e)] = (fl[E.indexOf(e)] || 0) + d; return d; };
+      const hit = (e, d) => { d = Math.round(d * (e.brk > 0 ? 1.5 : 1) * (buff > 0 ? 1.3 : 1)); if (e.shield > 0) e.shield = Math.max(0, e.shield - d); else e.hp = Math.max(0, e.hp - d); e.hurt = 1; fl[E.indexOf(e)] = (fl[E.indexOf(e)] || 0) + d; return d; };
       const flash = () => { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); };
       async function act(a, s) {
         busy = true; phase = 'me'; actI = 0; const lines = []; let t = E[tgt] && E[tgt].hp > 0 ? E[tgt] : E[first()];
-        if (a === 'atk') { const d = hit(t, 10 + Math.floor(Math.random() * 4)); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50); tone(440, 0.25, 0.18, 'square'); }
+        if (a === 'dodge') { dodging = true; en = Math.min(100, en + 25); lines.push('你和夥伴擺出閃避姿勢！（連攜能量 +25）'); }
+        else if (a === 'search') { en = Math.min(100, en + 30); if (Math.random() < 0.75) { books++; lines.push('📘 找到一本轉生文獻！（' + books + '/3）'); } else lines.push('翻了翻書堆，什麼也沒找到……'); }
+        else if (a === 'atk') { const d = hit(t, 10 + Math.floor(Math.random() * 4)); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50); tone(440, 0.25, 0.18, 'square'); }
         else if (a === 'skill') {
-          lines.push(PASTS[pk][1] + ' ' + sk[0] + '！');
+          lines.push(PASTS[pk][1] + ' ' + sk[0] + '！'); if (cfg.boss) { if (pk === 0 && E[0].tele) { E[0].tele = null; lines.push('⚔️ 勇氣突進，打斷了鐘樓怪人的招式！'); } if (pk === 4 && E[0].shield > 0) { E[0].shield = 0; lines.push('🔮 魔法彈擊碎了時間護罩！'); } }
           if (pk === 1 || pk === 2) alive().forEach(e => hit(e, sk[2])); else if (pk === 4) shuffled(alive(), Math.random).slice(0, 2).forEach(e => hit(e, sk[2])); else hit(t, sk[2]);
           if (sk[3]) { php = Math.min(100, php + sk[3]); lines.push('隊伍回復 ' + sk[3] + ' HP！'); } en = Math.min(100, en + 50); tone(660, 0.35, 0.2, 'triangle');
         } else {
           flash(); bell(523, 0); bell(784, 0.1); bell(1047, 0.2);
           batEl.querySelector('.bm').innerHTML = '<span class="big">' + s.name + '</span>' + s.desc; await sleep(2800);
           en = 0; const keep = buff;
-          if (s.id === 'burst') { E.forEach(e => { if (e.hp > 0) { hit(e, cfg.tutorial ? 99 : 45); e.brk = 3; } }); log = '✨ ' + s.name + '！全體重創並陷入破防！'; }
+          if (cfg.boss && E[0].shield > 0 && s.id === 'burst') E[0].shield = 0;
+          if (cfg.boss && bossPh === 3) { E[0].hp = 0; log = '✨ ' + s.name + '！合體技一擊必殺——鐘樓怪人被擊倒了！'; }
+          else if (s.id === 'burst') { E.forEach(e => { if (e.hp > 0) { hit(e, cfg.tutorial ? 99 : 45); e.brk = 3; } }); log = '✨ ' + s.name + '！全體重創並陷入破防！'; }
           else if (s.id === 'stage') { php = Math.min(100, php + 50); buff = 3; guard = 3; log = '🎶 全隊回復 50% HP，攻擊力 +30%、霸體 3 回合！'; }
           else if (s.id === 'cyber') { for (let i = 0; i < 5; i++) { alive().forEach(e => hit(e, 10)); tone(300 + i * 120, 0.2, 0.18, 'sawtooth', i * 0.12); } log = '🐶 光束砲 5 連射！異常狀態全部清除！'; }
           else if (s.id === 'all') { alive().forEach(e => hit(e, 90)); en = 100; log = '🔔 鐘聲響徹校園！全體巨額傷害，連攜能量補滿！'; }
           else if (s.id === 'neon') { alive().forEach(e => { e.stun = 2; }); en = 50; log = '💫 敵人看得入迷，眩暈 2 回合！連攜能量回復 50%！'; }
-          draw(); await sleep(1500); if (!alive().length) { finish(true); return; }
+          draw(); await sleep(1500); if (cleared()) { finish(true); return; }
           buff = s.id === 'stage' ? buff : keep; await foe(); return;
         }
-        log = lines.join('　'); draw(); await sleep(900);
-        if (!alive().length) { finish(true); return; }
+        log = lines.join('　'); draw(); await sleep(900); if (cfg.lib && books >= 3) { log = '📘 三本轉生文獻都找齊了！'; draw(); await sleep(900); finish(true); return; }
+        if (cleared()) { finish(true); return; }
         const n = party.length - 1; actI = n > 0 ? 1 + Math.floor(Math.random() * n) : -1;
         if (n > 0) { let tot = 0; for (let i = 0; i < n; i++) { const al = alive(); if (!al.length) break; tot += hit(al[Math.floor(Math.random() * al.length)], 8 + Math.floor(Math.random() * 3)); } log = '同伴們一起攻擊，造成 ' + tot + ' 傷害！'; draw(); await sleep(800); }
-        if (!alive().length) { finish(true); return; }
+        if (cleared()) { finish(true); return; }
         await foe();
       }
+      async function bossTurn() {
+        const B = E[0]; if (B.hp <= 0) return;
+        const ph = B.hp / B.mx > 0.6 ? 1 : B.hp / B.mx > 0.2 ? 2 : 3;
+        if (ph !== bossPh) {
+          bossPh = ph;
+          if (ph === 2) { B.shield = 60; snap0 = B.hp; cyc = 0; B.atk = 6; log = '⏪ 鐘樓怪人張開「時間護罩」！護罩沒破就會時間倒流！'; }
+          if (ph === 3) { dark = true; cd = 4; B.atk = 8; B.shield = 0; log = '🌑 午夜十二點！全場陷入黑暗，倒數 4 回合大招清場！'; tone(60, 1.6, 0.3, 'sawtooth'); }
+          draw(); await sleep(1500);
+        }
+        if (B.tele === 'hand') {
+          if (dodging) log = '💨 你們閃過了巨大時針！'; else { php = Math.max(0, php - 15); hurtP = true; tone(120, 0.3, 0.25, 'sawtooth'); log = '🕰 巨大時針劃過全場，隊伍受到 15 傷害！'; }
+          B.tele = null; draw(); await sleep(900);
+        }
+        if (ph === 1) { if (turn % 2 === 0) { B.tele = 'hand'; log = '⚠️ 鐘樓怪人舉起了巨大的時針！'; } if (E.filter(e => e.hp > 0 && e.n === '秒針飛鏢').length < 2 && E.length < 4 && turn % 3 === 1) { E.push({ n: '秒針飛鏢', ic: '🎯', hp: 15, mx: 15, atk: 3, brk: 0, stun: 0 }); log += ' 召喚了秒針飛鏢！'; } draw(); await sleep(700); }
+        else if (ph === 2) { cyc++; if (cyc % 3 === 0) { if (B.shield > 0) { B.hp = Math.min(B.mx, B.hp + 40); B.shield = 60; log = '⏪ 時間倒流！鐘樓怪人回復了血量，護罩重組！'; } else log = '護罩已破，時間倒流失敗！'; draw(); await sleep(1100); } }
+        else { cd--; en = Math.min(100, en + 30); if (cd <= 0) { php = 0; hurtP = true; log = '🕛 午夜十二點，大招清場！……'; draw(); await sleep(1200); } else { log = '⏰ 倒數 ' + cd + ' 回合！'; draw(); await sleep(600); } }
+      }
       async function foe() {
-        phase = 'foe'; actI = -1; draw(); await sleep(500); let dm = 0, hp0 = php;
+        phase = 'foe'; actI = -1; draw(); await sleep(500); let dm = 0, hp0 = php; if (cfg.boss) await bossTurn();
         for (let i = 0; i < E.length; i++) {
           const e = E[i]; if (e.hp <= 0) continue;
           if (e.stun > 0) { actE = i; log = e.n + ' 眩暈中，無法行動！'; draw(); await sleep(600); continue; }
-          let d = e.atk + Math.floor(Math.random() * 3); if (guard > 0) d = Math.round(d / 2);
+          let d = e.atk + Math.floor(Math.random() * 3); if (guard > 0) d = Math.round(d / 2); if (dodging) d = Math.round(d * 0.3);
           actE = i; php = Math.max(safe ? 1 : 0, php - d); dm += d; hurtP = true; tone(150, 0.2, 0.2, 'sawtooth');
           log = e.n + ' 攻擊隊伍，造成 ' + d + ' 傷害！' + (guard > 0 ? '（霸體減傷）' : ''); draw(); await sleep(750); if (php <= 0) break;
         }
         en = Math.min(100, en + 4 * alive().filter(e => !e.stun).length); actE = -1; phase = 'me';
         E.forEach(e => { if (e.stun > 0) e.stun--; else if (e.brk > 0) e.brk--; }); if (buff > 0) buff--; if (guard > 0) guard--;
-        turn++; if (php <= 0) { finish(false); return; } if (E[tgt].hp <= 0) tgt = Math.max(0, first()); log = dm ? '敵人共造成 ' + (hp0 - php) + ' 傷害。輪到你了！' : '輪到你了！'; draw(); busy = false;
+        dodging = false; turn++; if (php <= 0 || (cfg.lib && turn >= cfg.lib.turns && books < 3)) { finish(false); return; } if (cfg.lib && !alive().length) wave(); if (E[tgt].hp <= 0) tgt = Math.max(0, first()); log = dm ? '敵人共造成 ' + (hp0 - php) + ' 傷害。輪到你了！' : '輪到你了！'; draw(); busy = false;
       }
       function finish(win) { if (fin) return; fin = true; batEl.classList.remove('show'); batEl.innerHTML = ''; res(win); }
       tgt = 0; batEl.classList.add('show'); draw();
@@ -9288,6 +9310,78 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       if (win) { S.syn = S.syn || {}; if (!S.syn[s.id]) { S.syn[s.id] = 1; addPts(10, '首次完成連攜技：' + s.name); } else toast('訓練完成！', 2000); save(); refreshAll(); }
     } finally { opActive = false; }
   }
+  /* ---------- 宇宙裂隙・第一章：舊校舍的失控時鐘塔 ---------- */
+  const MATS = [['book', '📘', '初級經驗書'], ['stone', '🔩', '裝備強化石'], ['seed', '🌱', '芽芽種子'], ['purple', '🟣', '紫色裝備材料'], ['shard', '💠', '前世記憶碎片']];
+  const matAdd = (k, n) => { S.mat = S.mat || {}; S.mat[k] = (S.mat[k] || 0) + n; };
+  const matStr = () => MATS.map(m => m[1] + ((S.mat || {})[m[0]] || 0)).join(' ');
+  const CH1 = [
+    { n: '1-1 扭曲的走廊', rw: { coin: 30, pts: 40, mat: { book: 1 } } },
+    { n: '1-2 狂暴圖書館', rw: { coin: 20, pts: 50, mat: { stone: 2, seed: 1 } } },
+    { n: '1-3 鐘樓頂層・BOSS 戰', rw: { coin: 60, pts: 100, mat: { purple: 1, shard: 1 } } }
+  ];
+  const ch1 = () => (S.ch1 = S.ch1 || { n: 0, c: {}, d: {} });
+  const ALLY5 = () => [0, 1, 2, 3, 4, 'p'].filter(k => k !== pastOf());
+  const ask = (who, text, btns, img) => new Promise(res => say(who, text, btns.map((b, i) => ({ label: b, fn: () => res(i) })), img));
+  async function switchPuzzle() {
+    const cols = ['🔵 藍', '🟡 黃', '🔴 紅'], ord = shuffled([0, 1, 2], Math.random);
+    for (;;) {
+      await talkSeq([['小創', '時空開關被破壞了！我用掃描器偵測到正確順序：\n' + ord.map(i => cols[i]).join(' → ') + '\n請依序按下開關，我來幫你修復！', 2]]);
+      let ok = true;
+      for (let st = 0; st < 3 && ok; st++) { const pick = await ask('⏱ 時空開關（第 ' + (st + 1) + ' / 3 個）', '按下哪一個開關？', cols); if (pick !== ord[st]) ok = false; }
+      if (ok) { await talkSeq([['小創', '修復完成！時空開關恢復運轉，走廊不再扭曲了！', 2]]); return; }
+      await talkSeq([['小創', '短路了！別急，我們重來一次。', 2, '再試一次']]);
+    }
+  }
+  async function gearPuzzle() {
+    let hp = 100;
+    for (let r = 0; r < 3; r++) {
+      const h = [3, 6, 9][Math.floor(Math.random() * 3)];
+      const pick = await ask('⚙️ 時間齒輪（第 ' + (r + 1) + ' / 3 次）', '鐘面指針指向「' + h + '」點！\n全場範圍技即將落下，快踩對應的時間齒輪，觸發護罩！', ['⚙️ 3 點齒輪', '⚙️ 6 點齒輪', '⚙️ 9 點齒輪'], AV(4));
+      if ([3, 6, 9][pick] === h) await talkSeq([['小T', '嗶嗶！護罩展開，全員無傷！', -1]]); else { hp -= 15; await talkSeq([['小T', '踩錯了！全隊受到 15 傷害……（Boss 戰開局 HP ' + hp + '）', -1]]); }
+    }
+    return hp;
+  }
+  function reward(i) {
+    const c = ch1(), st = CH1[i], first = !c.c[i], today = dayKey();
+    if (first) { c.c[i] = 1; c.n = Math.max(c.n, i + 1); addPts(st.rw.pts, '第一章 ' + st.n + ' 首通'); S.coin = (S.coin || 0) + st.rw.coin; Object.keys(st.rw.mat).forEach(k => matAdd(k, st.rw.mat[k])); toast('🎁 首通獎勵：🪙' + st.rw.coin + '　' + Object.keys(st.rw.mat).map(k => MATS.find(m => m[0] === k)[1] + '×' + st.rw.mat[k]).join(' '), 5200); }
+    else if (c.d[i] !== today) { c.d[i] = today; addPts(10, '重複挑戰'); S.coin = (S.coin || 0) + 10; toast('今日重複挑戰獎勵：+10 點、🪙+10', 3200); }
+    else toast('今日已領過重複挑戰獎勵囉', 2400);
+    save(); refreshAll();
+  }
+  async function runStage(i) {
+    if (opActive) return; opActive = true; opSkip = false; riftOn();
+    try {
+      const allies = ALLY5(); let win = false;
+      if (i === 0) {
+        await talkSeq([['小T', '嗶嗶！偵測到時空異常——「舊校舍」的走廊被扭曲了，失控的考卷怪在遊蕩！', -1], ['小創', '擊敗它們，我再來修復被破壞的時空開關！', 2]]);
+        win = await battle({ title: '1-1 扭曲的走廊', safe: true, dodge: true, allies, enemies: [0, 1, 2].map(() => ({ n: '失控考卷怪', ic: '📝', hp: 45, atk: 4 })) });
+        if (win) await switchPuzzle();
+      } else if (i === 1) {
+        await talkSeq([['小知', '這裡是狂暴的圖書館……書本怪發狂了！我要找到 3 本「轉生文獻」，請保護我！', 4], ['小T', '嗶嗶！限時生存！按「📖 搜尋」找文獻，同時擊退書本怪。', -1]]);
+        const E0 = [0, 1, 2].map(() => ({ n: '飛翔書本怪', ic: '📖', hp: 25, atk: 3 }));
+        win = await battle({ title: '1-2 狂暴圖書館', lib: { turns: 8 }, dodge: true, allies: allies.filter(k => k !== 4), enemies: E0 });
+      } else {
+        await talkSeq([['小T', '嗶嗶！抵達鐘樓頂層大廳。前方有時間齒輪，指針落下前要踩對位置！', -1]]);
+        const hp = await gearPuzzle();
+        await talkSeq([['小樂', '鐘樓怪人出現了！大家，上！', 0], ['小T', '【時空剪影·瘋狂鐘樓怪人】，BOSS 戰開始！', -1]]);
+        win = await battle({ title: 'BOSS・瘋狂鐘樓怪人', boss: true, php0: hp, allies, enemies: [{ n: '瘋狂鐘樓怪人', ic: '🕰️', hp: 400, atk: 4 }] });
+        if (win) await talkSeq([['小知', '鐘聲停了……失控的時鐘塔恢復正常了。', 4], ['小同', '我們做到了！同樂社最強！', 1], ['小T', '嗶嗶！取得「前世記憶碎片」！第一章完成。', -1]]);
+      }
+      riftOff();
+      if (win) { reward(i); } else { await new Promise(res => say('挑戰失敗', '別氣餒，整理一下隊伍再挑戰一次吧！', [{ label: '再挑戰', pri: true, fn: () => { res(); setTimeout(() => runStage(i), 250); } }, { label: '離開', fn: res }], AV(0))); }
+    } finally { riftOff(); opActive = false; }
+  }
+  function chapterMenu() {
+    if (opActive || dlgOpen) return; if (pastOf() < 0) { toast('請先選擇前世身分', 2400); return; }
+    const c = ch1();
+    say('🌀 宇宙裂隙・第一章', '【舊校舍的失控時鐘塔】\n隊伍：你與 5 位夥伴（含汪汪／小T）全員出動，連攜技全開！\n材料：' + matStr() + '\n首通有豐厚獎勵，之後每天各關可領一次小獎勵。',
+      CH1.map((st, i) => ({ label: (c.c[i] ? '✅ ' : c.n >= i ? '' : '🔒 ') + st.n, fn: () => { if (c.n < i) { setTimeout(() => say('尚未解鎖', '請先通關「' + CH1[i - 1].n + '」。', [{ label: '好' }], AV(4)), 120); } else setTimeout(() => runStage(i), 150); } })).concat([{ label: '關閉' }]), AV(4));
+  }
+  L.chapter = { menu: chapterMenu, run: runStage };
+  { const RP = snap(9, -44, { maxR: 5 }) || { x: 9, y: 0.03, z: -44 }; const grp = new T.Group(); grp.position.set(RP.x, RP.y + 1.6, RP.z); G.add(grp);
+    const ring = new T.Mesh(new T.TorusGeometry(1.2, 0.18, 12, 36), new T.MeshBasicMaterial({ color: 0xb46bff })); grp.add(ring); const core = new T.Mesh(new T.CircleGeometry(1.05, 24), new T.MeshBasicMaterial({ color: 0x3a1d8f, transparent: true, opacity: 0.8, side: T.DoubleSide })); grp.add(core);
+    sprite(nameTex('🌀 宇宙裂隙・第一章', '#6a3fd0'), [2.4, 0.55], RP.x, RP.y + 3.6, RP.z, 30);
+    ia({ id: 'rift1', x: RP.x, y: RP.y, z: RP.z, r: 2.8, txt: () => '🌀 進入宇宙裂隙', act: chapterMenu }); L.riftPortal = grp; }
   /* 開場主流程 */
   async function startOpening(replay) {
     if (opActive || dlgOpen) return; opActive = true; opSkip = false;
