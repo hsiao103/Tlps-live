@@ -9,7 +9,7 @@
 window.TL_AUTH_CONFIG = {
   clientId: '496401881030-1qjipaivkr1sivbnakccf017i1v4ia9a.apps.googleusercontent.com',
   allowDomains: ['tmail.ilc.edu.tw', 'smail.ilc.edu.tw'],
-  allowEmails: [],
+  allowEmails: ['blurwater@gmail.com', 'hsiao103@gmail.com'],   /* 白名單：網域之外的個別信箱 */
   sessionHours: 12,
   fullPage: 'play.html',        // 遊戲頁面
   visitorPage: 'index.html'     // 登入頁（未登入會被送回這裡）
