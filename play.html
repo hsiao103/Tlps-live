@@ -4997,13 +4997,46 @@ box(-72, -13.84, -71.92, 3.7, 0.04, 0.05, M.white, { noShadow: true });   // 西
   box(-72, -19.05, -57.0, -18.75, 1.4, 2.0, FNM, { wall: true, noShadow: true });
   for (let x = -72; x <= -57; x += 3) box(x, -19.15, x + 0.1, -19.05, 0, 2.0, M.steel, { wall: true });
   for (let x = -71.8; x < -57; x += 0.6) box(x, -19.22, x + 0.04, -18.48, 0, 1.4, mat(0x2f6f2c), { noShadow: true }); }
-const carCols = [0xdddddd, 0xb02a2a, 0x2c3e5b, 0x2f2f2f, 0xeeeeee, 0x7a8a7a];
-[[-71.3, 1], [-71.3, 3], [-71.3, 5], [-61.9, 0], [-61.9, 2], [-61.9, 4]].forEach((p, i) =>
-  box(p[0], -13.8 + p[1] * 2.5 + 0.35, p[0] + 3.8, -13.8 + p[1] * 2.5 + 2.15, 0.15, 1.45, mat(carCols[i % carCols.length]), { wall: true }));
+// 車輛（休旅車、轎車、小貨車；車身為碰撞體，其餘細節為裝飾）
+{ const GL = mat(0x23323f), TY = mat(0x161616), HL = mat(0xfff2b0), TL = mat(0xc42626), CH = mat(0x9aa0a6);
+  // x0＝車尾端 x、zc＝車位中心線；dir=+1 車頭朝東、-1 朝西；kind: 'sedan' | 'suv' | 'van'
+  function car(x0, zc, dir, kind, col) {
+    const L = kind === 'van' ? 4.2 : kind === 'suv' ? 3.9 : 3.8, W = 1.7, B = mat(col), z0 = zc - W / 2, z1 = zc + W / 2;
+    const X = (a, b) => dir > 0 ? [x0 + a, x0 + b] : [x0 + L - b, x0 + L - a];   // a,b＝距車尾的距離
+    const bx = (a, b, za, zb, y0, y1, m, o) => { const r = X(a, b); box(r[0], zc + za, r[1], zc + zb, y0, y1, m, o || { noShadow: true }); };
+    const hb = kind === 'suv' ? 0.85 : kind === 'van' ? 0.9 : 0.75;                 // 車身高度
+    bx(0, L, -W / 2, W / 2, 0.22, hb, B, { wall: true });                          // 下車身（碰撞體）
+    // 車艙：轎車較短、休旅車與小貨車長而高
+    const c0 = kind === 'sedan' ? 0.9 : kind === 'suv' ? 0.25 : 0.2, c1 = kind === 'sedan' ? 2.9 : kind === 'suv' ? 3.3 : 3.0, top = kind === 'sedan' ? 1.32 : kind === 'suv' ? 1.58 : 1.75;
+    bx(c0, c1, -W / 2 + 0.05, W / 2 - 0.05, hb, top - 0.07, GL);                   // 車窗
+    bx(c0 - 0.05, c1 + 0.05, -W / 2 + 0.08, W / 2 - 0.08, top - 0.07, top, B);     // 車頂
+    [c0 - 0.02, c1 - 0.04].forEach(a => bx(a, a + 0.06, -W / 2 + 0.03, W / 2 - 0.03, hb, top - 0.07, B));   // 前後柱
+    if (kind === 'sedan') { bx(0.1, 0.9, -W / 2 + 0.05, W / 2 - 0.05, hb, hb + 0.07, B); }                   // 後行李箱蓋
+    bx(L - 0.06, L, -0.7, -0.4, 0.4, 0.62, HL); bx(L - 0.06, L, 0.4, 0.7, 0.4, 0.62, HL);                    // 頭燈
+    bx(0, 0.06, -0.72, -0.4, 0.45, 0.62, TL); bx(0, 0.06, 0.4, 0.72, 0.45, 0.62, TL);                         // 尾燈
+    bx(L - 0.1, L, -0.45, 0.45, 0.25, 0.4, CH);                                                               // 前保險桿格柵
+    [0.65, L - 0.8].forEach(a => [-1, 1].forEach(sd => bx(a, a + 0.62, sd > 0 ? W / 2 - 0.02 : -W / 2 - 0.1, sd > 0 ? W / 2 + 0.1 : -W / 2 + 0.02, 0, 0.55, TY)));   // 四個輪胎
+    if (kind === 'suv') bx(0.4, 3.0, -0.6, 0.6, top, top + 0.08, CH);              // 車頂行李架
+  }
+  [[-71.3, 1, 1, 'suv', 0xe9ecef], [-71.3, 3, 1, 'sedan', 0xb02a2a], [-71.3, 5, 1, 'suv', 0x2c3e5b], [-61.9, 0, -1, 'sedan', 0x2f2f2f], [-61.9, 2, -1, 'van', 0xdfe6ea], [-61.9, 4, -1, 'sedan', 0x7a8a7a]].forEach(c => car(c[0], -13.8 + c[1] * 2.5 + 1.25, c[2], c[3], c[4]));
+}
 box(-72, -18.3, -58.6, -13.8, 0, 0.08, mat(0xa9a79d), { walk: true, noShadow: true });             // 機車・腳踏車車棚（橫貫停車場北緣全寬）
 box(-72.2, -18.5, -58.4, -13.6, 2.4, 2.55, M.roofB, {});
 for (let x = -72; x <= -58.8; x += 4.7) { box(x, -18.2, x + 0.2, -18.0, 0, 2.4, M.steel, { wall: true }); box(x, -14.0, x + 0.2, -13.8, 0, 2.4, M.steel, { wall: true }); }   // 前後柱列
-{ const bk = [0x2f2f2f, 0xb02a2a, 0x2c3e5b, 0x7a8a7a, 0xeeeeee]; for (let i = 0; i < 5; i++) { const bx = -71 + i * 2.6; box(bx, -17.5, bx + 0.7, -15.3, 0.08, 0.95, mat(bk[i % 5]), { wall: true }); box(bx + 0.05, -17.7, bx + 0.65, -17.5, 0.6, 1.1, M.steel, { noShadow: true }); } }   // 機車（車頭朝北靠停）
+{ // 機車與腳踏車（車頭朝北靠停）
+  const TY = mat(0x161616), GL = mat(0x23323f), CH = mat(0x9aa0a6), SE = mat(0x2a2a2a);
+  function moto(bx, col) { const B = mat(col), zN = -17.6;   // zN＝車頭端
+    box(bx + 0.07, zN, bx + 0.23, zN + 0.62, 0, 0.58, TY, { noShadow: true }); box(bx + 0.07, zN + 1.5, bx + 0.23, zN + 2.12, 0, 0.58, TY, { noShadow: true });   // 前後輪
+    box(bx + 0.02, zN + 0.55, bx + 0.28, zN + 1.55, 0.25, 0.62, B, { wall: true });             // 車身
+    box(bx + 0.04, zN + 0.2, bx + 0.26, zN + 0.55, 0.62, 1.0, B, { noShadow: true });             // 前擋腿板
+    box(bx + 0.02, zN + 1.0, bx + 0.28, zN + 1.65, 0.62, 0.72, SE, { noShadow: true });           // 座墊
+    box(bx - 0.18, zN + 0.3, bx + 0.48, zN + 0.38, 0.98, 1.06, CH, { noShadow: true });           // 把手
+    box(bx + 0.06, zN + 0.18, bx + 0.24, zN + 0.26, 1.06, 1.45, GL, { noShadow: true }); }        // 擋風鏡
+  function bicycle(bx, col) { const B = mat(col), zN = -17.5;
+    box(bx + 0.1, zN, bx + 0.2, zN + 0.55, 0, 0.55, TY, { noShadow: true }); box(bx + 0.1, zN + 1.3, bx + 0.2, zN + 1.85, 0, 0.55, TY, { noShadow: true });
+    box(bx + 0.12, zN + 0.3, bx + 0.18, zN + 1.5, 0.45, 0.55, B, { wall: true }); box(bx + 0.12, zN + 0.45, bx + 0.18, zN + 0.5, 0.5, 0.95, B, { noShadow: true });
+    box(bx + 0.02, zN + 0.42, bx + 0.28, zN + 0.5, 0.92, 0.98, CH, { noShadow: true }); box(bx + 0.08, zN + 1.2, bx + 0.22, zN + 1.5, 0.78, 0.85, SE, { noShadow: true }); }
+  moto(-70.4, 0xc23b3b); moto(-67.6, 0x2c3e5b); bicycle(-64.5, 0x2f9e44); bicycle(-62.2, 0xf08c00); }
 // （垃圾集中場已移除）                                   // 垃圾集中場
 label('行政大樓', -24, 9.4, 2.8, 3.6, '#fff4e0', '#a8421a');
 label('停車場', -68, 3.4, -4, 2.8, '#e8eef2', '#23374d');
