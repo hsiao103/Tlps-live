@@ -8535,7 +8535,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   /* ---------- 週活動：資源回收 ---------- */
   const BINS = [['紙類', 0x2f80ed, '📰'], ['塑膠', 0xf2c230, '🧴'], ['金屬', 0xe0564a, '🥫'], ['玻璃', 0x2e9b45, '🍾'], ['一般垃圾', 0x6b7580, '🗑️']];
   const RITEMS = [['報紙', 0, '📰'], ['紙箱', 0, '📦'], ['寶特瓶', 1, '🧴'], ['塑膠杯', 1, '🥤'], ['鋁罐', 2, '🥫'], ['鐵罐', 2, '🥫'], ['玻璃瓶', 3, '🍾'], ['玻璃罐', 3, '🫙'], ['沾油的紙餐盒', 4, '🍱'], ['破掉的陶瓷杯', 4, '☕']];
-  const RECY = [snap(14, -42, { maxR: 5 }) || { x: 14, y: 0.03, z: -42 }][0];
+  const RECY = [snap(1.5, -122.5, { maxR: 2.5 }) || snap(1.5, -122.5, { maxR: 6 }) || { x: 1.5, y: 0.03, z: -122.5 }][0];   // 資源回收室（科任及幼兒園區 1F）門外
   { RECY && BINS.forEach((b, i) => { const m = new T.Mesh(new T.BoxGeometry(0.8, 1.0, 0.8), gm(b[1])); m.position.set(RECY.x + (i - 2) * 1.05, RECY.y + 0.5, RECY.z); m.castShadow = true; G.add(m); const lid = new T.Mesh(new T.BoxGeometry(0.86, 0.1, 0.86), gm(0x333333)); lid.position.set(m.position.x, RECY.y + 1.05, RECY.z); G.add(lid); });
     sprite(nameTex('♻️ 資源回收站', '#2e9b45'), [2.6, 0.68], RECY.x, RECY.y + 2.3, RECY.z, 30);
     ia({ id: 'recy', x: RECY.x, y: RECY.y, z: RECY.z, r: 3.2, txt: () => { const w = W(); return w.bag.length ? '♻️ 分類回收（背包 ' + w.bag.length + ' 件）' : '♻️ 回收站說明'; }, act: () => { const w = W(); if (w.bag.length) sortNext(); else say('資源回收站', '本週是資源回收週！\n在校園裡找找看被亂丟的回收物（頭上有 ♻️ 的），撿起來帶到這裡，丟進正確的桶子。\n本週目標：正確分類 10 件。\n目前進度：' + w.sorted + '/10。'); } }); }
