@@ -9211,10 +9211,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   L.SYN = SYN;
   function battle(cfg) {
     return new Promise(res => {
-      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, awm = 1 + 0.25 * (S.awk || 0), sk = PSKILL[pk].map((v, i) => i >= 2 ? Math.round(v * awm) : v), gS = 1 + 0.08 * ((S.gear || {}).sword || 0), gB = 1 - 0.06 * ((S.gear || {}).bag || 0), gE = 4 * ((S.gear || {}).shoe || 0);
+      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, awm = 1 + 0.25 * (S.awk || 0) + 0.3 * (S.evo ? 1 : 0), sk = PSKILL[pk].map((v, i) => i >= 2 ? Math.round(v * awm) : i === 0 && S.evo ? '極・' + v : v), gS = 1 + 0.08 * ((S.gear || {}).sword || 0), gB = 1 - 0.06 * ((S.gear || {}).bag || 0), gE = 4 * ((S.gear || {}).shoe || 0);
       const allies = cfg.allies || [0], party = [pk].concat(allies.filter(k => k !== pk)), safe = cfg.tutorial || cfg.safe;
       const elig = () => cfg.tutorial ? SYN.filter(s => s.id === 'burst') : SYN.filter(s => s.req.every(r => party.indexOf(r) >= 0));
-      let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false, buff = 0, guard = 0, pick = false, phase = 'me', actI = -1, actE = -1, hurtP = false, fl = {}, bossPh = 0, snap0 = 0, cyc = 0, cd = 0, dark = false, dodging = false, books = 0;
+      let php = 100, en = S.evo ? 20 : 0, turn = 0, tgt = 0, busy = false, log = '', fin = false, buff = 0, guard = 0, pick = false, phase = 'me', actI = -1, actE = -1, hurtP = false, fl = {}, bossPh = 0, snap0 = 0, cyc = 0, cd = 0, dark = false, dodging = false, books = 0;
       if (cfg.php0) php = cfg.php0;
       const alive = () => { if (cfg.boss && E[0].hp <= 0) E.forEach(e => { e.hp = 0; }); return E.filter(e => e.hp > 0); }, wave = () => { E.length = 0; for (let i = 0; i < 3; i++) E.push({ n: '飛翔書本怪', ic: '📖', hp: 25, mx: 25, atk: 3, brk: 0, stun: 0 }); tgt = 0; }, cleared = () => { if (cfg.lib) { if (!alive().length) wave(); return false; } return !alive().length; }, first = () => E.findIndex(e => e.hp > 0), an = k => PM[k][0];
       const coach = () => { if (cfg.boss) { const B = E[0]; if (bossPh === 3) return '⏰ 午夜十二點倒數 ' + cd + ' 回合！小T：攢滿連攜能量，用連攜技一擊必殺！'; if (B.tele) return '⚠️ 鐘樓怪人舉起巨大時針！按「💨 閃避」，或用勇者技「斷招」！'; if (bossPh === 2 && B.shield > 0) return '🛡 時間護罩 ' + B.shield + '！用魔法師的技或【光輝破魔爆裂陣】可一擊破盾，否則會時間倒流！'; return ''; } if (cfg.lib) return '📚 找齊 3 本轉生文獻（已找到 ' + books + '/3），同時別讓小知被書本怪打倒！限時 ' + cfg.lib.turns + ' 回合。'; if (!cfg.tutorial) return ''; if (en >= 100) return '④ 連攜能量滿了！按下「連攜技」，和' + an(allies[0]) + '一起發動必殺技！'; if (turn === 0) return '① 先按「普攻」攻擊墨水怪（點敵人可以換目標）。'; if (turn === 1) return '② 這是你的「前世主動技」：' + sk[0] + '！每次行動都會累積連攜能量。'; return '③ 再行動一次，連攜能量就會滿了！'; };
@@ -9391,8 +9391,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function workshop() {
     if (opActive || dlgOpen) return; if (pastOf() < 0) { toast('請先選擇前世身分', 2400); return; }
     const pk = pastOf();
-    say('🔧 同樂工坊', '材料：' + matStr() + '　🪙' + (S.coin || 0) + '\n' + GEARS.map(g => g[1] + g[2] + ' Lv' + gearLv(g[0])).join('　') + '\n前世覺醒：' + PASTS[pk][0] + ' Lv' + awkLv() + '（主動技威力 +' + awkLv() * 25 + '%）',
-      [{ label: '📘 使用初級經驗書（+30 點）', fn: () => setTimeout(useBook, 120) }, { label: '🔩 強化裝備', fn: () => setTimeout(gearMenu, 120) }, { label: '🌱 用芽芽種子餵夥伴', fn: () => setTimeout(feedSeed, 120) }, { label: '💠 前世覺醒', fn: () => setTimeout(awaken, 120) }, { label: '關閉' }], AV(2));
+    say('🔧 同樂工坊', '材料：' + matStr() + '　🪙' + (S.coin || 0) + '\n' + GEARS.map(g => g[1] + g[2] + ' Lv' + gearLv(g[0])).join('　') + '\n前世覺醒：' + (S.evo ? '🌟' + evoName(pk) : PASTS[pk][0]) + ' Lv' + awkLv() + '（主動技威力 +' + awkLv() * 25 + '%）',
+      [{ label: '📘 使用初級經驗書（+30 點）', fn: () => setTimeout(useBook, 120) }, { label: '🔩 強化裝備', fn: () => setTimeout(gearMenu, 120) }, { label: '🌱 用芽芽種子餵夥伴', fn: () => setTimeout(feedSeed, 120) }, { label: '💠 前世覺醒', fn: () => setTimeout(awaken, 120) }, { label: '🌟 進化試煉', fn: () => setTimeout(evolveTrial, 120) }, { label: '關閉' }], AV(2));
   }
   function useBook() { if (has('book') < 1) { say('同樂工坊', '沒有初級經驗書了。通關「宇宙裂隙」可以獲得！', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(2)); return; } costM('book', 1); addPts(30, '使用初級經驗書'); save(); refreshAll(); setTimeout(workshop, 300); }
   function gearMenu() {
@@ -9516,6 +9516,37 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   stall(13, -49, 0x2e9b72, '📋 校園打工', '📋 查看打工布告欄', jobBoard, 'jobb');
   stall(-13, -49, 0xe0562d, '🛒 跳蚤市場', '🛒 逛跳蚤市場', market, 'mkt');
+  /* ---------- 前世進化試煉 ---------- */
+  const EVO = [['聖光騎士', '勇氣鍛成了光，守護所有人'], ['閃耀巨星', '舞台因你而閃耀'], ['機械大師', '科技與巧手合而為一'], ['星級主廚', '料理能療癒每一顆心'], ['賢者大魔導', '知識化為無窮的魔法']];
+  const EVQ = [['同樂國小位在哪個縣市？', ['宜蘭縣', '花蓮縣', '台東縣']], ['寶特瓶要資源回收，應該怎麼做？', ['清洗壓扁後回收', '連飲料一起丟', '跟廚餘一起丟']], ['過馬路時應該？', ['停、看、聽，走斑馬線', '邊走邊滑手機', '從車子中間穿越']], ['同學難過時，你會？', ['關心陪伴他', '假裝沒看到', '取笑他']], ['怎樣看書最護眼？', ['坐姿端正、光線充足', '躺著在昏暗處看', '邊走邊看']], ['節約用水的好方法是？', ['隨手關緊水龍頭', '讓水一直流', '洗手時開到最大']]];
+  const evoName = k => EVO[k][0];
+  const EVC = { shard: 3, purple: 3, coin: 300, lv: 15 };
+  async function evoQuiz() {
+    let ok = 0; const qs = shuffled(EVQ, Math.random).slice(0, 3);
+    for (let i = 0; i < 3; i++) { const q = qs[i], opts = shuffled([0, 1, 2], Math.random); const pick = await ask('🧠 智慧試煉（' + (i + 1) + '/3）', q[0], opts.map(o => q[1][o]), AV(4)); if (opts[pick] === 0) ok++; }
+    return ok >= 2;
+  }
+  async function evolveTrial() {
+    if (opActive) return; const pk = pastOf();
+    if (S.evo) { say('🌟 進化試煉', '你已經進化為「' + evoName(pk) + '」！', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(pk)); return; }
+    const lack = []; if (awkLv() < 3) lack.push('前世覺醒需達 Lv3（目前 Lv' + awkLv() + '）'); if (lvOf() < EVC.lv) lack.push('等級需 LV' + EVC.lv + '（目前 LV' + lvOf() + '）'); if (has('shard') < EVC.shard) lack.push('💠×' + EVC.shard + '（有 ' + has('shard') + '）'); if (has('purple') < EVC.purple) lack.push('🟣×' + EVC.purple + '（有 ' + has('purple') + '）'); if ((S.coin || 0) < EVC.coin) lack.push('🪙' + EVC.coin + '（有 ' + (S.coin || 0) + '）');
+    if (lack.length) { say('🌟 進化試煉', '進化後成為「' + evoName(pk) + '」：' + EVO[pk][1] + '。\n主動技威力再 +30%、戰鬥開場連攜能量 +20。\n\n尚未達成條件：\n・' + lack.join('\n・'), [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(pk)); return; }
+    const go = await ask('🌟 進化試煉', '進化後成為「' + evoName(pk) + '」！\n三道試煉：勇氣（單挑守衛）→ 智慧（答題）→ 羈絆（與夥伴合力）。\n通過後消耗 💠3、🟣3、🪙300。失敗不扣材料。', ['接受試煉', '再準備一下'], AV(pk));
+    if (go !== 0) return;
+    opActive = true; opSkip = false; riftOn();
+    try {
+      await talkSeq([['小T', '嗶嗶！進入試煉之間。第一關：勇氣試煉——只有你一個人！', -1]]);
+      let w = await battle({ title: '🗿 勇氣試煉', allies: [], enemies: [{ n: '試煉守衛', ic: '🗿', hp: 90, atk: 6 }] });
+      if (w) { w = await evoQuiz(); if (!w) await talkSeq([['小知', '智慧試煉沒有通過……再多讀點書，下次再來吧。', 4]]); }
+      else await talkSeq([['小樂', '勇氣試煉沒有通過……整理裝備再來吧。', 0]]);
+      if (w) { await talkSeq([['小T', '最後一關：羈絆試煉！夥伴們來幫你了！', -1]]); w = await battle({ title: '⏳ 羈絆試煉', allies: ALLY5(), enemies: [{ n: '時空剪影', ic: '👤', hp: 220, atk: 7 }, { n: '時空剪影', ic: '👤', hp: 120, atk: 5 }] }); }
+      riftOff();
+      if (w) { costM('shard', EVC.shard); costM('purple', EVC.purple); S.coin -= EVC.coin; S.evo = 1; save(); refreshAll(); flashRift(); await talkSeq([['進化！', PASTS[pk][1] + ' ' + PASTS[pk][0] + ' 進化為「' + evoName(pk) + '」！\n' + EVO[pk][1] + '。', pk]]); toast('🌟 進化完成！主動技威力 +30%、開場連攜能量 +20', 5200); }
+      else toast('試煉失敗，材料沒有消耗，可以再挑戰', 3600);
+    } finally { riftOff(); opActive = false; }
+  }
+  const flashRift = () => { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); bell(523, 0); bell(784, 0.15); bell(1047, 0.3); };
+  L.evolve = evolveTrial;
   /* 開場主流程 */
   async function startOpening(replay) {
     if (opActive || dlgOpen) return; opActive = true; opSkip = false;
