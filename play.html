@@ -9182,6 +9182,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const r5 = document.createElement('div'); r5.className = 'row'; r5.id = 'gCloudRow'; r5.innerHTML = '<span class="lab">天空雲朵</span><button type="button" id="bCld"></button>';
       const b5 = r5.querySelector('#bCld'), sync5 = () => { b5.textContent = S.noCloud ? '☁️ 已關閉（點此開啟）' : '☁️ 開啟（點此關閉）'; b5.className = S.noCloud ? '' : 'on'; };
       b5.onclick = () => { S.noCloud = S.noCloud ? 0 : 1; save(); sync5(); }; sync5(); r.after(r5);
+      const r6 = document.createElement('div'); r6.className = 'row'; r6.id = 'gSkyRow'; r6.innerHTML = '<span class="lab">浮空島城堡</span><button type="button" id="bSky"></button>';
+      const b6 = r6.querySelector('#bSky'), sync6 = () => { b6.textContent = S.noSky ? '🏰 已關閉（點此開啟）' : '🏰 開啟（點此關閉）'; b6.className = S.noSky ? '' : 'on'; };
+      b6.onclick = () => { S.noSky = S.noSky ? 0 : 1; save(); sync6(); }; sync6(); r5.after(r6);
     }
     setTimeout(festSync, 300);
   }
@@ -9439,6 +9442,43 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       q.g.position.set(cx + q.ox, q.y, cz + q.oz);
     });
   }
+  /* ---------- 天空浮空島＋城堡：高掛在校園北方天空，緩緩上下飄浮 ---------- */
+  const ISL = { g: new T.Group(), flag: null, win: [], sat: [], fall: null, t: 0 };
+  ISL.g.name = 'liveSkyIsland'; ISL.g.position.set(30, 62, -380); scene.add(ISL.g);
+  (() => {
+    const M = (c, o) => new T.MeshLambertMaterial(Object.assign({ color: c, flatShading: true }, o || {})), add = (m, x, y, z, par) => { m.position.set(x, y, z); m.frustumCulled = false; (par || ISL.g).add(m); return m; }, rr = rng(4242);
+    const rock = M(0x7a6a58), rock2 = M(0x62564a), grass = M(0x6fae4e), stone = M(0xe3dccb), stone2 = M(0xcfc6b2), roofB = M(0x3f6fd8), roofR = M(0xc8423b), wood = M(0x6b4a2b);
+    const under = add(new T.Mesh(new T.ConeGeometry(36, 46, 9), rock), 0, -23, 0); under.rotation.x = Math.PI;
+    add(new T.Mesh(new T.ConeGeometry(18, 30, 7), rock2), -9, -42, 6).rotation.x = Math.PI;
+    add(new T.Mesh(new T.ConeGeometry(10, 22, 6), rock), 12, -38, -8).rotation.x = Math.PI;
+    add(new T.Mesh(new T.CylinderGeometry(38, 36, 6, 18), grass), 0, 1, 0);
+    add(new T.Mesh(new T.CylinderGeometry(38.5, 38.5, 1.6, 18), M(0x8bc65f)), 0, 4.2, 0);
+    // 城堡
+    const keep = add(new T.Mesh(new T.BoxGeometry(16, 18, 14), stone), 0, 13, -2);
+    add(new T.Mesh(new T.BoxGeometry(8, 9, 1.2), M(0x4a3a2a)), 0, 9, 5.3); add(new T.Mesh(new T.CylinderGeometry(4, 4, 1.2, 12, 1, false, 0, Math.PI), M(0x4a3a2a)), 0, 13.5, 5.3).rotation.x = Math.PI / 2;
+    for (const [x, z] of [[-10, -9], [10, -9], [-10, 5], [10, 5]]) { add(new T.Mesh(new T.CylinderGeometry(3, 3.2, 24, 10), stone2), x, 16, z); add(new T.Mesh(new T.ConeGeometry(4.2, 8, 10), roofB), x, 32, z); }
+    add(new T.Mesh(new T.CylinderGeometry(4.2, 4.6, 34, 12), stone), 0, 21, -4); add(new T.Mesh(new T.ConeGeometry(5.8, 12, 12), roofR), 0, 44, -4);
+    add(new T.Mesh(new T.CylinderGeometry(0.15, 0.15, 7, 5), wood), 0, 53, -4);
+    const fl = add(new T.Mesh(new T.PlaneGeometry(5, 3, 6, 1), new T.MeshBasicMaterial({ color: 0xff5a4a, side: T.DoubleSide })), 2.5, 55.5, -4); ISL.flag = fl; fl.userData.base = fl.geometry.attributes.position.array.slice();
+    for (const [x, z] of [[-5, -9], [5, -9], [0, 5], [-10, -2], [10, -2]]) { add(new T.Mesh(new T.BoxGeometry(14, 6, 1.4), stone2), x * 0.9, 7, z * 0.9 + (z === 5 ? 3 : 0)); }
+    const wm = new T.MeshBasicMaterial({ color: 0xffe9a0 }); ISL.wmat = wm;
+    for (const [x, y, z] of [[-4, 16, 5.1], [4, 16, 5.1], [-3, 20, -9.4], [3, 20, -9.4], [0, 28, -0.4], [0, 36, -0.4]]) add(new T.Mesh(new T.BoxGeometry(1.6, 2.6, 0.4), wm), x, y, z);
+    // 樹與石頭
+    for (let i = 0; i < 12; i++) { const a = rr() * 6.283, d = 20 + rr() * 14, h = 3 + rr() * 3, g = new T.Group(); add(new T.Mesh(new T.CylinderGeometry(0.4, 0.5, h * 0.5, 5), wood), 0, h * 0.25, 0, g); add(new T.Mesh(new T.ConeGeometry(2 + rr(), h, 7), M(i % 3 ? 0x3f8f4a : 0x4fa35a)), 0, h * 0.5 + h * 0.5, 0, g); g.position.set(Math.cos(a) * d, 5, Math.sin(a) * d); ISL.g.add(g); }
+    // 瀑布（從島緣掉下去）
+    const fall = add(new T.Mesh(new T.BoxGeometry(3, 38, 1), new T.MeshBasicMaterial({ color: 0x9fd6ff, transparent: true, opacity: 0.55 })), -34, -16, 14); fall.rotation.y = 0.4; ISL.fall = fall;
+    // 小浮石
+    for (let i = 0; i < 4; i++) { const r = add(new T.Mesh(new T.DodecahedronGeometry(2 + rr() * 2.5, 0), rock), 0, 0, 0); ISL.sat.push({ m: r, a: rr() * 6.283, d: 52 + rr() * 16, y: -6 + rr() * 22, v: 0.05 + rr() * 0.07 }); }
+  })();
+  function islTick(dt, night, c) {
+    ISL.t += dt; const t = ISL.t, g = ISL.g;
+    if (!g.userData.fix) g.position.y = 62 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
+    if (ISL.wmat) ISL.wmat.color.setHex(night || c.dark > 0.3 ? 0xffd25a : 0x8a8f9c);
+    const fl = ISL.flag; if (fl) { const pa = fl.geometry.attributes.position, b = fl.userData.base; for (let i = 0; i < pa.count; i++) { const x = b[i * 3] + 2.5; pa.array[i * 3 + 2] = Math.sin(t * 4 + x * 1.2) * 0.35 * (x / 5); } pa.needsUpdate = true; }
+    ISL.sat.forEach(q => { q.a += q.v * dt; q.m.position.set(Math.cos(q.a) * q.d, q.y + Math.sin(t * 0.6 + q.a * 3) * 1.5, Math.sin(q.a) * q.d); q.m.rotation.y += dt * 0.3; });
+    if (ISL.fall) ISL.fall.material.opacity = 0.45 + Math.sin(t * 5) * 0.1;
+    g.visible = !S.noSky;
+  }
   let wxLast = 0, wxAcc = 0, wxId = '', wxVacKey = '', wxFog = null, wxBn = 160, wxBf = 900;
   function wxFrame(now) {
     requestAnimationFrame(wxFrame);
@@ -9449,6 +9489,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (scene.fog) { if (scene.fog !== wxFog) { wxFog = scene.fog; wxBn = scene.fog.near; wxBf = scene.fog.far; } scene.fog.near = wxBn * st.fn / 160; scene.fog.far = wxBf * st.ff / 900; }
     const nightK = typeof isNight !== 'undefined' && isNight ? 0.6 : 1;
     try { cloudTick(dt, st, c, intro, nightK < 1); } catch (e) { /* 忽略 */ }
+    try { islTick(dt, nightK < 1, c); } catch (e) { /* 忽略 */ }
     let col, al; if (tg.tint) { col = tg.tint; al = Math.max(st.white, st.dark * nightK); } else if (st.white > 0.02) { col = '225,232,240'; al = st.white; } else { col = '28,38,58'; al = st.dark * nightK; }
     wxEl.style.background = 'rgba(' + col + ',' + al.toFixed(3) + ')'; wxEl.style.setProperty('--flc', tg.fest === 'halloween' ? '#cba6ff' : '#fff');
     wxEl.style.boxShadow = st.wind > 0.05 ? 'inset 0 0 ' + Math.round(st.wind * 140) + 'px rgba(10,20,40,' + (0.3 * st.wind).toFixed(2) + ')' : 'none';
@@ -9684,7 +9725,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     box.querySelectorAll('.jc').forEach(b => b.onclick = () => { if (fin || b.disabled) return; if (b.dataset.g === '1') { got++; b.disabled = true; b.classList.add('on'); SFX.play('coin', 40); if (got >= 6) end(true); } else { wrong++; b.classList.add('bad'); SFX.play('error', 40); setTimeout(() => b.classList.remove('bad'), 300); t = Math.max(0, t - 2); } info(); });
     iv = setInterval(() => { t--; info(); if (t <= 0) end(false); }, 1000);
   }
-  L.wx = { clouds: CLD, wishMenu, windowRain, homeDoor, setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
+  L.wx = { island: ISL, clouds: CLD, wishMenu, windowRain, homeDoor, setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
   /* ---------- 開場劇情＋新手教學＋回合制戰鬥 ---------- */
   let opActive = false, opSkip = false, opWait = null, opAu = null;
   const opEl = mkEl('div', 'gOp'), riftEl = mkEl('div', 'gRift'), batEl = mkEl('div', 'gBat'), tutEl = mkEl('div', 'gTut'), sloEl = mkEl('div', 'gSlo');
