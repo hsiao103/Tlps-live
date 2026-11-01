@@ -8223,7 +8223,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
-#gWx{position:fixed;inset:0;z-index:4;pointer-events:none;transition:box-shadow .6s}#gWx::after{content:'';position:absolute;inset:0;background:#fff;opacity:calc(var(--fl,0)*.7)}#gRain{position:fixed;inset:0;z-index:4;pointer-events:none}body.intro #gWx,body.intro #gRain,body.intro #gWxChip{display:none}
+#gWx{position:fixed;inset:0;z-index:4;pointer-events:none;transition:box-shadow .6s}#gWx::after{content:'';position:absolute;inset:0;background:var(--flc,#fff);opacity:calc(var(--fl,0)*.7)}#gRain{position:fixed;inset:0;z-index:4;pointer-events:none}body.intro #gWx,body.intro #gRain,body.intro #gWxChip{display:none}
 #gWxChip{position:fixed;right:16px;top:calc(62px + env(safe-area-inset-top,0px));z-index:19;display:flex;align-items:center;gap:5px;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);border-radius:99px;padding:4px 10px;font:700 13px var(--font-ui);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12)}#gWxChip.ext{border-color:#e0462f;background:#fff0ed;color:#b02a16;animation:gWxP 1.6s infinite}#gWxChip i,#gWxChip em{font-style:normal}@keyframes gWxP{50%{box-shadow:0 0 0 5px rgba(224,70,47,.22)}}
 #gHwSp{position:fixed;inset:0;z-index:62;display:grid;place-items:center;background:rgba(20,30,40,.78);font-family:var(--font-ui)}#gHwSp .bx{background:#fffaf0;border:3px solid #2e9b72;border-radius:18px;padding:18px 22px;text-align:center;color:#333;min-width:230px}#gHwSp .big{font-size:20px;font-weight:800}#gHwSp .tp{display:block;margin:12px auto;width:130px;height:130px;border-radius:50%;border:0;background:#2e9b72;color:#fff;font-size:28px;font-weight:800;cursor:pointer;touch-action:manipulation}#gHwSp .tp:active{transform:scale(.94)}#gHwSp .cnt{font-weight:800}
 #gOp.ttlon{background:radial-gradient(circle at 50% 40%,#2a1d6e,#07072a 75%)}#gOp .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}#gOp .stars i{position:absolute;border-radius:50%;background:#fff;opacity:.2;animation:gTw 2.4s ease-in-out infinite}@keyframes gTw{50%{opacity:.95}}#gOp .ttl{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2.2vh,20px)}#gOp .ttl .l1{max-width:min(420px,70vw);max-height:26vh;object-fit:contain;opacity:0;transform:scale(.7);animation:gTi 1.6s .2s forwards cubic-bezier(.2,.8,.2,1)}#gOp .ttl .tp{font-size:30px;font-weight:800}#gOp .ttl h1{margin:0;font-size:clamp(24px,min(7vw,9vh),48px);line-height:1.3;letter-spacing:.1em;text-shadow:0 0 24px #8fb4ff;opacity:0;transform:translateY(14px);animation:gTu 1.4s 1.3s forwards}#gOp .ttl .l3{margin:0;font-size:clamp(12px,3.2vw,16px);letter-spacing:.24em;opacity:0;animation:gTu 1.2s 2.4s forwards;color:#cdd8ff}@keyframes gTi{to{opacity:1;transform:none}}@keyframes gTu{to{opacity:1;transform:none}}
@@ -8405,7 +8405,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (b.stage === 0) return '🌱 種下種子';
     if (b.stage >= 3) return '🌸 採收花朵';
     if (b.water === today) return null;
-    return rainNow() ? '🌧 雨水澆灌（免水桶）' : S.can > 0 ? '💧 澆水（水量 ' + S.can + '）' : '💧 澆水（先去水龍頭裝水）';
+    return rainNow() ? (wxCur().snow ? '❄️ 融雪澆灌（免水桶）' : '🌧 雨水澆灌（免水桶）') : S.can > 0 ? '💧 澆水（水量 ' + S.can + '）' : '💧 澆水（先去水龍頭裝水）';
   }
   function bedAct(i) {
     const b = S.beds[i], today = dayKey(), d = D();
@@ -8823,7 +8823,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const DORMP = snap(-14, 10, { maxR: 6 }) || { x: -14, y: 0.03, z: 10 }, CLUBR = snap(14, 10, { maxR: 6 }) || { x: 14, y: 0.03, z: 10 };
     cabin(DORMP.x, DORMP.y, DORMP.z - 0.3, 0xf6e3b8, 0xd9534f, '🏠 我的小屋', '#d9534f');
     cabin(CLUBR.x, CLUBR.y, CLUBR.z - 0.3, 0xcfe8fb, 0x2f80ed, '🎪 社辦', '#2f80ed');
-    ia({ id: 'dorm', x: DORMP.x, y: DORMP.y, z: DORMP.z + 1.8, r: 2.6, txt: () => '🏠 進入我的小屋', act: () => openRoom('dorm') });
+    ia({ id: 'dorm', x: DORMP.x, y: DORMP.y, z: DORMP.z + 1.8, r: 2.6, txt: () => '🏠 進入我的小屋', act: () => homeDoor(() => openRoom('dorm'), () => decorScore('dorm')) });
     ia({ id: 'clubroom', x: CLUBR.x, y: CLUBR.y, z: CLUBR.z + 1.8, r: 2.6, txt: () => '🎪 進入社辦', act: () => openRoom('club') });
     L.room = { FURN, openRoom, closeRoom, giveItem, placeItem, decorScore, roomOf, ownedOK, DORMP, CLUBR, get open() { return roomOpen; } };
   ia({ id: 'club', x: CLUBP.x, y: CLUBP.y, z: CLUBP.z, r: 2.8, txt: () => '🎪 社團佈告欄', act: clubDlg });
@@ -9208,6 +9208,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       lose() { [392, 330, 262, 196].forEach((f, i) => o(f, 0.4, { v: 0.09, at: i * 0.2, f2: f * 0.97 })); },
       jump() { o(300, 0.16, { type: 'sine', v: 0.08, f2: 620 }); },
       land() { n(0.07, { f: 500, v: 0.1 }); },
+      boom() { o(95, 0.4, { type: 'sine', v: 0.16, f2: 40 }); n(0.5, { f: 2600, f2: 300, v: 0.07, at: 0.02 }); },
       thunder() { n(1.8, { f: 900, f2: 50, v: 0.32 }); o(55, 1.4, { type: 'sine', v: 0.22, f2: 35, a: 0.05 }); n(0.5, { f: 3000, f2: 200, v: 0.18, at: 0.02 }); },
       step() { step.k ^= 1; n(0.045, { f: step.k ? 700 : 520, v: 0.035 }); }
     };
@@ -9357,6 +9358,16 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   };
   const WXT = { 1: 16, 2: 17, 3: 19, 4: 22, 5: 25, 6: 28, 7: 30, 8: 30, 9: 28, 10: 25, 11: 22, 12: 18 };
   const WXORD = ['sun', 'cloud', 'over', 'drizzle', 'storm', 'mist'];
+  /* 節慶 × 天氣：聖誕下雨→下雪、萬聖節起霧→鬼霧、春節晴夜放煙火、端午雨＝龍舟雨 */
+  const festCache = {};
+  function festOf(d) { const k = realKey(d); if (!festCache[k]) { const c = festNow(d); festCache[k] = { id: c ? c.f.id : '', off: c ? c.off : 0 }; } return festCache[k]; }
+  const WXV = {
+    christmas: { drizzle: { n: '小雪', ic: '🌨️', snow: 1 }, storm: { n: '暴風雪', ic: '🌨️', snow: 1, th: 0 }, heavy: { n: '大雪特報', ic: '❄️', snow: 1, th: 0 } },
+    halloween: { mist: { n: '鬼霧', ic: '👻', fog: [8, 150], tint: '66,46,108', white: 0.42 }, storm: { n: '魔女雷雨', ic: '🦇' } },
+    newyear: { drizzle: { n: '春雨', ic: '🌦️' }, storm: { n: '春雷雨', ic: '⛈️' } },
+    duanwu: { drizzle: { n: '龍舟雨', ic: '🐲' }, storm: { n: '端午雷雨', ic: '🐲' } }
+  };
+  function wxVar(id, d) { const f = festOf(d), v = (WXV[f.id] || {})[id]; return Object.assign({}, WXS[id], v || {}, { fest: f.id, foff: f.off }); }
   let wxDate = null, wxForce = null;   // 測試用：覆寫日期／天氣
   const wxToday = () => wxDate || new Date();
   const dAdd = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
@@ -9366,7 +9377,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const key = realKey(d), r = rng('wx' + key), m = d.getMonth() + 1;
     const hp = [0, 0, 0, 0, 0, 0, 0.02, 0.02, 0.06, 0.06, 0.02, 0.02, 0.02], u1 = r(), u2 = r(), u3 = r(), u4 = r(), s1 = r(), s2 = r(), s3 = r(), th = r();
     const typ = isTyp(d), heavy = !typ && (m === 5 || m === 6 ? u1 < 0.06 : m === 8 || m === 9 ? u1 < 0.04 : u1 < 0.02), cold = !typ && !heavy && ((m === 12 || m === 1 || m === 2) ? u2 < 0.1 : (m === 11 || m === 3) ? u2 < 0.02 : false);
-    const wt = WXM[m], tot = wt.reduce((a, b) => a + b, 0); let acc = 0, base = 0; for (let i = 0; i < 6; i++) { acc += wt[i] / tot; if (u3 < acc) { base = i; break; } }
+    const fid = festOf(d).id, wt = WXM[m].slice(); if (fid === 'halloween') { wt[5] *= 3; wt[4] *= 2; } else if (fid === 'duanwu') { wt[3] *= 1.5; wt[4] *= 2; } else if (fid === 'christmas') { wt[3] *= 1.8; wt[2] *= 1.3; } else if (fid === 'newyear') wt[3] *= 1.3; const tot = wt.reduce((a, b) => a + b, 0); let acc = 0, base = 0; for (let i = 0; i < 6; i++) { acc += wt[i] / tot; if (u3 < acc) { base = i; break; } }
     let ph;
     if (typ) ph = ['typhoon', 'typhoon', 'typhoon']; else if (heavy) ph = ['heavy', 'heavy', 'heavy'];
     else {
@@ -9383,7 +9394,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     return { key, ph, ext: typ ? 'typhoon' : heavy ? 'heavy' : null, cold, temp };
   }
   const wxPhase = () => { const h = L.clock ? L.clock.h : 8; return h < 12 ? 0 : h < 18 ? 1 : 2; };
-  const wxCur = () => { const w = wxOf(wxToday()), id = wxForce || w.ph[wxPhase()]; return Object.assign({ id, w }, WXS[id]); };
+  const wxCur = () => { const w = wxOf(wxToday()), id = wxForce || w.ph[wxPhase()]; const v = wxVar(id, wxToday()); return Object.assign({ id, w: v.snow ? Object.assign({}, w, { temp: Math.min(w.temp, 3) }) : w }, v); };
   const typhoonNow = () => { const c = wxCur(); return c.id === 'typhoon'; };
   const rainNow = () => { const c = wxCur(); return c.rain > 0; };
   /* 假期：暑假 7/1–8/31、寒假 2/1–2/21 */
@@ -9398,40 +9409,52 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   /* 畫面：暗角、霧、雨、閃電 */
   const wxEl = mkEl('div', 'gWx'), rainCv = mkEl('canvas', 'gRain'), wxChip = mkEl('button', 'gWxChip');
   wxChip.type = 'button';
-  const WXST = { dark: 0, white: 0, rain: 0, slant: 0, fn: 160, ff: 900, flash: 0, th: 0, nextTh: 6, wind: 0, drops: [] };
+  const WXST = { dark: 0, white: 0, rain: 0, slant: 0, fn: 160, ff: 900, flash: 0, th: 0, nextTh: 6, wind: 0, drops: [], flakes: [], fw: [], fwT: 1, fwSaid: 0 };
   function wxResize() { rainCv.width = innerWidth; rainCv.height = innerHeight; }
   addEventListener('resize', wxResize); wxResize();
-  let wxLast = 0, wxAcc = 0, wxId = '', wxVacKey = '';
+  let wxLast = 0, wxAcc = 0, wxId = '', wxVacKey = '', wxFog = null, wxBn = 160, wxBf = 900;
   function wxFrame(now) {
     requestAnimationFrame(wxFrame);
     const dt = Math.min(0.1, (now - wxLast) / 1000); wxLast = now; if (document.hidden) return;
     const intro = document.body.classList.contains('intro'), c = wxCur(), st = WXST, k = Math.min(1, dt * 1.6), tg = intro ? WXS.sun : c;
     st.dark += (tg.dark - st.dark) * k; st.white += ((tg.white || 0) - st.white) * k; st.rain += (tg.rain - st.rain) * k; st.slant += (tg.slant - st.slant) * k; st.wind += ((tg.wind || 0) - st.wind) * k;
     st.fn += (tg.fog[0] - st.fn) * k; st.ff += (tg.fog[1] - st.ff) * k; st.th = tg.th;
-    if (scene.fog && (c.id !== 'sun' || Math.abs(scene.fog.far - 900) > 2 || Math.abs(st.ff - 900) > 2)) { scene.fog.near = st.fn; scene.fog.far = st.ff; }
+    if (scene.fog) { if (scene.fog !== wxFog) { wxFog = scene.fog; wxBn = scene.fog.near; wxBf = scene.fog.far; } scene.fog.near = wxBn * st.fn / 160; scene.fog.far = wxBf * st.ff / 900; }
     const nightK = typeof isNight !== 'undefined' && isNight ? 0.6 : 1;
-    wxEl.style.background = 'rgba(' + (st.white > 0.02 ? '225,232,240' : '28,38,58') + ',' + (st.white > 0.02 ? st.white : st.dark * nightK).toFixed(3) + ')';
+    let col, al; if (tg.tint) { col = tg.tint; al = Math.max(st.white, st.dark * nightK); } else if (st.white > 0.02) { col = '225,232,240'; al = st.white; } else { col = '28,38,58'; al = st.dark * nightK; }
+    wxEl.style.background = 'rgba(' + col + ',' + al.toFixed(3) + ')'; wxEl.style.setProperty('--flc', tg.fest === 'halloween' ? '#cba6ff' : '#fff');
     wxEl.style.boxShadow = st.wind > 0.05 ? 'inset 0 0 ' + Math.round(st.wind * 140) + 'px rgba(10,20,40,' + (0.3 * st.wind).toFixed(2) + ')' : 'none';
     /* 閃電 */
     if (st.th > 0 && !intro) { st.nextTh -= dt * st.th; if (st.nextTh <= 0) { st.nextTh = 7 + Math.random() * 9; st.flash = 1; const dl = 0.35 + Math.random() * 1.4; setTimeout(() => { try { SFX.play('thunder', 800); } catch (e) { /* 忽略 */ } }, dl * 1000); if (Math.random() < 0.5) setTimeout(() => { st.flash = 0.8; }, 140); } }
     st.flash = Math.max(0, st.flash - dt * 3);
     wxEl.style.setProperty('--fl', st.flash.toFixed(3));
-    /* 雨 */
-    const cx = rainCv.getContext('2d'); if (st.rainOn || st.rain > 0.02) cx.clearRect(0, 0, rainCv.width, rainCv.height); st.rainOn = st.rain > 0.02 && !intro;
+    /* 雨／雪／煙火 */
+    const cx = rainCv.getContext('2d'), W = rainCv.width, H = rainCv.height, night2 = nightK < 1;
+    const fw = !intro && tg.fest === 'newyear' && tg.foff >= -1 && tg.foff <= 3 && night2 && st.rain < 0.1;
+    if (st.rainOn || st.rain > 0.02 || fw || st.fw.length) cx.clearRect(0, 0, W, H); st.rainOn = st.rain > 0.02 && !intro;
     if (st.rain > 0.02 && !intro) {
-      const want = Math.min(360, Math.round(st.rain * 150)), W = rainCv.width, H = rainCv.height, dr = st.drops;
-      while (dr.length < want) dr.push({ x: Math.random() * (W + 200) - 100, y: Math.random() * H, l: 10 + Math.random() * 16, v: 700 + Math.random() * 500, a: 0.25 + Math.random() * 0.4 });
-      if (dr.length > want) dr.length = want;
-      cx.lineWidth = 1.2; const sl = st.slant;
-      dr.forEach(p => { p.y += p.v * dt * (0.8 + st.rain * 0.3); p.x += p.v * dt * sl * 0.9; if (p.y > H) { p.y = -20; p.x = Math.random() * (W + 200) - 100; } cx.strokeStyle = 'rgba(205,220,240,' + p.a.toFixed(2) + ')'; cx.beginPath(); cx.moveTo(p.x, p.y); cx.lineTo(p.x + p.l * sl, p.y + p.l); cx.stroke(); });
+      if (tg.snow) {
+        const want = Math.min(260, Math.round(st.rain * 110)), fl = st.flakes;
+        while (fl.length < want) fl.push({ x: Math.random() * W, y: Math.random() * H, r: 1.2 + Math.random() * 2.6, v: 50 + Math.random() * 90, ph: Math.random() * 6.3 });
+        if (fl.length > want) fl.length = want; cx.fillStyle = 'rgba(255,255,255,0.88)'; const tt = now / 1000;
+        fl.forEach(q => { q.y += q.v * dt; q.x += Math.sin(tt * 1.2 + q.ph) * 30 * dt + st.slant * 160 * dt; if (q.y > H + 6) { q.y = -6; q.x = Math.random() * W; } if (q.x > W + 6) q.x = -6; cx.beginPath(); cx.arc(q.x, q.y, q.r, 0, 6.283); cx.fill(); });
+      } else {
+        const want = Math.min(360, Math.round(st.rain * 150)), dr = st.drops;
+        while (dr.length < want) dr.push({ x: Math.random() * (W + 200) - 100, y: Math.random() * H, l: 10 + Math.random() * 16, v: 700 + Math.random() * 500, a: 0.25 + Math.random() * 0.4 });
+        if (dr.length > want) dr.length = want;
+        cx.lineWidth = 1.2; const sl = st.slant;
+        dr.forEach(p => { p.y += p.v * dt * (0.8 + st.rain * 0.3); p.x += p.v * dt * sl * 0.9; if (p.y > H) { p.y = -20; p.x = Math.random() * (W + 200) - 100; } cx.strokeStyle = 'rgba(205,220,240,' + p.a.toFixed(2) + ')'; cx.beginPath(); cx.moveTo(p.x, p.y); cx.lineTo(p.x + p.l * sl, p.y + p.l); cx.stroke(); });
+      }
     }
+    if (fw) { st.fwT -= dt; if (st.fwT <= 0) { st.fwT = 1.6 + Math.random() * 2.6; const hue = Math.floor(Math.random() * 360), bx = W * (0.15 + Math.random() * 0.7), by = H * (0.12 + Math.random() * 0.3), ps = []; for (let i = 0; i < 46; i++) { const an = i / 46 * 6.283, sp = 70 + Math.random() * 90; ps.push({ vx: Math.cos(an) * sp, vy: Math.sin(an) * sp }); } st.fw.push({ x: bx, y: by, h: hue, t: 0, ps }); const dl = 0.2 + Math.random() * 0.5; setTimeout(() => { try { SFX.play('boom', 400); } catch (e) { /* 忽略 */ } }, dl * 1000); if (!st.fwSaid) { st.fwSaid = 1; toast('🎆 新春夜晚，天空綻放煙火！', 3500); } } }
+    if (st.fw.length) { cx.globalCompositeOperation = 'lighter'; st.fw = st.fw.filter(b => { b.t += dt; if (b.t > 2.2) return false; const a = Math.max(0, 1 - b.t / 2.2); b.ps.forEach(q => { const x = b.x + q.vx * b.t, y = b.y + q.vy * b.t + 40 * b.t * b.t; cx.fillStyle = 'hsla(' + b.h + ',95%,62%,' + (a * 0.9).toFixed(2) + ')'; cx.beginPath(); cx.arc(x, y, 2.2 * a + 0.6, 0, 6.283); cx.fill(); }); return true; }); cx.globalCompositeOperation = 'source-over'; }
     /* 移動速度、環境音、標籤 */
     window.__spd = intro ? 1 : c.spd;
     wxAcc += dt; if (wxAcc > 0.8) { wxAcc = 0; wxUi(c, intro); }
   }
   function wxUi(c, intro) {
     const v = vacNow(), vk = v ? v.id : '', night = typeof isNight !== 'undefined' && isNight;
-    try { SFX.amb(intro || !L.ready ? {} : { rain: Math.min(1.4, WXST.rain), wind: WXST.wind + (WXST.rain > 1 ? 0.2 : 0), cic: v && v.id === 'summer' && !night && WXST.rain < 0.3 ? 1 : 0 }); } catch (e) { /* 忽略 */ }
+    try { SFX.amb(intro || !L.ready ? {} : { rain: c.snow ? 0 : Math.min(1.4, WXST.rain), wind: c.snow ? 0.25 : WXST.wind + (WXST.rain > 1 ? 0.2 : 0), cic: v && v.id === 'summer' && !night && WXST.rain < 0.3 ? 1 : 0 }); } catch (e) { /* 忽略 */ }
     const sig = c.id + '|' + vk + '|' + (v ? v.day : 0) + '|' + c.w.temp + '|' + (c.w.cold ? 1 : 0);
     if (wxChip.dataset.sig !== sig) {
       wxChip.dataset.sig = sig; wxChip.className = c.ext ? 'ext' : '';
@@ -9445,7 +9468,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   function wxAnnounce(c, first) {
     const v = vacNow(); let m = '';
-    if (c.id === 'typhoon') m = '🌀 颱風假！今天停止上班上課，戶外風雨很大，跑跳都變慢了。待在安全的地方，打工與市場今天休息。';
+    if (c.snow) m = '❄️ 聖誕節下雪了！（' + c.n + '）路面濕滑，移動稍慢。';
+    else if (c.fest === 'halloween' && c.id === 'mist') m = '👻 鬼霧瀰漫……萬聖節的校園好像不太平靜。';
+    else if (c.fest === 'halloween' && c.id === 'storm') m = '🦇 魔女雷雨！閃電把天空染成紫色。';
+    else if (c.fest === 'duanwu' && (c.id === 'drizzle' || c.id === 'storm')) m = '🐲 端午節的龍舟雨來了，老一輩說「龍舟水」。';
+    else if (c.id === 'typhoon') m = '🌀 颱風假！今天停止上班上課，戶外風雨很大，跑跳都變慢了。待在安全的地方（「我的小屋」有颱風假活動），打工與市場今天休息。';
     else if (c.id === 'heavy') m = '🌧️ 豪雨特報！雨勢很大、路面積水，移動會變慢，也要小心雷擊。';
     else if (c.id === 'storm') m = '⛈️ 雷雨來了，記得躲雨！（雨天澆花不用水桶）';
     else if (c.id === 'drizzle') m = '🌦️ 下起小雨了。（雨天澆花不用水桶）';
@@ -9462,10 +9489,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   /* 氣象站（點右上角天氣標籤） */
   function wxStation() {
     if (opActive || dlgOpen) return; const d0 = wxToday(), c = wxCur(), v = vacNow(), PH = ['上午', '下午', '晚間'], wd = ['日', '一', '二', '三', '四', '五', '六'];
-    let tx = '現在：' + c.ic + c.n + '　' + c.w.temp + '°C' + (c.w.cold ? '　🥶 寒流' : '') + '\n今天：' + c.w.ph.map((p, i) => PH[i] + WXS[p].ic).join('　') + '\n';
+    let tx = '現在：' + c.ic + c.n + '　' + c.w.temp + '°C' + (c.w.cold ? '　🥶 寒流' : '') + '\n今天：' + c.w.ph.map((p, i) => PH[i] + wxVar(p, d0).ic).join('　') + '\n';
     if (c.ext) tx += '⚠️ ' + (c.id === 'typhoon' ? '颱風假：停止上班上課，打工與市場休息，移動速度大減' : '豪雨特報：移動變慢、小心雷擊與積水') + '\n';
     tx += '\n未來三天：\n';
-    for (let i = 1; i <= 3; i++) { const d = dAdd(d0, i), w = wxOf(d); tx += (d.getMonth() + 1) + '/' + d.getDate() + '（' + wd[d.getDay()] + '）' + WXS[w.ph[1]].ic + WXS[w.ph[1]].n + ' ' + w.temp + '°' + (w.ext === 'typhoon' ? '　🌀預報颱風假' : w.ext ? '　⚠豪雨特報' : '') + (w.cold ? '　🥶寒流' : '') + '\n'; }
+    for (let i = 1; i <= 3; i++) { const d = dAdd(d0, i), w = wxOf(d); tx += (d.getMonth() + 1) + '/' + d.getDate() + '（' + wd[d.getDay()] + '）' + wxVar(w.ph[1], d).ic + wxVar(w.ph[1], d).n + ' ' + w.temp + '°' + (w.ext === 'typhoon' ? '　🌀預報颱風假' : w.ext ? '　⚠豪雨特報' : '') + (w.cold ? '　🥶寒流' : '') + '\n'; }
     const nv = (() => { if (v) return null; for (let i = 1; i <= 366; i++) { const x = dAdd(d0, i), y = vacOf(x); if (y) return { n: y.name, i }; } return null; })();
     tx += '\n' + (v ? v.ic + v.name + '第 ' + v.day + ' 天（剩 ' + v.left + ' 天）' : nv ? '📅 距離下次放假（' + nv.n + '）還有 ' + nv.i + ' 天' : '');
     const bt = [{ label: '🛡 防災小學堂', pri: !!c.ext, fn: () => setTimeout(disasterQuiz, 120) }];
@@ -9546,7 +9573,45 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       say('✍️ 今天的日記', '今天心情如何？', HWMOOD.map(m => ({ label: m[0] + ' ' + m[1], fn: () => setTimeout(() => say('✍️ 今天的日記', '選一句話記下來：', HWSENT.map(t => ({ label: t, fn: () => { r.diary.push({ d: dk, m: m[0], t: t }); if (r.diary.length > 30) r.diary.shift(); toast('📝 日記寫好了', 1500); hwDone(v, 4); setTimeout(hwBook, 500); } })), AV(0)), 120) })), AV(0));
     }
   }
-  L.wx = { setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
+  /* 颱風假在家：小屋專屬事件（窩在家休息、防颱準備小遊戲、收聽颱風消息） */
+  function homeDoor(enter, score) {
+    if (!typhoonNow()) { enter(); return; }
+    S.wx = S.wx || { dq: {} }; S.wx.home = S.wx.home || {}; const k = realKey(wxToday()), h = S.wx.home[k] || (S.wx.home[k] = { rest: 0, prep: 0 });
+    say('🏠 我的小屋（颱風假）', '外面風雨很大，待在家最安全。\n' + (h.rest ? '✅' : '⬜') + ' 窩在家休息　' + (h.prep ? '✅' : '⬜') + ' 防颱準備\n（每項每個颱風假各能領一次獎勵）',
+      [{ label: '🛋 進小屋佈置', fn: () => setTimeout(enter, 120) }, { label: (h.rest ? '✅ ' : '🍲 ') + '窩在家休息', fn: () => setTimeout(() => homeRest(h, score), 120) }, { label: (h.prep ? '✅ ' : '🎒 ') + '防颱準備（小遊戲）', pri: !h.prep, fn: () => setTimeout(() => homePrep(h, enter, score), 120) }, { label: '📻 收聽颱風消息', fn: () => setTimeout(() => homeRadio(enter, score), 120) }, { label: '離開' }], AV(0));
+  }
+  function homeRest(h, score) {
+    if (h.rest) { toast('今天已經好好休息過了，再躺就要變成懶骨頭啦～', 2600); return; }
+    h.rest = 1; const sc = score ? score() : 0, pts = 5 + Math.min(15, Math.floor(sc / 5));
+    S.hp = hpMax(); S.mp = mpMax(); addPts(pts, '颱風假窩在家'); save(); refreshAll();
+    say('🍲 窩在家休息', '熱熱的湯、毛毯，外面風雨聲反而讓人好安心。\nHP、MP 全部回滿！' + (sc > 0 ? '\n（小屋舒適度 ' + sc + '，額外獲得 ' + pts + ' 點）' : '\n（把小屋佈置得越舒適，休息獎勵越多）'), [{ label: '好舒服～' }], AV(0));
+  }
+  function homeRadio(enter, score) {
+    const d0 = wxToday(); let end = 0; for (let i = 1; i <= 7; i++) { if (wxOf(dAdd(d0, i)).ext !== 'typhoon') { end = i; break; } }
+    const tips = shuffled(DQ.typ, Math.random).slice(0, 2).map(q => '・' + q[1]);
+    say('📻 颱風消息', '氣象署廣播：颱風正通過宜蘭，各縣市停止上班上課。\n預計 ' + (end <= 1 ? '明天' : end + ' 天後') + '天氣轉好。\n接下來三天：' + [1, 2, 3].map(i => { const w = wxOf(dAdd(d0, i)); return wxVar(w.ph[1], dAdd(d0, i)).ic; }).join(' ') + '\n\n小提醒：\n' + tips.join('\n'), [{ label: '🛡 防災小學堂', fn: () => setTimeout(disasterQuiz, 120) }, { label: '返回', fn: () => setTimeout(() => homeDoor(enter, score), 120) }], AV(0));
+  }
+  function homePrep(h, enter, score) {
+    if (opActive) return; opActive = true;
+    const GOOD = [['🔦', '手電筒'], ['🥫', '乾糧'], ['💧', '飲用水'], ['🔋', '備用電池'], ['📻', '收音機'], ['🩹', '急救包']], BAD = [['🎮', '遊戲機'], ['🕯️', '蠟燭'], ['🏖️', '泳圈'], ['🛹', '滑板'], ['🎈', '氣球'], ['🍭', '糖果']];
+    const cells = shuffled(GOOD.concat(BAD), Math.random); let got = 0, wrong = 0, t = 25, fin = false, iv = null;
+    const box = jobShell('🎒 防颱準備', '25 秒內，找出 6 樣「防颱必備」放進防颱包！（蠟燭容易引發火災，不算喔）');
+    jobEl.querySelector('.jx').textContent = '離開';
+    box.innerHTML = '<div class="jg">' + cells.map(c => '<button type="button" class="jc" data-g="' + (GOOD.some(g => g[0] === c[0]) ? 1 : 0) + '">' + c[0] + '<small style="color:#555;font-size:11px">' + c[1] + '</small></button>').join('') + '</div><div class="jm">已放入 0 / 6　⏱ 25</div>';
+    const info = () => { const m = box.querySelector('.jm'); if (m) m.textContent = '已放入 ' + got + ' / 6　⏱ ' + Math.max(0, t) + (wrong ? '　拿錯 ' + wrong : ''); };
+    const end = ok => {
+      if (fin) return; fin = true; clearInterval(iv); jobEnd(); opActive = false;
+      if (ok === -1) { return; }
+      if (!ok) { say('🎒 防颱準備', '時間到了，還沒備齊……再試一次吧！', [{ label: '再試一次', pri: true, fn: () => setTimeout(() => homePrep(h, enter, score), 120) }, { label: '離開' }], AV(0)); return; }
+      let msg = '防颱包備齊了！手電筒、乾糧、飲用水、電池、收音機、急救包，一樣都不少。';
+      if (!h.prep) { h.prep = 1; const bonus = wrong === 0 ? 10 : 0; addPts(20, '防颱準備'); S.coin = (S.coin || 0) + 20 + bonus; S.items = S.items || {}; S.items.med = (S.items.med || 0) + 1; msg += '\n🎁 +20 點、🪙+' + (20 + bonus) + '、🩹補血包 +1' + (bonus ? '（零失誤獎勵 🪙+10）' : ''); save(); refreshAll(); } else msg += '\n（今天的獎勵已經領過囉）';
+      say('🎒 防颱準備完成', msg, [{ label: '太好了' }], AV(0));
+    };
+    jobEl.querySelector('.jx').onclick = () => end(-1);
+    box.querySelectorAll('.jc').forEach(b => b.onclick = () => { if (fin || b.disabled) return; if (b.dataset.g === '1') { got++; b.disabled = true; b.classList.add('on'); SFX.play('coin', 40); if (got >= 6) end(true); } else { wrong++; b.classList.add('bad'); SFX.play('error', 40); setTimeout(() => b.classList.remove('bad'), 300); t = Math.max(0, t - 2); } info(); });
+    iv = setInterval(() => { t--; info(); if (t <= 0) end(false); }, 1000);
+  }
+  L.wx = { homeDoor, setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
   /* ---------- 開場劇情＋新手教學＋回合制戰鬥 ---------- */
   let opActive = false, opSkip = false, opWait = null, opAu = null;
   const opEl = mkEl('div', 'gOp'), riftEl = mkEl('div', 'gRift'), batEl = mkEl('div', 'gBat'), tutEl = mkEl('div', 'gTut'), sloEl = mkEl('div', 'gSlo');
