@@ -8223,6 +8223,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gOp.ttlon{background:radial-gradient(circle at 50% 40%,#2a1d6e,#07072a 75%)}#gOp .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}#gOp .stars i{position:absolute;border-radius:50%;background:#fff;opacity:.2;animation:gTw 2.4s ease-in-out infinite}@keyframes gTw{50%{opacity:.95}}#gOp .ttl{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2.2vh,20px)}#gOp .ttl .l1{max-width:min(420px,70vw);max-height:26vh;object-fit:contain;opacity:0;transform:scale(.7);animation:gTi 1.6s .2s forwards cubic-bezier(.2,.8,.2,1)}#gOp .ttl .tp{font-size:30px;font-weight:800}#gOp .ttl h1{margin:0;font-size:clamp(24px,min(7vw,9vh),48px);line-height:1.3;letter-spacing:.1em;text-shadow:0 0 24px #8fb4ff;opacity:0;transform:translateY(14px);animation:gTu 1.4s 1.3s forwards}#gOp .ttl .l3{margin:0;font-size:clamp(12px,3.2vw,16px);letter-spacing:.24em;opacity:0;animation:gTu 1.2s 2.4s forwards;color:#cdd8ff}@keyframes gTi{to{opacity:1;transform:none}}@keyframes gTu{to{opacity:1;transform:none}}
 #gOp{position:fixed;inset:0;z-index:90;display:none;background:#000;color:#fff;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity 1.2s;font-family:var(--font-ui);padding:24px}#gOp.show{display:flex}#gOp.on{opacity:1}#gOp .tx{font-size:clamp(18px,4.6vw,28px);line-height:1.9;white-space:pre-line;opacity:0;transition:opacity 1s;letter-spacing:.06em}#gOp .sk{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:99px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit}
 #gRift{position:fixed;inset:0;z-index:35;pointer-events:none;opacity:0;transition:opacity 1.2s;background:radial-gradient(ellipse at 50% 12%,rgba(150,60,255,.55),rgba(30,20,110,.45) 55%,rgba(10,10,50,.5))}#gRift.on{opacity:1}#gRift .vx{position:absolute;left:50%;top:-8vmin;width:70vmin;height:70vmin;margin-left:-35vmin;border-radius:50%;background:conic-gradient(from 0deg,#b46bff,#3a1d8f,#6fd0ff,#3a1d8f,#b46bff);filter:blur(6px);opacity:.75;animation:vxs 3.2s linear infinite;-webkit-mask:radial-gradient(circle,transparent 8%,#000 40%,transparent 72%);mask:radial-gradient(circle,transparent 8%,#000 40%,transparent 72%)}@keyframes vxs{to{transform:rotate(360deg)}}
 #gRift.flash::after{content:"";position:absolute;inset:0;background:#fff;animation:fl 1s ease-out forwards}@keyframes fl{0%{opacity:.95}100%{opacity:0}}
@@ -8962,7 +8963,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.jb2').onclick = () => { closeBag(); setTimeout(jobBoard, 200); }; bagEl.querySelector('.mk2').onclick = () => { closeBag(); setTimeout(market, 200); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.jb2').onclick = () => { closeBag(); setTimeout(jobBoard, 200); }; bagEl.querySelector('.mk2').onclick = () => { closeBag(); setTimeout(market, 200); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(async () => { await playTitle(true); startOpening(true, true); }, 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -9181,6 +9182,26 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     await show('那一天，我只是像往常一樣，\n在考試前夕迷迷糊糊地睡著了……', 3400);
     [523, 392, 330, 392].forEach((f, i) => bell(f, i * 0.85)); await show('叮——　咚——　當——　咚——', 3600);
     opEl.classList.remove('on'); await sleep(1300); opEl.classList.remove('show'); opEl.innerHTML = '';
+  }
+  /* 片頭：每次「進入世界」播放。完整版＝序幕文字＋鐘聲＋標題卡（新玩家／重看）；簡短版＝只有標題卡（老玩家），都可略過 */
+  async function playTitle(full) {
+    if (opActive) return; opActive = true; opSkip = false;
+    try {
+      opEl.innerHTML = '<div class="tx" id="gOpTx"></div><button type="button" class="sk">略過片頭 ⏭</button>'; opEl.classList.add('show', 'on');
+      opEl.querySelector('.sk').onclick = () => { opSkip = true; };
+      if (full) {
+        const tx = opEl.querySelector('#gOpTx'), show = async (t, ms) => { tx.style.opacity = 0; tx.textContent = t; await sleep(60); tx.style.opacity = 1; await sleep(ms); };
+        await show('那一天，我只是像往常一樣，\n在考試前夕迷迷糊糊地睡著了……', 3200);
+        [523, 392, 330, 392].forEach((f, i) => bell(f, i * 0.85)); await show('叮——　咚——　當——　咚——', 3400);
+        tx.style.opacity = 0; await sleep(700);
+      }
+      const lg = document.querySelector('img.lg'), st = []; for (let i = 0; i < 46; i++) st.push('<i style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 100).toFixed(1) + '%;animation-delay:' + (Math.random() * 3).toFixed(2) + 's;width:' + (1 + Math.random() * 2.5).toFixed(1) + 'px;height:' + (1 + Math.random() * 2.5).toFixed(1) + 'px"></i>');
+      opEl.innerHTML = '<div class="stars">' + st.join('') + '</div><div class="ttl">' + (lg && lg.src ? '<img class="l1" src="' + lg.src + '" alt="">' : '<div class="l1 tp">Project: TLPS Youth</div>') + '<h1 class="l2">關於我轉生到<br>同樂宇宙這檔事</h1><p class="l3">TLPS Universe ・ 宜蘭縣員山鄉</p></div><button type="button" class="sk">略過片頭 ⏭</button>';
+      opEl.querySelector('.sk').onclick = () => { opSkip = true; }; opEl.classList.add('ttlon');
+      bell(523, 0.6); bell(659, 0.9); bell(784, 1.2);
+      await sleep(full ? 5200 : 3600);
+      opEl.classList.remove('on'); await sleep(1100);
+    } finally { opEl.classList.remove('show', 'on', 'ttlon'); opEl.innerHTML = ''; opSkip = false; opActive = false; }
   }
   function riftOn() { riftEl.innerHTML = '<div class="vx"></div>'; riftEl.classList.add('on'); document.body.classList.add('gShake'); setTimeout(() => document.body.classList.remove('gShake'), 1400); tone(70, 1.8, 0.3, 'sawtooth'); tone(94, 1.6, 0.15, 'triangle', 0.1); }
   function riftOff() { riftEl.classList.remove('on'); }
@@ -9609,11 +9630,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   L.compEvo = compEvoMenu;
   /* 開場主流程 */
-  async function startOpening(replay) {
+  async function startOpening(replay, noBlack) {
     if (opActive || dlgOpen) return; opActive = true; opSkip = false;
     try {
       const pz = snap(0, -46, { maxR: 6 }) || { x: 0, y: 0, z: -46 };
-      if (!replay) await opBlack();
+      if (!replay && !noBlack) await opBlack();
       await talkSeq([['同樂國小・校門口', '晴空萬里。你睜開眼睛，發現自己穿著嶄新的校服，站在一座充滿奇幻星芒的校門前。', -1], ['小樂', '嘿！新來的轉學生！別發呆啦，入學典禮快要開始了！\n跟我來，我們去梅花廣場集合！', 0]]);
       if (!opSkip) {
         opSetTut('🕹 <b>教學 1：移動</b>　電腦：WASD（Shift 跑步）／手機：左下搖桿<br>跟著 📍 走到 <b>梅花廣場</b> 吧！'); try { navStart({ name: '梅花廣場', x: pz.x, z: pz.z + 4, lv: 0 }); } catch (e) { /* 沒有導航也能走 */ }
@@ -9637,7 +9658,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   L.opening = { start: startOpening, battle, practice: synPractice, get active() { return opActive; }, applyPast };
   { const st = document.createElement('style'); st.id = 'gLand'; st.textContent = "@media (max-height:500px) and (orientation:landscape){\n#joyL,#joyR{bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;width:104px;height:104px}#joyL .knob,#joyR .knob{left:32px;top:32px}#tbtns{flex-direction:row!important;right:calc(24px + 104px + 14px)!important;bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;gap:12px!important}#tbtns button{width:58px;height:58px}#gAct{bottom:calc(36px + env(safe-area-inset-bottom,0px))!important}\nbody.intro #gHud{display:none}\n#intro{bottom:8px;left:8px;padding:10px 16px;width:min(460px,calc(100vw - 16px));max-height:calc(100vh - 16px)}#intro h2{font-size:20px;margin:2px 0 6px}#intro p{font-size:12.5px;margin:0 0 6px;line-height:1.5}#intro .go{margin:8px 0}#intro .go button{min-height:36px;font-size:14px}#intro .eb{font-size:13px}\n#gDlg{max-height:calc(100dvh - 12px);overflow:auto}#gDlg .av{width:44px;height:44px}#gDlg .tx{font-size:13.5px;line-height:1.5}\n#gBag .pn,#gBag>div{max-height:calc(100dvh - 10px);overflow:auto}\n#gBat .bp{width:min(780px,calc(100vw - 16px));max-height:calc(100dvh - 8px);padding:8px;display:grid;grid-template-columns:1fr 1fr;column-gap:10px;row-gap:4px;align-content:start}\n#gBat .bh{grid-column:1/-1;margin:0}#gBat .be{grid-column:1;grid-row:2;margin:0}#gBat .ba{grid-column:1;grid-row:3;margin:0}#gBat .bc{grid-column:2;grid-row:2;margin:0;font-size:12px;padding:4px 8px}#gBat .bm{grid-column:2;grid-row:3;min-height:0;margin:0;font-size:12.5px}#gBat .bb{grid-column:2;grid-row:4}#gBat .be .en i{font-size:28px}#gBat .en b,#gBat .en small{font-size:11px}#gBat .al img,#gBat .al .pe{width:34px;height:34px;font-size:20px}#gBat .bb button{padding:8px 2px}#gBat .bl{grid-template-columns:70px 1fr 44px}\n#gJob .jp{max-height:calc(100dvh - 10px);overflow:auto;padding:8px}#gJob .jc{font-size:22px;padding:5px 0}#gJob .jg{gap:5px}\n#gRoom .pn{max-height:calc(100dvh - 8px)}\n}\n"; document.head.appendChild(st); }  /* 手機橫式（矮螢幕）排版，放最後以覆蓋前面樣式 */
   if (pastOf() >= 0 && !S.opening) S.opening = 1;
-  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); if (pastOf() < 0 && !S.opening) setTimeout(() => startOpening(false), 600); else if (pastOf() < 0) setTimeout(pickPast, 700); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); });
+  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); playTitle(pastOf() < 0 && !S.opening).then(() => { if (pastOf() < 0 && !S.opening) setTimeout(() => startOpening(false, true), 400); else if (pastOf() < 0) setTimeout(pickPast, 500); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); }); });
   L.TIERS = TIERS; setTimeout(() => { CP(); applyComp(); }, 0);
   L.TIERS = TIERS; L.tier = level; L.lvNeed = lvNeed; L.addPts = addPts;
   L.ready = true;
