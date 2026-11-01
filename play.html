@@ -8233,6 +8233,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
 #gBat .ba{display:flex;gap:10px;align-items:center;margin-bottom:8px}#gBat .al{display:grid;justify-items:center;font-size:11px;gap:2px}#gBat .al img{width:48px;height:48px;border-radius:50%;border:2px solid #fff;object-fit:cover;background:#fff}#gBat .bg{flex:1;display:grid;gap:6px}#gBat .bl{display:grid;grid-template-columns:78px 1fr 48px;align-items:center;gap:6px;font-size:11.5px}#gBat .bl em{font-style:normal}#gBat .bl small{text-align:right;color:#cfc8ff}
 #gBat .bc{background:rgba(255,213,74,.16);border:1.5px solid #ffd54a;border-radius:10px;padding:6px 10px;font-size:13.5px;line-height:1.6;margin-bottom:6px}#gBat .bm{min-height:34px;font-size:13.5px;line-height:1.6;color:#e7e3ff;margin-bottom:6px}#gBat .bm .big{display:block;font-size:20px;font-weight:900;color:#ffd54a;letter-spacing:.08em}
 #gBat .ba.sm .al img,#gBat .ba.sm .al .pe{width:38px;height:38px;font-size:22px}#gBat .ba.sm .bg{flex-basis:100%}#gBat .ba{flex-wrap:wrap}#gBat .al .pe{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#fff;font-style:normal;font-size:28px}#gBat .tg{display:block;color:#ffd54a;font-style:normal;font-size:12px}#gBat .sp{display:block;width:100%;text-align:left;margin-bottom:5px;border:1.5px solid #ffd54a;border-radius:10px;background:rgba(255,213,74,.12);color:#fff;padding:6px 10px;font-family:inherit;cursor:pointer}#gBat .sp b{display:block;font-size:14px}#gBat .sp small{color:#e7e3ff;font-size:12px}
+#gJob{position:fixed;inset:0;z-index:62;display:none;place-items:center;background:rgba(20,30,40,.8)}#gJob.show{display:grid}#gJob .jp{box-sizing:border-box;width:min(440px,calc(100vw - 20px));background:#fffaf0;border:3px solid #2e9b72;border-radius:18px;padding:12px;font-family:var(--font-ui);color:#333}#gJob .jh{display:flex;justify-content:space-between;align-items:center;font-size:16px}#gJob .jx{border:0;background:#e8e2d0;border-radius:99px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:inherit}#gJob .ji{margin:8px 0;font-size:14.5px;line-height:1.6}#gJob .jg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}#gJob .jg.g3{grid-template-columns:repeat(3,1fr)}#gJob .jg.g2{grid-template-columns:repeat(2,1fr)}#gJob .jc{border:2px solid #d9cfae;background:#fff;border-radius:12px;font-size:34px;padding:10px 0;cursor:pointer;display:grid;justify-items:center;line-height:1.1;font-family:inherit}#gJob .jc small{font-size:15px;font-weight:900;color:#a33}#gJob .jc.on{background:#bfeccd;border-color:#2e9b72;transform:scale(1.06)}#gJob .jc.bad{background:#f7c5bf;animation:hit .3s}#gJob .jo{display:block;width:100%;margin-top:10px;border:0;border-radius:12px;background:#2e9b72;color:#fff;font-size:16px;font-weight:800;padding:10px;cursor:pointer;font-family:inherit}#gJob .jm{margin-top:8px;text-align:center;font-weight:800}
 #gBat .tc{color:#bcb3ff;font-size:12px;margin-left:4px}#gBat .bp.dark{filter:brightness(.72) saturate(.8)}#gBat .bh b{font-size:13.5px;flex:1 1 auto}#gBat .bh{gap:6px;align-items:center}#gBat .bb button{font-size:12.5px;padding:10px 2px}#gBat .tn{padding:2px 10px;border-radius:99px;font-weight:800;font-size:12.5px}#gBat .tn.me{background:#2f9e5b;color:#fff}#gBat .tn.foe{background:#d4453a;color:#fff}
 #gBat .phme .ba{box-shadow:0 0 0 2px #4fcf6a;border-radius:12px;padding:4px}#gBat .phfoe .be{box-shadow:0 0 0 2px #ff6a5a;border-radius:12px;padding:4px}#gBat .phfoe .ba,#gBat .phme .be{opacity:.78}#gBat .phfoe .bb{opacity:.45;pointer-events:none}
 #gBat .act{transform:translateY(-6px) scale(1.07);filter:drop-shadow(0 0 8px #ffd54a)}#gBat .en.act{border-color:#ff6a5a;background:rgba(255,106,90,.22)}#gBat .al.act img,#gBat .al.act .pe{border-color:#ffd54a;box-shadow:0 0 12px #ffd54a}
@@ -8954,12 +8955,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
-      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button><button type="button" class="lgb wks">🔧 同樂工坊</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button><button type="button" class="lgb wks">🔧 同樂工坊</button><button type="button" class="lgb jb2">📋 校園打工</button><button type="button" class="lgb mk2">🛒 跳蚤市場</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.jb2').onclick = () => { closeBag(); setTimeout(jobBoard, 200); }; bagEl.querySelector('.mk2').onclick = () => { closeBag(); setTimeout(market, 200); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -9418,6 +9419,103 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       [{ label: '覺醒！', pri: true, fn: () => { if (has('shard') < need[0] || has('purple') < need[1]) { toast('材料不足', 2400); return setTimeout(workshop, 300); } costM('shard', need[0]); costM('purple', need[1]); S.awk = lv + 1; save(); refreshAll(); toast('✨ 前世覺醒 Lv' + (lv + 1) + '！主動技威力 +' + (lv + 1) * 25 + '%', 4200); setTimeout(workshop, 400); } }, { label: '返回', fn: () => setTimeout(workshop, 120) }], AV(pk));
   }
   L.workshop = workshop;
+  /* ---------- 校園打工＋跳蚤市場（代幣的用途） ---------- */
+  const jobEl = mkEl('div', 'gJob');
+  const JOBS = [
+    { id: 'shop', n: '🥤 合作社店員', d: '依客人的需求，挑出正確的商品結帳（5 位客人）', bonus: [1, 2], bn: '偶像・工程師 +30%' },
+    { id: 'lib', n: '📚 圖書館整書', d: '依號碼由小到大，盡快點完所有書（9 本）', bonus: [4], bn: '魔法師 +30%' },
+    { id: 'lunch', n: '🍳 午餐幫手', d: '記住配菜出現的順序，再依序點一次（最多 4 關）', bonus: [3], bn: '廚師 +30%' }
+  ];
+  const JOBMAX = 6;
+  const jobS = () => { const d = dayKey(); if (!S.job || S.job.d !== d) S.job = { d: d, n: 0, t: (S.job && S.job.t) || 0 }; return S.job; };
+  const jobShell = (title, info) => { jobEl.innerHTML = '<div class="jp"><div class="jh"><b>' + title + '</b><button type="button" class="jx">離開（不計薪）</button></div><div class="ji">' + info + '</div><div class="jb"></div></div>'; jobEl.classList.add('show'); return jobEl.querySelector('.jb'); };
+  const jobEnd = () => { jobEl.classList.remove('show'); jobEl.innerHTML = ''; };
+  function jobRun(id) {
+    return new Promise(res => {
+      const done = r => { jobEnd(); res(r); };
+      const T0 = Date.now(); let box;
+      const bind = () => { jobEl.querySelector('.jx').onclick = () => done(-1); };
+      if (id === 'shop') {
+        const ALL = ['🍙', '🥛', '🍎', '✏️', '📒', '🧃', '🍪', '🎒']; let r = 0, ok = 0;
+        const round = () => {
+          if (r >= 5) return done(ok / 5);
+          const need = shuffled(ALL, Math.random).slice(0, 2), sel = new Set();
+          box = jobShell('🥤 合作社店員', '第 ' + (r + 1) + ' / 5 位客人：想買 <b>' + need.join(' ＋ ') + '</b>');
+          box.innerHTML = '<div class="jg">' + shuffled(ALL, Math.random).map(x => '<button type="button" class="jc" data-i="' + x + '">' + x + '</button>').join('') + '</div><button type="button" class="jo">結帳</button>'; bind();
+          box.querySelectorAll('.jc').forEach(b => b.onclick = () => { const x = b.dataset.i; if (sel.has(x)) { sel.delete(x); b.classList.remove('on'); } else { sel.add(x); b.classList.add('on'); } });
+          box.querySelector('.jo').onclick = () => { if (sel.size === 2 && need.every(x => sel.has(x))) { ok++; toast('✔ 結帳正確！', 900); } else toast('✘ 拿錯了…', 900); r++; setTimeout(round, 350); };
+        }; round();
+      } else if (id === 'lib') {
+        let nxt = 1, pen = 0; box = jobShell('📚 圖書館整書', '依序點 1 → 9（點錯 +2 秒）');
+        box.innerHTML = '<div class="jg g3">' + shuffled([1, 2, 3, 4, 5, 6, 7, 8, 9], Math.random).map(n => '<button type="button" class="jc bk" data-n="' + n + '">📕<small>' + n + '</small></button>').join('') + '</div>'; bind();
+        box.querySelectorAll('.jc').forEach(b => b.onclick = () => { if (+b.dataset.n === nxt) { b.classList.add('on'); b.disabled = true; nxt++; if (nxt > 9) { const t = (Date.now() - T0) / 1000 + pen; done(Math.max(0.3, Math.min(1, (35 - t) / 20))); } } else { pen += 2; b.classList.add('bad'); setTimeout(() => b.classList.remove('bad'), 300); } });
+      } else {
+        const FD = ['🥕', '🍅', '🥬', '🌽']; let lv = 0, seq = []; box = jobShell('🍳 午餐幫手', '看配菜亮起的順序，再依序點一次');
+        const play = async () => {
+          if (lv >= 4) return done(1); seq = Array.from({ length: 2 + lv }, () => Math.floor(Math.random() * 4)); let busy = true; let pos = 0;
+          box.innerHTML = '<div class="jg g2">' + FD.map((x, i) => '<button type="button" class="jc" data-i="' + i + '">' + x + '</button>').join('') + '</div><div class="jm">第 ' + (lv + 1) + ' / 4 關：看好囉…</div>'; bind();
+          const bs = box.querySelectorAll('.jc');
+          for (const q of seq) { await new Promise(r => setTimeout(r, 450)); bs[q].classList.add('on'); tone(300 + q * 100, 0.25, 0.15, 'triangle'); await new Promise(r => setTimeout(r, 500)); bs[q].classList.remove('on'); }
+          busy = false; box.querySelector('.jm').textContent = '換你了！';
+          bs.forEach(b => b.onclick = () => { if (busy) return; const q = +b.dataset.i; tone(300 + q * 100, 0.2, 0.15, 'triangle'); if (q === seq[pos]) { pos++; if (pos >= seq.length) { busy = true; lv++; setTimeout(play, 500); } } else { busy = true; done(lv / 4); } });
+        }; play();
+      }
+    });
+  }
+  async function doJob(id) {
+    if (opActive) return; const j = jobS(), job = JOBS.find(x => x.id === id);
+    if (j.n >= JOBMAX) { say('📋 打工布告欄', '今天的體力用完了（每個遊戲日最多 ' + JOBMAX + ' 班），明天再來吧！', [{ label: '好' }], AV(0)); return; }
+    opActive = true; let r; try { r = await jobRun(id); } finally { opActive = false; }
+    if (r < 0) { toast('中途離開，沒有薪水喔', 2200); return; }
+    j.n++; j.t = (j.t || 0) + 1; const bonus = job.bonus.indexOf(pastOf()) >= 0 ? 1.3 : 1, pay = Math.max(4, Math.round(24 * r * bonus));
+    S.coin = (S.coin || 0) + pay; addPts(5, '打工：' + job.n.slice(2)); save(); refreshAll();
+    say(job.n + ' 下班！', (r >= 0.9 ? '表現超棒！' : r >= 0.5 ? '做得不錯！' : '下次再加油！') + '\n成績 ' + Math.round(r * 100) + ' 分，薪水 🪙' + pay + (bonus > 1 ? '（天賦加成 +30%）' : '') + '\n今日剩餘班數：' + (JOBMAX - j.n) + '　累計打工 ' + j.t + ' 班',
+      [{ label: '再來一班', pri: true, fn: () => setTimeout(jobBoard, 150) }, { label: '下班' }], AV(pastOf() >= 0 ? pastOf() : 0));
+  }
+  function jobBoard() {
+    if (opActive || dlgOpen) return; const j = jobS();
+    say('📋 校園打工布告欄', '賺代幣，到「跳蚤市場」換好東西！\n今日班數：' + j.n + ' / ' + JOBMAX + '　🪙' + (S.coin || 0) + '\n（時薪最高約 🪙24，天賦加成 +30%）',
+      JOBS.map(x => ({ label: x.n + '｜' + x.bn, fn: () => setTimeout(() => say(x.n, x.d + '\n天賦加成：' + x.bn, [{ label: '開始上班', pri: true, fn: () => setTimeout(() => doJob(x.id), 120) }, { label: '返回', fn: () => setTimeout(jobBoard, 120) }], AV(0)), 120) })).concat([{ label: '關閉' }]), AV(0));
+  }
+  const MK = [
+    { id: 'lunch', n: '🍱 營養便當', p: 25, lim: 99, d: 'HP、MP 全部回滿' },
+    { id: 'book', n: '📘 初級經驗書', p: 60, lim: 5, d: '使用可得 30 點' },
+    { id: 'stone', n: '🔩 裝備強化石', p: 45, lim: 5, d: '強化裝備' },
+    { id: 'seed', n: '🌱 芽芽種子', p: 50, lim: 3, d: '餵夥伴' },
+    { id: 'shard', n: '💠 前世記憶碎片', p: 180, lim: 1, d: '前世覺醒' },
+    { id: 'purple', n: '🟣 紫色裝備材料', p: 280, lim: 1, d: '前世覺醒' }
+  ];
+  const SELLP = { book: 20, stone: 15, seed: 20, shard: 70, purple: 100 };
+  const mkS = () => { const d = dayKey(); if (!S.mk || S.mk.d !== d) S.mk = { d: d, b: {} }; return S.mk; };
+  const spec = () => { let h = 0; String(dayKey()).split('').forEach(c => { h = (h * 31 + c.charCodeAt(0)) % 9973; }); return MK[1 + h % (MK.length - 1)].id; };
+  const mkPrice = m => Math.round(m.p * (m.id === spec() ? 0.7 : 1));
+  function market() {
+    if (opActive || dlgOpen) return; const m = mkS();
+    say('🛒 同樂跳蚤市場', '歡迎光臨！每個遊戲日更新限量與特價。\n🪙' + (S.coin || 0) + '　材料：' + matStr() + '\n今日特價：' + MK.find(x => x.id === spec()).n + '（7 折）',
+      MK.map(x => { const left = x.lim - (m.b[x.id] || 0); return { label: x.n + '｜🪙' + mkPrice(x) + (x.id === spec() ? ' 🔥特價' : '') + (x.lim < 99 ? '｜剩 ' + left : ''), fn: () => setTimeout(() => buy(x), 120) }; }).concat([{ label: '💰 賣出多餘材料', fn: () => setTimeout(sellMenu, 120) }, { label: '關閉' }]), AV(3));
+  }
+  function buy(x) {
+    const m = mkS(), pr = mkPrice(x);
+    if ((m.b[x.id] || 0) >= x.lim) toast('今日這項賣完了', 2200);
+    else if ((S.coin || 0) < pr) toast('代幣不足（需要 🪙' + pr + '）', 2400);
+    else { S.coin -= pr; m.b[x.id] = (m.b[x.id] || 0) + 1; if (x.id === 'lunch') { S.hp = hpMax(); S.mp = mpMax(); toast('🍱 HP、MP 全部回滿！', 2400); } else { matAdd(x.id, 1); toast('購買 ' + x.n + '！', 2200); } save(); refreshAll(); }
+    setTimeout(market, 400);
+  }
+  function sellMenu() {
+    const ks = Object.keys(SELLP).filter(k => has(k) > 0);
+    say('💰 賣出材料', '收購價比售價低喔，確定不需要再賣！\n材料：' + matStr(), ks.map(k => { const mt = MATS.find(q => q[0] === k); return { label: mt[1] + mt[2] + ' ×' + has(k) + '｜賣 1 個 🪙' + SELLP[k], fn: () => { costM(k, 1); S.coin = (S.coin || 0) + SELLP[k]; save(); refreshAll(); toast('賣出 ' + mt[2] + '，🪙+' + SELLP[k], 2000); setTimeout(sellMenu, 300); } }; }).concat([{ label: '返回', fn: () => setTimeout(market, 120) }]), AV(3));
+  }
+  L.job = { board: jobBoard, market };
+  function stall(x, z, col, name, ic, act, id) {
+    const p = snap(x, z, { maxR: 5 }) || { x: x, y: 0.03, z: z }, g = new T.Group(); g.position.set(p.x, p.y, p.z); G.add(g);
+    const cn = new T.Mesh(new T.BoxGeometry(2.6, 1.0, 1.0), gm(0x8b5a2b)); cn.position.y = 0.5; g.add(cn);
+    const aw = new T.Mesh(new T.BoxGeometry(3.0, 0.16, 1.7), gm(col)); aw.position.set(0, 2.2, -0.2); g.add(aw);
+    [-1.3, 1.3].forEach(dx => { const po = new T.Mesh(new T.BoxGeometry(0.12, 2.2, 0.12), gm(0x6b4a2a)); po.position.set(dx, 1.1, 0.5); g.add(po); });
+    sprite(nameTex(name, '#' + col.toString(16).padStart(6, '0')), [2.3, 0.6], p.x, p.y + 3.0, p.z, 30);
+    ia({ id: id, x: p.x, y: p.y, z: p.z + 0.8, r: 3, txt: () => ic, act: act });
+  }
+  stall(13, -49, 0x2e9b72, '📋 校園打工', '📋 查看打工布告欄', jobBoard, 'jobb');
+  stall(-13, -49, 0xe0562d, '🛒 跳蚤市場', '🛒 逛跳蚤市場', market, 'mkt');
   /* 開場主流程 */
   async function startOpening(replay) {
     if (opActive || dlgOpen) return; opActive = true; opSkip = false;
