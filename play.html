@@ -9179,6 +9179,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const r4 = document.createElement('div'); r4.className = 'row'; r4.id = 'gSndTest'; r4.innerHTML = '<span class="lab">聲音測試</span><button type="button" id="bSnd">🔔 測試聲音</button>';
       r4.querySelector('#bSnd').onclick = () => { auUnlock(); const st = L.audioState(); setTimeout(() => { SFX.play('levelup', 0); toast(st === 'running' ? '🔊 如果聽到鈴聲就正常。沒聲音請檢查：裝置音量、手機靜音鍵（iPhone 請撥到有聲）、瀏覽器分頁是否被靜音' : '🔇 聲音尚未啟用（' + st + '），請再點一次此按鈕；iPhone 請關閉靜音鍵', 6500); }, 150); }; sync3(); r2.parentNode ? (r2.parentNode.insertBefore(r3, r2.nextSibling), r3.parentNode.insertBefore(r4, r3.nextSibling)) : m.appendChild(r3);
       const at = m.querySelector('#gTheme'); if (at && at.nextSibling) m.insertBefore(r, at.nextSibling); else m.appendChild(r);
+      const r5 = document.createElement('div'); r5.className = 'row'; r5.id = 'gCloudRow'; r5.innerHTML = '<span class="lab">天空雲朵</span><button type="button" id="bCld"></button>';
+      const b5 = r5.querySelector('#bCld'), sync5 = () => { b5.textContent = S.noCloud ? '☁️ 已關閉（點此開啟）' : '☁️ 開啟（點此關閉）'; b5.className = S.noCloud ? '' : 'on'; };
+      b5.onclick = () => { S.noCloud = S.noCloud ? 0 : 1; save(); sync5(); }; sync5(); r.after(r5);
     }
     setTimeout(festSync, 300);
   }
@@ -9414,6 +9417,28 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const WXST = { dark: 0, white: 0, rain: 0, slant: 0, fn: 160, ff: 900, flash: 0, th: 0, nextTh: 6, wind: 0, drops: [], flakes: [], fw: [], fwT: 1, fwSaid: 0 };
   function wxResize() { rainCv.width = innerWidth; rainCv.height = innerHeight; }
   addEventListener('resize', wxResize); wxResize();
+  /* ---------- 天空雲朵：依天氣調整雲量、顏色與飄移速度 ---------- */
+  const CLD = { N: 24, cover: 0, on: true, grp: new T.Group(), items: [], mat: new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.92, fog: false, depthWrite: false }), col: new T.Color(0xffffff) };
+  CLD.grp.name = 'liveClouds'; scene.add(CLD.grp);
+  (() => {
+    const g = new T.SphereGeometry(1, 8, 6), rr = rng(7771);
+    for (let i = 0; i < CLD.N; i++) {
+      const c = new T.Group(), n = 4 + Math.floor(rr() * 3), w = 22 + rr() * 26;
+      for (let j = 0; j < n; j++) { const m = new T.Mesh(g, CLD.mat), r = w * (0.35 + rr() * 0.3); m.scale.set(r, r * 0.45, r * 0.8); m.position.set((j - n / 2) * w * 0.38 + (rr() - 0.5) * 6, (rr() - 0.4) * 6, (rr() - 0.5) * 10); m.frustumCulled = false; c.add(m); }
+      const a = rr() * 6.283, d = 90 + rr() * 330; CLD.items.push({ g: c, ox: Math.cos(a) * d, oz: Math.sin(a) * d, y: 85 + rr() * 55, v: 0.6 + rr() * 0.8, rank: i / CLD.N, k: 0 }); c.rotation.y = rr() * 3; c.frustumCulled = false; CLD.grp.add(c);
+    }
+  })();
+  const CLD_COVER = { sun: 0.22, cloud: 0.62, over: 1, mist: 0.5, drizzle: 1, storm: 1, heavy: 1, typhoon: 1 };
+  function cloudTick(dt, st, c, intro, night) {
+    const on = S.noCloud ? false : true; CLD.grp.visible = on; if (!on) return;
+    const tgt = intro ? 0.3 : (CLD_COVER[c.id] != null ? CLD_COVER[c.id] : 0.4), cx = camera.position.x, cz = camera.position.z, wind = 1 + st.wind * 5, sh = Math.max(0.28, 1 - st.dark * 1.15 - (night ? 0.62 : 0)) + st.flash * 0.6;
+    CLD.cover += (tgt - CLD.cover) * Math.min(1, dt * 0.8);
+    const day = night ? new T.Color(0x38405c) : new T.Color(0xffffff); CLD.col.copy(day).multiplyScalar(Math.min(1.3, sh)); CLD.mat.color.copy(CLD.col); CLD.mat.opacity = 0.72 + st.dark * 0.4;
+    CLD.items.forEach(q => {
+      q.ox += q.v * wind * dt; if (q.ox > 430) q.ox -= 860; const want = q.rank < CLD.cover ? 1 : 0; q.k += (want - q.k) * Math.min(1, dt * 0.9); q.g.visible = q.k > 0.03; q.g.scale.setScalar(0.4 + 0.6 * q.k);
+      q.g.position.set(cx + q.ox, q.y, cz + q.oz);
+    });
+  }
   let wxLast = 0, wxAcc = 0, wxId = '', wxVacKey = '', wxFog = null, wxBn = 160, wxBf = 900;
   function wxFrame(now) {
     requestAnimationFrame(wxFrame);
@@ -9423,6 +9448,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     st.fn += (tg.fog[0] - st.fn) * k; st.ff += (tg.fog[1] - st.ff) * k; st.th = tg.th;
     if (scene.fog) { if (scene.fog !== wxFog) { wxFog = scene.fog; wxBn = scene.fog.near; wxBf = scene.fog.far; } scene.fog.near = wxBn * st.fn / 160; scene.fog.far = wxBf * st.ff / 900; }
     const nightK = typeof isNight !== 'undefined' && isNight ? 0.6 : 1;
+    try { cloudTick(dt, st, c, intro, nightK < 1); } catch (e) { /* 忽略 */ }
     let col, al; if (tg.tint) { col = tg.tint; al = Math.max(st.white, st.dark * nightK); } else if (st.white > 0.02) { col = '225,232,240'; al = st.white; } else { col = '28,38,58'; al = st.dark * nightK; }
     wxEl.style.background = 'rgba(' + col + ',' + al.toFixed(3) + ')'; wxEl.style.setProperty('--flc', tg.fest === 'halloween' ? '#cba6ff' : '#fff');
     wxEl.style.boxShadow = st.wind > 0.05 ? 'inset 0 0 ' + Math.round(st.wind * 140) + 'px rgba(10,20,40,' + (0.3 * st.wind).toFixed(2) + ')' : 'none';
@@ -9658,7 +9684,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     box.querySelectorAll('.jc').forEach(b => b.onclick = () => { if (fin || b.disabled) return; if (b.dataset.g === '1') { got++; b.disabled = true; b.classList.add('on'); SFX.play('coin', 40); if (got >= 6) end(true); } else { wrong++; b.classList.add('bad'); SFX.play('error', 40); setTimeout(() => b.classList.remove('bad'), 300); t = Math.max(0, t - 2); } info(); });
     iv = setInterval(() => { t--; info(); if (t <= 0) end(false); }, 1000);
   }
-  L.wx = { wishMenu, windowRain, homeDoor, setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
+  L.wx = { clouds: CLD, wishMenu, windowRain, homeDoor, setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
   /* ---------- 開場劇情＋新手教學＋回合制戰鬥 ---------- */
   let opActive = false, opSkip = false, opWait = null, opAu = null;
   const opEl = mkEl('div', 'gOp'), riftEl = mkEl('div', 'gRift'), batEl = mkEl('div', 'gBat'), tutEl = mkEl('div', 'gTut'), sloEl = mkEl('div', 'gSlo');
