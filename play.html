@@ -8221,6 +8221,18 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gOp{position:fixed;inset:0;z-index:90;display:none;background:#000;color:#fff;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity 1.2s;font-family:var(--font-ui);padding:24px}#gOp.show{display:flex}#gOp.on{opacity:1}#gOp .tx{font-size:clamp(18px,4.6vw,28px);line-height:1.9;white-space:pre-line;opacity:0;transition:opacity 1s;letter-spacing:.06em}#gOp .sk{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:99px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+#gRift{position:fixed;inset:0;z-index:35;pointer-events:none;opacity:0;transition:opacity 1.2s;background:radial-gradient(ellipse at 50% 12%,rgba(150,60,255,.55),rgba(30,20,110,.45) 55%,rgba(10,10,50,.5))}#gRift.on{opacity:1}#gRift .vx{position:absolute;left:50%;top:-8vmin;width:70vmin;height:70vmin;margin-left:-35vmin;border-radius:50%;background:conic-gradient(from 0deg,#b46bff,#3a1d8f,#6fd0ff,#3a1d8f,#b46bff);filter:blur(6px);opacity:.75;animation:vxs 3.2s linear infinite;-webkit-mask:radial-gradient(circle,transparent 8%,#000 40%,transparent 72%);mask:radial-gradient(circle,transparent 8%,#000 40%,transparent 72%)}@keyframes vxs{to{transform:rotate(360deg)}}
+#gRift.flash::after{content:"";position:absolute;inset:0;background:#fff;animation:fl 1s ease-out forwards}@keyframes fl{0%{opacity:.95}100%{opacity:0}}
+body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0%{transform:translate(0,0)}25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,3px)}75%{transform:translate(3px,4px)}100%{transform:translate(0,0)}}
+#gTut{position:fixed;left:50%;top:calc(96px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:36;display:none;max-width:min(420px,calc(100vw - 24px));background:rgba(20,20,40,.88);color:#fff;border:1.5px solid #ffd54a;border-radius:14px;padding:8px 14px;font-size:14px;line-height:1.6;text-align:center;font-family:var(--font-ui)}#gTut.show{display:block}#gTut b{color:#ffd54a}
+#gSlo{position:fixed;inset:0;z-index:91;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle,#2a1d6e,#0a0a30);color:#fff;text-align:center;padding:24px;font-family:var(--font-ui)}#gSlo.show{display:flex}#gSlo img{max-width:min(420px,80vw);max-height:30vh;object-fit:contain}#gSlo h2{font-size:34px;margin:0}#gSlo p{font-size:clamp(17px,4.4vw,24px);margin:0;letter-spacing:.08em}
+#gBat{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:rgba(10,8,40,.78)}#gBat.show{display:grid}#gBat .bp{box-sizing:border-box;width:min(520px,calc(100vw - 20px));max-height:calc(100dvh - 20px);overflow:auto;background:linear-gradient(#2b2370,#1a1450);border:2px solid #8f7cff;border-radius:18px;padding:12px;color:#fff;font-family:var(--font-ui)}
+#gBat .bh{display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px}#gBat .bh span{color:#bcb3ff;font-size:13px}#gBat .be{display:flex;gap:8px;justify-content:center;margin-bottom:10px}#gBat .en{flex:1;border:2px solid transparent;border-radius:12px;background:rgba(255,255,255,.08);color:#fff;padding:6px 4px;display:grid;justify-items:center;gap:2px;cursor:pointer;font-family:inherit}#gBat .en i{font-style:normal;font-size:44px;line-height:1.1}#gBat .en b{font-size:12px}#gBat .en small{font-size:11px;color:#cfc8ff}#gBat .en.sel{border-color:#ffd54a;background:rgba(255,213,74,.15)}#gBat .en.dead{opacity:.25;filter:grayscale(1)}
+#gBat .hb{width:100%;height:8px;border-radius:8px;background:rgba(0,0,0,.4);overflow:hidden}#gBat .hb s{display:block;height:100%;background:#e8505b;transition:width .35s}#gBat .hb.p s{background:#4fcf6a}#gBat .hb.e s{background:#6fd0ff}#gBat .hb.e.full s{background:#ffd54a;animation:pu .7s infinite alternate}@keyframes pu{to{filter:brightness(1.6)}}
+#gBat .ba{display:flex;gap:10px;align-items:center;margin-bottom:8px}#gBat .al{display:grid;justify-items:center;font-size:11px;gap:2px}#gBat .al img{width:48px;height:48px;border-radius:50%;border:2px solid #fff;object-fit:cover;background:#fff}#gBat .bg{flex:1;display:grid;gap:6px}#gBat .bl{display:grid;grid-template-columns:78px 1fr 48px;align-items:center;gap:6px;font-size:11.5px}#gBat .bl em{font-style:normal}#gBat .bl small{text-align:right;color:#cfc8ff}
+#gBat .bc{background:rgba(255,213,74,.16);border:1.5px solid #ffd54a;border-radius:10px;padding:6px 10px;font-size:13.5px;line-height:1.6;margin-bottom:6px}#gBat .bm{min-height:34px;font-size:13.5px;line-height:1.6;color:#e7e3ff;margin-bottom:6px}#gBat .bm .big{display:block;font-size:20px;font-weight:900;color:#ffd54a;letter-spacing:.08em}
+#gBat .bb{display:flex;gap:8px}#gBat .bb button{flex:1;border:0;border-radius:12px;background:#5b4bd1;color:#fff;padding:11px 4px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}#gBat .bb button:disabled{opacity:.35;cursor:not-allowed}#gBat .bb button.hint{box-shadow:0 0 0 3px #ffd54a;animation:pu .7s infinite alternate}#gBat .bb button.syn{background:linear-gradient(90deg,#ff7a45,#ffd54a);color:#2a1d00}
 #gCM{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:34;display:none;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:6px 10px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px}#gCM.show{display:flex}#gCM span{font-weight:800;padding:0 4px}#gCM button{border:0;background:#f5821f;color:#fff;border-radius:99px;padding:7px 14px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
 #gCS{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:33;display:none;align-items:center;gap:10px;max-width:min(440px,calc(100vw - 24px));background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:8px 14px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px;line-height:1.5;cursor:pointer}#gCS.show{display:flex}#gCS i{font-style:normal;font-size:30px}#gCS b{display:block;font-size:12px;color:var(--muted)}
 #gBag .care{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin:4px 0 6px}#gBag .care .ch{display:flex;justify-content:space-between;gap:6px;font-size:13px;margin-bottom:4px}#gBag .care .ch span{font-size:11.5px;color:var(--muted)}
@@ -8594,6 +8606,11 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   const NPCDEF = {
     nurse: { name: '校護 林老師', tag: '👩‍⚕️ 校護', col: '#d9534f', kind: 'girl', h: 1.6, at: [18.4, -3.2], colors: { 'school-shirt': 0xf6f4ee, 'school-sleeve': 0xf6f4ee, 'school-shorts': 0xe7ecef, collar: 0xd9534f, hair: 0x2c2225, shoes: 0xf2f2f2, 'hair-band': 0xd9534f }, chat: ['天氣變化大，記得多喝水。', '受傷了要馬上來健康中心喔！', '洗手要用肥皂搓 20 秒！'] },
     vol: { name: '愛心志工 王媽媽', tag: '💚 愛心志工', col: '#2e9b45', kind: 'girl', h: 1.58, at: [4.4, -9.5], colors: { 'school-shirt': 0x3fae5a, 'school-sleeve': 0xf4f1ea, 'school-shorts': 0x3b4252, collar: 0xf2c230, hair: 0x5b5650, shoes: 0x2b3340, 'hair-band': 0x3fae5a }, chat: ['早安！上學要注意安全喔。', '謝謝你願意當小志工！', '志工服務是最美的事。'] },
+    xle: { name: '勇者 小樂', tag: '⚔️ 小樂', col: '#e0562d', kind: 'boy', h: 1.6, at: [-5, -48], lv: 0, colors: { 'school-shirt': 0xe0562d, 'school-sleeve': 0xe0562d, 'school-shorts': 0x3b4252, collar: 0xf2c230, hair: 0x6b3a22, shoes: 0x2b3340 }, chat: ['我是同樂社的社長小樂！今天也要保護大家！', '一起冒險吧，新同學！', '勇氣不是不怕，是怕也要往前走。'] },
+    xtong: { name: '偶像 小同', tag: '🎤 小同', col: '#e0568a', kind: 'girl', h: 1.58, at: [-2.5, -49], lv: 0, colors: { 'school-shirt': 0xf08cb4, 'school-sleeve': 0xf08cb4, 'school-shorts': 0xf4f1ea, collar: 0xffffff, hair: 0x3a2a40, shoes: 0xf2f2f2, 'hair-band': 0xe0568a }, chat: ['校慶舞台，我一定要站上去！', '要不要一起練習唱歌？', '笑一個，今天也要閃閃發亮！'] },
+    xchuang: { name: '工程師 小創', tag: '🔧 小創', col: '#2c7a9b', kind: 'boy', h: 1.6, at: [0, -49.5], lv: 0, colors: { 'school-shirt': 0x4a90a4, 'school-sleeve': 0x4a90a4, 'school-shorts': 0x3b4252, collar: 0xf2c230, hair: 0x2a2a30, shoes: 0x1b1b1e }, chat: ['我正在改裝小T，下次升級給你看。', '壞掉的東西交給我就對了。', '科技就是用來幫助大家的。'] },
+    xwei: { name: '廚師 小味', tag: '🍳 小味', col: '#e07a1f', kind: 'girl', h: 1.58, at: [2.5, -49], lv: 0, colors: { 'school-shirt': 0xffffff, 'school-sleeve': 0xffffff, 'school-shorts': 0xf0a030, collar: 0xe07a1f, hair: 0x5a3a24, shoes: 0xf2f2f2, 'hair-band': 0xffffff }, chat: ['肚子餓了嗎？我做了星光便當！', '吃飽飽才有力氣打怪。', '今天的午餐有你愛的菜喔！'] },
+    xzhi: { name: '魔法師 小知', tag: '🔮 小知', col: '#6a4fd1', kind: 'girl', h: 1.58, at: [5, -48], lv: 0, colors: { 'school-shirt': 0x7a5fd1, 'school-sleeve': 0x7a5fd1, 'school-shorts': 0x3b4252, collar: 0xffffff, hair: 0x2c2a4a, shoes: 0x2b3340, 'hair-band': 0x6a4fd1 }, chat: ['根據我的推算，今天會是美好的一天。', '知識就是力量，要多看書喔。', '……（推眼鏡）需要幫忙嗎？'] },
     jan: { name: '工友 阿伯', tag: '🧰 工友', col: '#2f80ed', kind: 'boy', h: 1.68, at: [-32.5, -2.2], colors: { 'school-shirt': 0x3b6fb6, 'school-sleeve': 0x3b6fb6, 'school-shorts': 0x3b4252, collar: 0x3b6fb6, hair: 0x6f6a66, shoes: 0x1b1b1e }, chat: ['學校乾乾淨淨，大家才舒服。', '花要天天澆，不能偷懶啊。', '用完的東西要放回原位。'] },
     cook: { name: '廚工 阿美姨', tag: '🍳 廚工', col: '#e07a1f', kind: 'girl', h: 1.6, at: [-40.5, -17], lv: 0, colors: { 'school-shirt': 0xffffff, 'school-sleeve': 0xffffff, 'school-shorts': 0xcfd6dd, collar: 0xe07a1f, hair: 0x3a2e2a, shoes: 0x2b3340, 'hair-band': 0xe07a1f }, chat: ['營養午餐要吃光光，才會長高高！','青菜也要吃，每一種顏色都有不同營養。','廚房很燙，跑跳的時候要小心喔。'] },
     qi: { name: '教導主任 小琪', tag: '📋 教導主任', col: '#a259d9', kind: 'girl', h: 1.62, at: [-18, -28], lv: 0, colors: { 'school-shirt': 0x8a5fc7, 'school-sleeve': 0x8a5fc7, 'school-shorts': 0x3b4252, collar: 0xf2f2f2, hair: 0x2a2024, shoes: 0x2b3340, 'hair-band': 0xa259d9 }, chat: ['學習是一輩子的事，今天學到什麼了？','有任何困擾，隨時可以到教導處找我。','守規矩、有禮貌，是同樂人的好習慣！'] },
@@ -8931,12 +8948,12 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
-      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -8949,7 +8966,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   function closeBag() { bagOpen = false; bagEl.classList.remove('show'); }
   L.openBag = openBag; L.closeBag = closeBag; L.bagItems = bagItems; L.updateBars = updateBars;
   bagEl.addEventListener('pointerdown', e => { if (e.target === bagEl) closeBag(); });
-  addEventListener('keydown', e => { if (e.code !== 'Escape') return; if (roomOpen) closeRoom(); else if (bagOpen) closeBag(); else if (dlgOpen) { if (pastOf() >= 0) close(); } else if (document.body.classList.contains('gearopen')) document.body.classList.remove('gearopen'); });
+  addEventListener('keydown', e => { if (e.code !== 'Escape') return; if (roomOpen) closeRoom(); else if (bagOpen) closeBag(); else if (dlgOpen) { if (pastOf() >= 0 && !opActive) close(); } else if (document.body.classList.contains('gearopen')) document.body.classList.remove('gearopen'); });
   addEventListener('keydown', e => { if (e.code === 'KeyE') e.stopImmediatePropagation(); }, true);
   addEventListener('keydown', e => { if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.code === 'KeyH' && !document.body.classList.contains('intro') && !dlgOpen) { useMed(); } else if (e.code === 'KeyB' && !document.body.classList.contains('intro')) { bagOpen ? closeBag() : openBag(); } else if (e.code === 'Escape' && bagOpen) closeBag(); });
 
@@ -9107,7 +9124,7 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   let vAcc = 0, hpT = 0, mpT = 0;
   const prevTick = window.liveTick;
   window.liveTick = function (dt, now) {
-    prevTick(dt, now); followTick(dt, now); clockTick(dt); careTick(dt);
+    prevTick(dt, now); followTick(dt, now); clockTick(dt); careTick(dt); opTick();
     vAcc += dt; if (vAcc >= 1) { const sec = Math.floor(vAcc); vAcc -= sec; hpT += sec; mpT += sec;
       const hpS = compOn('sprout') ? 1 : 2, mpS = compOn('bunny') ? 6 : 12;
       if (hpT >= hpS) { const n = Math.floor(hpT / hpS); hpT -= n * hpS; if (movingT <= 0) S.hp = Math.min(hpMax(), S.hp + n); }
@@ -9139,7 +9156,112 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
   const home = document.querySelector('#intro h2.home'); if (home) home.innerHTML = '<span class="o">Project: TLPS</span><span class="g">Youth</span>';
   const hp = document.querySelector('#intro p.home'); if (hp) hp.innerHTML = '<b style="display:block;margin-bottom:4px;font-size:15px">關於我轉生到同樂宇宙這檔事</b>這一次的同樂校園生活，由你定義！每天種花、澆水、打掃，一起守護同樂宇宙。';
   const eb = document.querySelector('#intro .eb.home'); if (eb) eb.lastChild.textContent = 'TLPS Universe・宜蘭縣員山鄉';
-  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); if (pastOf() < 0) setTimeout(pickPast, 700); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); });
+  /* ---------- 開場劇情＋新手教學＋回合制戰鬥 ---------- */
+  let opActive = false, opSkip = false, opWait = null, opAu = null;
+  const opEl = mkEl('div', 'gOp'), riftEl = mkEl('div', 'gRift'), batEl = mkEl('div', 'gBat'), tutEl = mkEl('div', 'gTut'), sloEl = mkEl('div', 'gSlo');
+  const sleep = ms => new Promise(r => setTimeout(r, opSkip ? Math.min(ms, 60) : ms));
+  function tone(f, dur, vol, type, delay) { try { opAu = opAu || new (window.AudioContext || window.webkitAudioContext)(); const t = opAu.currentTime + (delay || 0), o = opAu.createOscillator(), g = opAu.createGain(); o.type = type || 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.2, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(opAu.destination); o.start(t); o.stop(t + dur + 0.05); } catch (e) { /* 無音效也能玩 */ } }
+  const bell = (f, d) => { tone(f, 2.4, 0.22, 'sine', d); tone(f * 2.01, 1.6, 0.09, 'sine', d); tone(f * 3.02, 0.9, 0.05, 'sine', d); };
+  const talkSeq = list => list.reduce((p, x) => p.then(() => new Promise(res => { if (opSkip) { res(); return; } say(x[0], x[1], [{ label: x[3] || '繼續', pri: true, fn: res }], x[2] >= 0 ? AV(x[2]) : undefined); })), Promise.resolve());
+  const OPSEC = { le: 0, tong: 1, chuang: 2, wei: 3, zhi: 4 };
+  function opSetTut(t) { tutEl.innerHTML = t ? t : ''; tutEl.classList.toggle('show', !!t); }
+  async function opBlack() {
+    opEl.innerHTML = '<div class="tx" id="gOpTx"></div><button type="button" class="sk">略過序幕 ⏭</button>'; opEl.classList.add('show', 'on');
+    opEl.querySelector('.sk').onclick = () => { opSkip = true; };
+    const tx = opEl.querySelector('#gOpTx'), show = async (t, ms) => { tx.style.opacity = 0; tx.textContent = t; await sleep(60); tx.style.opacity = 1; await sleep(ms); };
+    await show('那一天，我只是像往常一樣，\n在考試前夕迷迷糊糊地睡著了……', 3400);
+    [523, 392, 330, 392].forEach((f, i) => bell(f, i * 0.85)); await show('叮——　咚——　當——　咚——', 3600);
+    opEl.classList.remove('on'); await sleep(1300); opEl.classList.remove('show'); opEl.innerHTML = '';
+  }
+  function riftOn() { riftEl.innerHTML = '<div class="vx"></div>'; riftEl.classList.add('on'); document.body.classList.add('gShake'); setTimeout(() => document.body.classList.remove('gShake'), 1400); tone(70, 1.8, 0.3, 'sawtooth'); tone(94, 1.6, 0.15, 'triangle', 0.1); }
+  function riftOff() { riftEl.classList.remove('on'); }
+  const QZ = [
+    ['你最喜歡在下課時做什麼？', ['帶頭衝刺、玩冒險遊戲', '唱歌跳舞、表演給大家看', '拆玩具、研究機器怎麼運作', '吃好吃的、跟大家分享點心', '安靜看書、解謎題']],
+    ['遇到很困難的事，你通常會？', ['勇敢衝上去，先做再說', '說笑話、鼓勵大家一起加油', '想辦法發明一個工具來解決', '做點好吃的讓大家有力氣', '先分析整理，找出最好的方法']],
+    ['你最喜歡校園的哪個角落？', ['操場與跑道', '禮堂的舞台', '電腦教室與科學教室', '廚房與午餐時間', '圖書館']]
+  ];
+  async function opQuiz() {
+    await talkSeq([['小T', '嗶嗶！檢測到高濃度「轉生者波動」！\n請把手放上「前世召喚石」，回答 3 個問題。', -1]]);
+    const sc = [0, 0, 0, 0, 0];
+    for (let q = 0; q < QZ.length; q++) {
+      await new Promise(res => say('🔮 前世召喚石（' + (q + 1) + '/3）', QZ[q][0], QZ[q][1].map((t, k) => ({ label: t, fn: () => { sc[k]++; res(); } }))));
+    }
+    const mx = Math.max.apply(null, sc), ties = sc.map((v, k) => v === mx ? k : -1).filter(k => k >= 0), k = ties[Math.floor(Math.random() * ties.length)];
+    riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); bell(660, 0); bell(990, 0.15);
+    await new Promise(res => { const x = PASTS[k]; say(x[1] + ' 召喚石發光了！', '你的前世是——「' + x[0] + '」！\n「' + x[4] + '」\n\n專屬天賦【' + x[2] + '】：' + x[3] + '。', [{ label: '就決定是你了！', pri: true, fn: () => { applyPast(k); res(); } }, { label: '我想自己選', fn: () => { const t = setInterval(() => { if (pastOf() >= 0) { clearInterval(t); res(); } }, 300); setTimeout(pickPast, 100); } }], AV(k)); });
+  }
+  function applyPast(k) { const x = PASTS[k]; S.past = k; addAttr(['body', 'charm', 'idea', 'social', 'study'][k], 5, true); save(); refreshAll(); toast('轉生完成！天賦【' + x[2] + '】啟動 ✨', 4200); }
+  /* 回合制戰鬥 */
+  const PSKILL = [['勇氣斬擊', '單體重擊', 18, 0], ['星光應援', '全體小傷害＋回復 HP', 7, 12], ['自動砲台', '全體小傷害', 9, 0], ['愛心便當', '單體傷害＋回復 HP', 12, 18], ['魔法彈', '隨機兩體', 13, 0]];
+  function battle(cfg) {
+    return new Promise(res => {
+      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp }, e)), pk = pastOf() >= 0 ? pastOf() : 0, sk = PSKILL[pk], ally = cfg.ally;
+      let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false;
+      const alive = () => E.filter(e => e.hp > 0), first = () => { const i = E.findIndex(e => e.hp > 0); return i; };
+      const coach = () => { if (!cfg.tutorial) return ''; if (en >= 100) return '④ 連攜能量滿了！按下「連攜技」，和' + ally.n + '一起發動必殺技！'; if (turn === 0) return '① 先按「普攻」攻擊墨水怪（點敵人可以換目標）。'; if (turn === 1) return '② 這是你的「前世主動技」：' + sk[0] + '！每次行動都會累積連攜能量。'; return '③ 再行動一次，連攜能量就會滿了！'; };
+      function draw() {
+        batEl.innerHTML = '<div class="bp"><div class="bh"><b>' + cfg.title + '</b><span>第 ' + (turn + 1) + ' 回合</span></div>' +
+          '<div class="be">' + E.map((e, i) => '<button type="button" class="en' + (e.hp <= 0 ? ' dead' : '') + (i === tgt && e.hp > 0 ? ' sel' : '') + '" data-t="' + i + '"><i>' + e.ic + '</i><b>' + e.n + '</b><div class="hb"><s style="width:' + Math.max(0, e.hp / e.mx * 100) + '%"></s></div><small>' + Math.max(0, e.hp) + '/' + e.mx + '</small></button>').join('') + '</div>' +
+          '<div class="ba"><div class="al">' + (AV(pk) ? '<img src="' + AV(pk) + '">' : '🎓') + '<span>你</span></div><div class="al">' + (AV(ally.k) ? '<img src="' + AV(ally.k) + '">' : '🛡️') + '<span>' + ally.n + '</span></div>' +
+          '<div class="bg"><div class="bl"><em>❤️ 隊伍 HP</em><div class="hb p"><s style="width:' + php + '%"></s></div><small>' + php + '/100</small></div><div class="bl"><em>🤝 連攜能量</em><div class="hb e' + (en >= 100 ? ' full' : '') + '"><s style="width:' + en + '%"></s></div><small>' + en + '/100</small></div></div></div>' +
+          (coach() ? '<div class="bc">' + coach() + '</div>' : '') + '<div class="bm">' + log + '</div>' +
+          '<div class="bb"><button type="button" data-a="atk" class="' + (cfg.tutorial && turn === 0 && en < 100 ? 'hint' : '') + '">⚔️ 普攻</button><button type="button" data-a="skill" class="' + (cfg.tutorial && turn === 1 && en < 100 ? 'hint' : '') + '">' + PASTS[pk][1] + ' ' + sk[0] + '</button><button type="button" data-a="syn" ' + (en >= 100 ? 'class="hint syn"' : 'disabled') + '>🤝 連攜技</button></div></div>';
+        batEl.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { if (!busy && E[+b.dataset.t].hp > 0) { tgt = +b.dataset.t; draw(); } });
+        batEl.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (!busy && !b.disabled) act(b.dataset.a); });
+      }
+      const hit = (e, d) => { e.hp = Math.max(0, e.hp - d); };
+      async function act(a) {
+        busy = true; const lines = []; let t = E[tgt] && E[tgt].hp > 0 ? E[tgt] : E[first()];
+        if (a === 'atk') { const d = 10 + Math.floor(Math.random() * 4); hit(t, d); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50); tone(440, 0.25, 0.18, 'square'); }
+        else if (a === 'skill') {
+          lines.push(PASTS[pk][1] + ' ' + sk[0] + '！');
+          if (pk === 1 || pk === 2) alive().forEach(e => hit(e, sk[2])); else if (pk === 4) shuffled(alive(), Math.random).slice(0, 2).forEach(e => hit(e, sk[2])); else hit(t, sk[2]);
+          if (sk[3]) { php = Math.min(100, php + sk[3]); lines.push('隊伍回復 ' + sk[3] + ' HP！'); } en = Math.min(100, en + 50); tone(660, 0.35, 0.2, 'triangle');
+        } else {
+          riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); bell(523, 0); bell(784, 0.1); bell(1047, 0.2);
+          batEl.querySelector('.bm').innerHTML = '<span class="big">' + cfg.syn.name + '</span>' + cfg.syn.desc; await sleep(2600);
+          E.forEach(e => { e.hp = 0; }); en = 0; log = '✨ ' + cfg.syn.name + ' 發動！敵人全部被擊退了！'; draw(); await sleep(1200); finish(true); return;
+        }
+        log = lines.join('　'); draw(); await sleep(900);
+        if (!alive().length) { finish(true); return; }
+        const al = alive()[Math.floor(Math.random() * alive().length)], d2 = 8 + Math.floor(Math.random() * 3); hit(al, d2); log = ally.n + ' 攻擊 ' + al.n + '，造成 ' + d2 + ' 傷害！'; draw(); await sleep(800);
+        if (!alive().length) { finish(true); return; }
+        let dm = 0; alive().forEach(e => { dm += e.atk + Math.floor(Math.random() * 3); }); php = Math.max(cfg.tutorial ? 1 : 0, php - dm); en = Math.min(100, en + 4 * alive().length);
+        log = '敵人反擊！隊伍受到 ' + dm + ' 傷害。'; turn++; if (php <= 0) { finish(false); return; } if (E[tgt].hp <= 0) tgt = Math.max(0, first()); draw(); busy = false;
+      }
+      function finish(win) { if (fin) return; fin = true; batEl.classList.remove('show'); batEl.innerHTML = ''; res(win); }
+      tgt = 0; batEl.classList.add('show'); draw();
+    });
+  }
+  /* 開場主流程 */
+  async function startOpening(replay) {
+    if (opActive || dlgOpen) return; opActive = true; opSkip = false;
+    try {
+      const pz = snap(0, -46, { maxR: 6 }) || { x: 0, y: 0, z: -46 };
+      if (!replay) await opBlack();
+      await talkSeq([['同樂國小・校門口', '晴空萬里。你睜開眼睛，發現自己穿著嶄新的校服，站在一座充滿奇幻星芒的校門前。', -1], ['小樂', '嘿！新來的轉學生！別發呆啦，入學典禮快要開始了！\n跟我來，我們去梅花廣場集合！', 0]]);
+      if (!opSkip) {
+        opSetTut('🕹 <b>教學 1：移動</b>　電腦：WASD（Shift 跑步）／手機：左下搖桿<br>跟著 📍 走到 <b>梅花廣場</b> 吧！'); try { navStart({ name: '梅花廣場', x: pz.x, z: pz.z + 4, lv: 0 }); } catch (e) { /* 沒有導航也能走 */ }
+        await new Promise(res => { opWait = { x: pz.x, z: pz.z, r: 9, res }; }); opSetTut(''); try { navClear(); } catch (e) { /* 忽略 */ }
+        await talkSeq([['小樂', '到啦！來，我介紹同樂社的大家給你認識！', 0], ['小同', '哈囉～我是小同，夢想是成為站在禮堂舞台上的大明星！', 1], ['小創', '我是小創。壞掉的東西交給我就對了。', 2], ['小味', '我是小味！肚子餓的時候來找我，保證吃得飽！', 3], ['小知', '我是小知。……（推眼鏡）歡迎你，新同學。', 4], ['小T', '嗶嗶！我是 AI 助理小T，旁邊這隻是汪汪！我們會陪你一起冒險！', -1]]);
+        if (!replay && pastOf() < 0) await opQuiz();
+        riftOn(); await sleep(1500);
+        await talkSeq([['小知', '不好了！同樂宇宙的能量失衡——天空出現「宇宙裂隙」，裂隙怪物跑到校園裡了！', 4], ['小樂', '大家別慌！新同學，讓我們一起保護校園！', 0], ['小T', '嗶嗶！戰鬥教學啟動！轉生者的力量與同伴的羈絆，就是我們的武器！', -1]]);
+        const won = await battle({ title: '⚔️ 首戰：墨水怪', tutorial: true, ally: { n: '小樂', k: 0 }, enemies: [{ n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }, { n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }, { n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }], syn: { name: '【光輝破魔爆裂陣】', desc: '小樂衝鋒聚敵，魔法陣瞬間爆炸！' } });
+        riftOff(); await sleep(1200);
+      }
+      await talkSeq([['小同', '太棒了！有你在，我們「同樂社」終於湊齊最後一位成員了！', 1], ['小創', '走吧！我帶你去看看我們的社辦，還有你的專屬宿舍！', 2], ['小T', '嗶嗶！小T 與星星醬已降落在你的肩膀上，接下來請多指教！', -1]]);
+      sloEl.innerHTML = ((document.querySelector('img.lg') || {}).src ? '<img src="' + document.querySelector('img.lg').src + '" alt="">' : '<h2>Project: TLPS Youth</h2>') + '<p>轉生同樂，放學後的異世界冒險正式開始！</p>'; sloEl.classList.add('show');
+      try { const u = new SpeechSynthesisUtterance('轉生同樂，放學後的異世界冒險正式開始！'); u.lang = 'zh-TW'; u.rate = 0.95; speechSynthesis.speak(u); } catch (e) { /* 沒有語音也能玩 */ }
+      bell(523, 0); bell(659, 0.3); bell(784, 0.6); await sleep(3600); sloEl.classList.remove('show');
+      if (!S.opening) { S.opening = 1; addPts(30, '完成新手教學'); S.coin = (S.coin || 0) + 20; toast('🎁 新手教學完成：+30 點、🪙+20。西邊有你的「🏠 我的小屋」，東邊有「🎪 社辦」！', 6000); }
+      S.opening = 1; save(); refreshAll();
+    } finally { opActive = false; riftOff(); opSetTut(''); batEl.classList.remove('show'); sloEl.classList.remove('show'); opEl.classList.remove('show'); if (pastOf() < 0) { S.opening = 1; setTimeout(pickPast, 400); } }
+  }
+  function opTick() { if (opWait && Math.hypot(PL.x - opWait.x, PL.z - opWait.z) < opWait.r) { const r = opWait.res; opWait = null; r(); } if (opActive && opSkip && opWait) { const r = opWait.res; opWait = null; r(); } }
+  L.opening = { start: startOpening, battle, get active() { return opActive; }, applyPast };
+  if (pastOf() >= 0 && !S.opening) S.opening = 1;
+  const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); if (pastOf() < 0 && !S.opening) setTimeout(() => startOpening(false), 600); else if (pastOf() < 0) setTimeout(pickPast, 700); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); });
   L.TIERS = TIERS; setTimeout(() => { CP(); applyComp(); }, 0);
   L.TIERS = TIERS; L.tier = level; L.lvNeed = lvNeed; L.addPts = addPts;
   L.ready = true;
