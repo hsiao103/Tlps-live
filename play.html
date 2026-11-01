@@ -8232,6 +8232,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
 #gBat .hb{width:100%;height:8px;border-radius:8px;background:rgba(0,0,0,.4);overflow:hidden}#gBat .hb s{display:block;height:100%;background:#e8505b;transition:width .35s}#gBat .hb.p s{background:#4fcf6a}#gBat .hb.e s{background:#6fd0ff}#gBat .hb.e.full s{background:#ffd54a;animation:pu .7s infinite alternate}@keyframes pu{to{filter:brightness(1.6)}}
 #gBat .ba{display:flex;gap:10px;align-items:center;margin-bottom:8px}#gBat .al{display:grid;justify-items:center;font-size:11px;gap:2px}#gBat .al img{width:48px;height:48px;border-radius:50%;border:2px solid #fff;object-fit:cover;background:#fff}#gBat .bg{flex:1;display:grid;gap:6px}#gBat .bl{display:grid;grid-template-columns:78px 1fr 48px;align-items:center;gap:6px;font-size:11.5px}#gBat .bl em{font-style:normal}#gBat .bl small{text-align:right;color:#cfc8ff}
 #gBat .bc{background:rgba(255,213,74,.16);border:1.5px solid #ffd54a;border-radius:10px;padding:6px 10px;font-size:13.5px;line-height:1.6;margin-bottom:6px}#gBat .bm{min-height:34px;font-size:13.5px;line-height:1.6;color:#e7e3ff;margin-bottom:6px}#gBat .bm .big{display:block;font-size:20px;font-weight:900;color:#ffd54a;letter-spacing:.08em}
+#gBat .ba.sm .al img,#gBat .ba.sm .al .pe{width:38px;height:38px;font-size:22px}#gBat .ba.sm .bg{flex-basis:100%}#gBat .ba{flex-wrap:wrap}#gBat .al .pe{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#fff;font-style:normal;font-size:28px}#gBat .tg{display:block;color:#ffd54a;font-style:normal;font-size:12px}#gBat .sp{display:block;width:100%;text-align:left;margin-bottom:5px;border:1.5px solid #ffd54a;border-radius:10px;background:rgba(255,213,74,.12);color:#fff;padding:6px 10px;font-family:inherit;cursor:pointer}#gBat .sp b{display:block;font-size:14px}#gBat .sp small{color:#e7e3ff;font-size:12px}
+#gBat .tn{padding:2px 10px;border-radius:99px;font-weight:800;font-size:12.5px}#gBat .tn.me{background:#2f9e5b;color:#fff}#gBat .tn.foe{background:#d4453a;color:#fff}
+#gBat .phme .ba{box-shadow:0 0 0 2px #4fcf6a;border-radius:12px;padding:4px}#gBat .phfoe .be{box-shadow:0 0 0 2px #ff6a5a;border-radius:12px;padding:4px}#gBat .phfoe .ba,#gBat .phme .be{opacity:.78}#gBat .phfoe .bb{opacity:.45;pointer-events:none}
+#gBat .act{transform:translateY(-6px) scale(1.07);filter:drop-shadow(0 0 8px #ffd54a)}#gBat .en.act{border-color:#ff6a5a;background:rgba(255,106,90,.22)}#gBat .al.act img,#gBat .al.act .pe{border-color:#ffd54a;box-shadow:0 0 12px #ffd54a}
+#gBat .hurt{animation:hit .42s}@keyframes hit{0%,100%{transform:translateX(0)}15%{transform:translateX(-9px)}35%{transform:translateX(8px)}55%{transform:translateX(-6px)}75%{transform:translateX(4px)}}
+#gBat .ba.hurt{background:rgba(232,80,91,.28);border-radius:12px}#gBat .en{position:relative}#gBat .dn{position:absolute;top:2px;right:6px;color:#ff8a7a;font-weight:900;font-size:16px;text-decoration:none;animation:up .9s forwards}@keyframes up{to{transform:translateY(-16px);opacity:0}}
 #gBat .bb{display:flex;gap:8px}#gBat .bb button{flex:1;border:0;border-radius:12px;background:#5b4bd1;color:#fff;padding:11px 4px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}#gBat .bb button:disabled{opacity:.35;cursor:not-allowed}#gBat .bb button.hint{box-shadow:0 0 0 3px #ffd54a;animation:pu .7s infinite alternate}#gBat .bb button.syn{background:linear-gradient(90deg,#ff7a45,#ffd54a);color:#2a1d00}
 #gCM{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:34;display:none;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:6px 10px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px}#gCM.show{display:flex}#gCM span{font-weight:800;padding:0 4px}#gCM button{border:0;background:#f5821f;color:#fff;border-radius:99px;padding:7px 14px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
 #gCS{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:33;display:none;align-items:center;gap:10px;max-width:min(440px,calc(100vw - 24px));background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:8px 14px;font-family:var(--font-ui);color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px;line-height:1.5;cursor:pointer}#gCS.show{display:flex}#gCS i{font-style:normal;font-size:30px}#gCS b{display:block;font-size:12px;color:var(--muted)}
@@ -8948,12 +8954,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
-      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(() => startOpening(true), 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -9191,47 +9197,96 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     await new Promise(res => { const x = PASTS[k]; say(x[1] + ' 召喚石發光了！', '你的前世是——「' + x[0] + '」！\n「' + x[4] + '」\n\n專屬天賦【' + x[2] + '】：' + x[3] + '。', [{ label: '就決定是你了！', pri: true, fn: () => { applyPast(k); res(); } }, { label: '我想自己選', fn: () => { const t = setInterval(() => { if (pastOf() >= 0) { clearInterval(t); res(); } }, 300); setTimeout(pickPast, 100); } }], AV(k)); });
   }
   function applyPast(k) { const x = PASTS[k]; S.past = k; addAttr(['body', 'charm', 'idea', 'social', 'study'][k], 5, true); save(); refreshAll(); toast('轉生完成！天賦【' + x[2] + '】啟動 ✨', 4200); }
-  /* 回合制戰鬥 */
+  /* 回合制戰鬥（支援多人隊伍與 5 招連攜技） */
   const PSKILL = [['勇氣斬擊', '單體重擊', 18, 0], ['星光應援', '全體小傷害＋回復 HP', 7, 12], ['自動砲台', '全體小傷害', 9, 0], ['愛心便當', '單體傷害＋回復 HP', 12, 18], ['魔法彈', '隨機兩體', 13, 0]];
+  const PM = { 0: ['小樂', '⚔️'], 1: ['小同', '🎤'], 2: ['小創', '🔧'], 3: ['小味', '🍳'], 4: ['小知', '🔮'], p: ['汪汪＆小T', '🐶'] };
+  const SYN = [
+    { id: 'all', name: '【同樂校園祭：最終奧義撞擊】', req: [0, 1, 2, 3, 4], desc: '五人齊心，同樂國小鐘樓的星空虛影降臨，鐘聲響起——全場清屏！', brief: '全體巨額傷害，並補滿連攜能量' },
+    { id: 'burst', name: '【光輝破魔爆裂陣】', req: [0, 4], desc: '小樂衝鋒聚敵，小知在聚敵點召喚幾何魔法陣，轟然爆炸！', brief: '全體高額傷害＋破防（受傷 +50%，3 回合）' },
+    { id: 'stage', name: '【夢幻滿腹應援舞台】', req: [1, 3], desc: '小同開啟閃耀舞台應援跳舞，小味拋灑「星光金牌便當」！', brief: '全隊回復 50% HP，攻擊 +30%、霸體（受傷減半）3 回合' },
+    { id: 'cyber', name: '【賽博犬砲：星光重轟擊】', req: [2, 'p'], desc: '小創改裝汪汪與小T，組出全自動狗頭光束砲，雷射掃射！', brief: '全體 5 連擊雷射，並清除異常狀態' },
+    { id: 'neon', name: '【賽博霓虹舞台陣】', req: [1, 2], desc: '小創部署全息投影與雷射燈光，小同極速歌舞，敵人看得入迷！', brief: '敵人眩暈 2 回合，連攜能量回復 50%' }
+  ];
+  L.SYN = SYN;
   function battle(cfg) {
     return new Promise(res => {
-      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp }, e)), pk = pastOf() >= 0 ? pastOf() : 0, sk = PSKILL[pk], ally = cfg.ally;
-      let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false;
-      const alive = () => E.filter(e => e.hp > 0), first = () => { const i = E.findIndex(e => e.hp > 0); return i; };
-      const coach = () => { if (!cfg.tutorial) return ''; if (en >= 100) return '④ 連攜能量滿了！按下「連攜技」，和' + ally.n + '一起發動必殺技！'; if (turn === 0) return '① 先按「普攻」攻擊墨水怪（點敵人可以換目標）。'; if (turn === 1) return '② 這是你的「前世主動技」：' + sk[0] + '！每次行動都會累積連攜能量。'; return '③ 再行動一次，連攜能量就會滿了！'; };
+      const E = cfg.enemies.map(e => Object.assign({ mx: e.hp, brk: 0, stun: 0 }, e)), pk = pastOf() >= 0 ? pastOf() : 0, sk = PSKILL[pk];
+      const allies = cfg.allies || [0], party = [pk].concat(allies.filter(k => k !== pk)), safe = cfg.tutorial || cfg.safe;
+      const elig = () => cfg.tutorial ? SYN.filter(s => s.id === 'burst') : SYN.filter(s => s.req.every(r => party.indexOf(r) >= 0));
+      let php = 100, en = 0, turn = 0, tgt = 0, busy = false, log = '', fin = false, buff = 0, guard = 0, pick = false, phase = 'me', actI = -1, actE = -1, hurtP = false, fl = {};
+      const alive = () => E.filter(e => e.hp > 0), first = () => E.findIndex(e => e.hp > 0), an = k => PM[k][0];
+      const coach = () => { if (!cfg.tutorial) return ''; if (en >= 100) return '④ 連攜能量滿了！按下「連攜技」，和' + an(allies[0]) + '一起發動必殺技！'; if (turn === 0) return '① 先按「普攻」攻擊墨水怪（點敵人可以換目標）。'; if (turn === 1) return '② 這是你的「前世主動技」：' + sk[0] + '！每次行動都會累積連攜能量。'; return '③ 再行動一次，連攜能量就會滿了！'; };
+      const face = k => k === 'p' ? '<i class="pe">🐶</i>' : (AV(k) ? '<img src="' + AV(k) + '">' : '<i class="pe">' + PM[k][1] + '</i>');
       function draw() {
-        batEl.innerHTML = '<div class="bp"><div class="bh"><b>' + cfg.title + '</b><span>第 ' + (turn + 1) + ' 回合</span></div>' +
-          '<div class="be">' + E.map((e, i) => '<button type="button" class="en' + (e.hp <= 0 ? ' dead' : '') + (i === tgt && e.hp > 0 ? ' sel' : '') + '" data-t="' + i + '"><i>' + e.ic + '</i><b>' + e.n + '</b><div class="hb"><s style="width:' + Math.max(0, e.hp / e.mx * 100) + '%"></s></div><small>' + Math.max(0, e.hp) + '/' + e.mx + '</small></button>').join('') + '</div>' +
-          '<div class="ba"><div class="al">' + (AV(pk) ? '<img src="' + AV(pk) + '">' : '🎓') + '<span>你</span></div><div class="al">' + (AV(ally.k) ? '<img src="' + AV(ally.k) + '">' : '🛡️') + '<span>' + ally.n + '</span></div>' +
+        const es = elig(), tg = (buff > 0 ? ' ⚡攻擊↑' : '') + (guard > 0 ? ' 🛡霸體' : '');
+        batEl.innerHTML = '<div class="bp ph' + phase + '"><div class="bh"><b>' + cfg.title + '</b><span class="tn ' + phase + '">' + (phase === 'me' ? '▶ 我方回合' : '◀ 敵方回合') + '・第 ' + (turn + 1) + ' 回合</span></div>' +
+          '<div class="be">' + E.map((e, i) => '<button type="button" class="en' + (e.hp <= 0 ? ' dead' : '') + (i === tgt && e.hp > 0 && phase === 'me' ? ' sel' : '') + (i === actE ? ' act' : '') + (e.hurt ? ' hurt' : '') + '" data-t="' + i + '">' + (fl[i] ? '<u class="dn">-' + fl[i] + '</u>' : '') + '<i>' + e.ic + '</i><b>' + e.n + (e.brk > 0 ? ' 💥破防' : '') + (e.stun > 0 ? ' 💫眩暈' : '') + '</b><div class="hb"><s style="width:' + Math.max(0, e.hp / e.mx * 100) + '%"></s></div><small>' + Math.max(0, e.hp) + '/' + e.mx + '</small></button>').join('') + '</div>' +
+          '<div class="ba' + (party.length > 3 ? ' sm' : '') + (hurtP ? ' hurt' : '') + '">' + party.map((k, i) => '<div class="al' + (i === actI ? ' act' : '') + '">' + face(k) + '<span>' + (i ? an(k) : '你') + '</span></div>').join('') +
           '<div class="bg"><div class="bl"><em>❤️ 隊伍 HP</em><div class="hb p"><s style="width:' + php + '%"></s></div><small>' + php + '/100</small></div><div class="bl"><em>🤝 連攜能量</em><div class="hb e' + (en >= 100 ? ' full' : '') + '"><s style="width:' + en + '%"></s></div><small>' + en + '/100</small></div></div></div>' +
-          (coach() ? '<div class="bc">' + coach() + '</div>' : '') + '<div class="bm">' + log + '</div>' +
-          '<div class="bb"><button type="button" data-a="atk" class="' + (cfg.tutorial && turn === 0 && en < 100 ? 'hint' : '') + '">⚔️ 普攻</button><button type="button" data-a="skill" class="' + (cfg.tutorial && turn === 1 && en < 100 ? 'hint' : '') + '">' + PASTS[pk][1] + ' ' + sk[0] + '</button><button type="button" data-a="syn" ' + (en >= 100 ? 'class="hint syn"' : 'disabled') + '>🤝 連攜技</button></div></div>';
+          (coach() ? '<div class="bc">' + coach() + '</div>' : '') + '<div class="bm">' + (pick ? es.map((s, i) => '<button type="button" class="sp" data-s="' + i + '"><b>' + s.name + '</b><small>' + s.brief + '</small></button>').join('') : (log || '') + (tg ? '<em class="tg">' + tg + '</em>' : '')) + '</div>' +
+          '<div class="bb"><button type="button" data-a="atk" class="' + (cfg.tutorial && turn === 0 && en < 100 ? 'hint' : '') + '">⚔️ 普攻</button><button type="button" data-a="skill" class="' + (cfg.tutorial && turn === 1 && en < 100 ? 'hint' : '') + '">' + PASTS[pk][1] + ' ' + sk[0] + '</button><button type="button" data-a="syn" ' + (en >= 100 && es.length ? 'class="hint syn"' : 'disabled') + '>🤝 連攜技' + (es.length > 1 ? '(' + es.length + ')' : '') + '</button></div></div>';
+        hurtP = false; E.forEach(e => { e.hurt = 0; }); fl = {};
         batEl.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { if (!busy && E[+b.dataset.t].hp > 0) { tgt = +b.dataset.t; draw(); } });
-        batEl.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (!busy && !b.disabled) act(b.dataset.a); });
+        batEl.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { if (!busy) { pick = false; act('syn', es[+b.dataset.s]); } });
+        batEl.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (busy || b.disabled) return; if (b.dataset.a === 'syn' && elig().length > 1) { pick = !pick; draw(); } else act(b.dataset.a, elig()[0]); });
       }
-      const hit = (e, d) => { e.hp = Math.max(0, e.hp - d); };
-      async function act(a) {
-        busy = true; const lines = []; let t = E[tgt] && E[tgt].hp > 0 ? E[tgt] : E[first()];
-        if (a === 'atk') { const d = 10 + Math.floor(Math.random() * 4); hit(t, d); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50); tone(440, 0.25, 0.18, 'square'); }
+      const hit = (e, d) => { d = Math.round(d * (e.brk > 0 ? 1.5 : 1) * (buff > 0 ? 1.3 : 1)); e.hp = Math.max(0, e.hp - d); e.hurt = 1; fl[E.indexOf(e)] = (fl[E.indexOf(e)] || 0) + d; return d; };
+      const flash = () => { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); };
+      async function act(a, s) {
+        busy = true; phase = 'me'; actI = 0; const lines = []; let t = E[tgt] && E[tgt].hp > 0 ? E[tgt] : E[first()];
+        if (a === 'atk') { const d = hit(t, 10 + Math.floor(Math.random() * 4)); lines.push('你攻擊 ' + t.n + '，造成 ' + d + ' 傷害！'); en = Math.min(100, en + 50); tone(440, 0.25, 0.18, 'square'); }
         else if (a === 'skill') {
           lines.push(PASTS[pk][1] + ' ' + sk[0] + '！');
           if (pk === 1 || pk === 2) alive().forEach(e => hit(e, sk[2])); else if (pk === 4) shuffled(alive(), Math.random).slice(0, 2).forEach(e => hit(e, sk[2])); else hit(t, sk[2]);
           if (sk[3]) { php = Math.min(100, php + sk[3]); lines.push('隊伍回復 ' + sk[3] + ' HP！'); } en = Math.min(100, en + 50); tone(660, 0.35, 0.2, 'triangle');
         } else {
-          riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); bell(523, 0); bell(784, 0.1); bell(1047, 0.2);
-          batEl.querySelector('.bm').innerHTML = '<span class="big">' + cfg.syn.name + '</span>' + cfg.syn.desc; await sleep(2600);
-          E.forEach(e => { e.hp = 0; }); en = 0; log = '✨ ' + cfg.syn.name + ' 發動！敵人全部被擊退了！'; draw(); await sleep(1200); finish(true); return;
+          flash(); bell(523, 0); bell(784, 0.1); bell(1047, 0.2);
+          batEl.querySelector('.bm').innerHTML = '<span class="big">' + s.name + '</span>' + s.desc; await sleep(2800);
+          en = 0; const keep = buff;
+          if (s.id === 'burst') { E.forEach(e => { if (e.hp > 0) { hit(e, cfg.tutorial ? 99 : 45); e.brk = 3; } }); log = '✨ ' + s.name + '！全體重創並陷入破防！'; }
+          else if (s.id === 'stage') { php = Math.min(100, php + 50); buff = 3; guard = 3; log = '🎶 全隊回復 50% HP，攻擊力 +30%、霸體 3 回合！'; }
+          else if (s.id === 'cyber') { for (let i = 0; i < 5; i++) { alive().forEach(e => hit(e, 10)); tone(300 + i * 120, 0.2, 0.18, 'sawtooth', i * 0.12); } log = '🐶 光束砲 5 連射！異常狀態全部清除！'; }
+          else if (s.id === 'all') { alive().forEach(e => hit(e, 90)); en = 100; log = '🔔 鐘聲響徹校園！全體巨額傷害，連攜能量補滿！'; }
+          else if (s.id === 'neon') { alive().forEach(e => { e.stun = 2; }); en = 50; log = '💫 敵人看得入迷，眩暈 2 回合！連攜能量回復 50%！'; }
+          draw(); await sleep(1500); if (!alive().length) { finish(true); return; }
+          buff = s.id === 'stage' ? buff : keep; await foe(); return;
         }
         log = lines.join('　'); draw(); await sleep(900);
         if (!alive().length) { finish(true); return; }
-        const al = alive()[Math.floor(Math.random() * alive().length)], d2 = 8 + Math.floor(Math.random() * 3); hit(al, d2); log = ally.n + ' 攻擊 ' + al.n + '，造成 ' + d2 + ' 傷害！'; draw(); await sleep(800);
+        const n = party.length - 1; actI = n > 0 ? 1 + Math.floor(Math.random() * n) : -1;
+        if (n > 0) { let tot = 0; for (let i = 0; i < n; i++) { const al = alive(); if (!al.length) break; tot += hit(al[Math.floor(Math.random() * al.length)], 8 + Math.floor(Math.random() * 3)); } log = '同伴們一起攻擊，造成 ' + tot + ' 傷害！'; draw(); await sleep(800); }
         if (!alive().length) { finish(true); return; }
-        let dm = 0; alive().forEach(e => { dm += e.atk + Math.floor(Math.random() * 3); }); php = Math.max(cfg.tutorial ? 1 : 0, php - dm); en = Math.min(100, en + 4 * alive().length);
-        log = '敵人反擊！隊伍受到 ' + dm + ' 傷害。'; turn++; if (php <= 0) { finish(false); return; } if (E[tgt].hp <= 0) tgt = Math.max(0, first()); draw(); busy = false;
+        await foe();
+      }
+      async function foe() {
+        phase = 'foe'; actI = -1; draw(); await sleep(500); let dm = 0, hp0 = php;
+        for (let i = 0; i < E.length; i++) {
+          const e = E[i]; if (e.hp <= 0) continue;
+          if (e.stun > 0) { actE = i; log = e.n + ' 眩暈中，無法行動！'; draw(); await sleep(600); continue; }
+          let d = e.atk + Math.floor(Math.random() * 3); if (guard > 0) d = Math.round(d / 2);
+          actE = i; php = Math.max(safe ? 1 : 0, php - d); dm += d; hurtP = true; tone(150, 0.2, 0.2, 'sawtooth');
+          log = e.n + ' 攻擊隊伍，造成 ' + d + ' 傷害！' + (guard > 0 ? '（霸體減傷）' : ''); draw(); await sleep(750); if (php <= 0) break;
+        }
+        en = Math.min(100, en + 4 * alive().filter(e => !e.stun).length); actE = -1; phase = 'me';
+        E.forEach(e => { if (e.stun > 0) e.stun--; else if (e.brk > 0) e.brk--; }); if (buff > 0) buff--; if (guard > 0) guard--;
+        turn++; if (php <= 0) { finish(false); return; } if (E[tgt].hp <= 0) tgt = Math.max(0, first()); log = dm ? '敵人共造成 ' + (hp0 - php) + ' 傷害。輪到你了！' : '輪到你了！'; draw(); busy = false;
       }
       function finish(win) { if (fin) return; fin = true; batEl.classList.remove('show'); batEl.innerHTML = ''; res(win); }
       tgt = 0; batEl.classList.add('show'); draw();
     });
+  }
+  /* 連攜技訓練（背包→🤝）：之後第一章副本可沿用 battle() */
+  function synPractice() {
+    if (opActive || dlgOpen) return; const pk = pastOf(); if (pk < 0) { toast('請先選擇前世身分', 2400); return; }
+    const done = S.syn || {};
+    say('🤝 連攜技訓練場', '選擇一招連攜技練習！系統會自動幫你組好需要的夥伴（你的前世身分會算在隊伍裡）。首次成功各 +10 點。', SYN.map(s => ({ label: (done[s.id] ? '✅ ' : '') + s.name.replace(/[【】]/g, '') + '｜' + s.req.map(r => PM[r][0].replace('汪汪＆小T', '汪汪/小T')).join('＋'), fn: () => setTimeout(() => runPractice(s), 150) })).concat([{ label: '關閉' }]), AV(pk));
+  }
+  async function runPractice(s) {
+    opActive = true; try {
+      const al = s.req.filter(r => r !== pastOf()), n = s.id === 'all' ? 4 : 3, hp = s.id === 'all' ? 90 : 60;
+      const win = await battle({ title: '🤝 連攜訓練：' + s.name.replace(/[【】]/g, ''), safe: true, allies: al, enemies: Array.from({ length: n }, () => ({ n: '墨水怪', ic: '🦑', hp: hp, atk: 4 })) });
+      if (win) { S.syn = S.syn || {}; if (!S.syn[s.id]) { S.syn[s.id] = 1; addPts(10, '首次完成連攜技：' + s.name); } else toast('訓練完成！', 2000); save(); refreshAll(); }
+    } finally { opActive = false; }
   }
   /* 開場主流程 */
   async function startOpening(replay) {
@@ -9247,7 +9302,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         if (!replay && pastOf() < 0) await opQuiz();
         riftOn(); await sleep(1500);
         await talkSeq([['小知', '不好了！同樂宇宙的能量失衡——天空出現「宇宙裂隙」，裂隙怪物跑到校園裡了！', 4], ['小樂', '大家別慌！新同學，讓我們一起保護校園！', 0], ['小T', '嗶嗶！戰鬥教學啟動！轉生者的力量與同伴的羈絆，就是我們的武器！', -1]]);
-        const won = await battle({ title: '⚔️ 首戰：墨水怪', tutorial: true, ally: { n: '小樂', k: 0 }, enemies: [{ n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }, { n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }, { n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }], syn: { name: '【光輝破魔爆裂陣】', desc: '小樂衝鋒聚敵，魔法陣瞬間爆炸！' } });
+        const won = await battle({ title: '⚔️ 首戰：墨水怪', tutorial: true, allies: [0], enemies: [{ n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }, { n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }, { n: '墨水怪', ic: '🦑', hp: 30, atk: 3 }], });
         riftOff(); await sleep(1200);
       }
       await talkSeq([['小同', '太棒了！有你在，我們「同樂社」終於湊齊最後一位成員了！', 1], ['小創', '走吧！我帶你去看看我們的社辦，還有你的專屬宿舍！', 2], ['小T', '嗶嗶！小T 與星星醬已降落在你的肩膀上，接下來請多指教！', -1]]);
@@ -9259,7 +9314,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     } finally { opActive = false; riftOff(); opSetTut(''); batEl.classList.remove('show'); sloEl.classList.remove('show'); opEl.classList.remove('show'); if (pastOf() < 0) { S.opening = 1; setTimeout(pickPast, 400); } }
   }
   function opTick() { if (opWait && Math.hypot(PL.x - opWait.x, PL.z - opWait.z) < opWait.r) { const r = opWait.res; opWait = null; r(); } if (opActive && opSkip && opWait) { const r = opWait.res; opWait = null; r(); } }
-  L.opening = { start: startOpening, battle, get active() { return opActive; }, applyPast };
+  L.opening = { start: startOpening, battle, practice: synPractice, get active() { return opActive; }, applyPast };
   if (pastOf() >= 0 && !S.opening) S.opening = 1;
   const go = $('iGo'); if (go) go.addEventListener('click', () => { view.third = true; view.iso = false; setMode('walk'); if (pastOf() < 0 && !S.opening) setTimeout(() => startOpening(false), 600); else if (pastOf() < 0) setTimeout(pickPast, 700); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); });
   L.TIERS = TIERS; setTimeout(() => { CP(); applyComp(); }, 0);
