@@ -5872,7 +5872,7 @@ function frame(now) {
     PL.yaw -= ((keys.ArrowLeft ? -1 : 0) + (keys.ArrowRight ? 1 : 0)) * 0 + joy.rx * 2.2 * dt;
     PL.pitch = Math.max(-1.3, Math.min(1.3, PL.pitch - joy.ry * 1.6 * dt));
     if (keys.ArrowLeft) PL.yaw += 1.8 * dt; if (keys.ArrowRight) PL.yaw -= 1.8 * dt; }
-    const sp = (AU ? AU.sp : keys.ShiftLeft || keys.ShiftRight || touchRun ? 6.5 : 3.4) * dt, len = Math.hypot(f, s) || 1;
+    const sp = (AU ? AU.sp : keys.ShiftLeft || keys.ShiftRight || touchRun ? 6.5 : 3.4) * dt * (window.__spd || 1), len = Math.hypot(f, s) || 1;
     const fx = -Math.sin(PL.yaw), fz = -Math.cos(PL.yaw), rx = Math.cos(PL.yaw), rz = -Math.sin(PL.yaw);
     const mx = (fx * f + rx * s) / Math.max(1, len) * sp, mz = (fz * f + rz * s) / Math.max(1, len) * sp;
     if (!blocked(PL.x + mx, PL.z, PL.y)) PL.x += mx;
@@ -8223,6 +8223,9 @@ body.live.gearopen #modes>button{width:100%!important;display:block}
 #gTime{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:19;background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:5px 14px;font:700 13px var(--font-ui);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}body.intro #gTime{display:none}@media(max-width:860px){#gTime{display:none}}
 #gRest{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,24,40,.88);color:#fff;font-family:var(--font-ui);text-align:center}#gRest .bx{max-width:min(420px,calc(100vw - 40px));padding:20px}#gRest .big{font-size:26px;font-weight:800;margin-bottom:8px}#gRest p{font-size:15px;line-height:1.7;margin:0 0 12px}#gRest .cnt{font-size:64px;font-weight:800;color:#7fe3a0;font-variant-numeric:tabular-nums}#gRest button{margin-top:14px;border:0;border-radius:99px;background:#2e9b45;color:#fff;font-size:16px;font-weight:800;padding:10px 22px;cursor:pointer}#gDlg button.gift{background:#fff0f4;border-color:#f06292}
 #gBag .x{position:sticky;top:0;float:right;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;cursor:pointer;padding:0;margin:-4px -4px 0 0}#gBag .pvd summary{font-size:12.5px;color:var(--muted);cursor:pointer;margin:4px 0}
+#gWx{position:fixed;inset:0;z-index:4;pointer-events:none;transition:box-shadow .6s}#gWx::after{content:'';position:absolute;inset:0;background:#fff;opacity:calc(var(--fl,0)*.7)}#gRain{position:fixed;inset:0;z-index:4;pointer-events:none}body.intro #gWx,body.intro #gRain,body.intro #gWxChip{display:none}
+#gWxChip{position:fixed;right:16px;top:calc(62px + env(safe-area-inset-top,0px));z-index:19;display:flex;align-items:center;gap:5px;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);border-radius:99px;padding:4px 10px;font:700 13px var(--font-ui);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12)}#gWxChip.ext{border-color:#e0462f;background:#fff0ed;color:#b02a16;animation:gWxP 1.6s infinite}#gWxChip i,#gWxChip em{font-style:normal}@keyframes gWxP{50%{box-shadow:0 0 0 5px rgba(224,70,47,.22)}}
+#gHwSp{position:fixed;inset:0;z-index:62;display:grid;place-items:center;background:rgba(20,30,40,.78);font-family:var(--font-ui)}#gHwSp .bx{background:#fffaf0;border:3px solid #2e9b72;border-radius:18px;padding:18px 22px;text-align:center;color:#333;min-width:230px}#gHwSp .big{font-size:20px;font-weight:800}#gHwSp .tp{display:block;margin:12px auto;width:130px;height:130px;border-radius:50%;border:0;background:#2e9b72;color:#fff;font-size:28px;font-weight:800;cursor:pointer;touch-action:manipulation}#gHwSp .tp:active{transform:scale(.94)}#gHwSp .cnt{font-weight:800}
 #gOp.ttlon{background:radial-gradient(circle at 50% 40%,#2a1d6e,#07072a 75%)}#gOp .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}#gOp .stars i{position:absolute;border-radius:50%;background:#fff;opacity:.2;animation:gTw 2.4s ease-in-out infinite}@keyframes gTw{50%{opacity:.95}}#gOp .ttl{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2.2vh,20px)}#gOp .ttl .l1{max-width:min(420px,70vw);max-height:26vh;object-fit:contain;opacity:0;transform:scale(.7);animation:gTi 1.6s .2s forwards cubic-bezier(.2,.8,.2,1)}#gOp .ttl .tp{font-size:30px;font-weight:800}#gOp .ttl h1{margin:0;font-size:clamp(24px,min(7vw,9vh),48px);line-height:1.3;letter-spacing:.1em;text-shadow:0 0 24px #8fb4ff;opacity:0;transform:translateY(14px);animation:gTu 1.4s 1.3s forwards}#gOp .ttl .l3{margin:0;font-size:clamp(12px,3.2vw,16px);letter-spacing:.24em;opacity:0;animation:gTu 1.2s 2.4s forwards;color:#cdd8ff}@keyframes gTi{to{opacity:1;transform:none}}@keyframes gTu{to{opacity:1;transform:none}}
 #gOp{position:fixed;inset:0;z-index:90;display:none;background:#000;color:#fff;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity 1.2s;font-family:var(--font-ui);padding:24px}#gOp.show{display:flex}#gOp.on{opacity:1}#gOp .tx{font-size:clamp(18px,4.6vw,28px);line-height:1.9;white-space:pre-line;opacity:0;transition:opacity 1s;letter-spacing:.06em}#gOp .sk{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:99px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit}
 #gRift{position:fixed;inset:0;z-index:35;pointer-events:none;opacity:0;transition:opacity 1.2s;background:radial-gradient(ellipse at 50% 12%,rgba(150,60,255,.55),rgba(30,20,110,.45) 55%,rgba(10,10,50,.5))}#gRift.on{opacity:1}#gRift .vx{position:absolute;left:50%;top:-8vmin;width:70vmin;height:70vmin;margin-left:-35vmin;border-radius:50%;background:conic-gradient(from 0deg,#b46bff,#3a1d8f,#6fd0ff,#3a1d8f,#b46bff);filter:blur(6px);opacity:.75;animation:vxs 3.2s linear infinite;-webkit-mask:radial-gradient(circle,transparent 8%,#000 40%,transparent 72%);mask:radial-gradient(circle,transparent 8%,#000 40%,transparent 72%)}@keyframes vxs{to{transform:rotate(360deg)}}
@@ -8402,7 +8405,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (b.stage === 0) return '🌱 種下種子';
     if (b.stage >= 3) return '🌸 採收花朵';
     if (b.water === today) return null;
-    return S.can > 0 ? '💧 澆水（水量 ' + S.can + '）' : '💧 澆水（先去水龍頭裝水）';
+    return rainNow() ? '🌧 雨水澆灌（免水桶）' : S.can > 0 ? '💧 澆水（水量 ' + S.can + '）' : '💧 澆水（先去水龍頭裝水）';
   }
   function bedAct(i) {
     const b = S.beds[i], today = dayKey(), d = D();
@@ -8412,9 +8415,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       if (!spend(2)) return;
       const f = FLOWERS[b.type]; S.flowers[f[0]] = (S.flowers[f[0]] || 0) + 1; b.stage = 0; b.water = ''; addPts(pastOf() === 3 ? 6 : 3, '採收了' + f[0]); addAttr('charm', 1); addAttr('body', 1); d.plant++; if (d.plant === 1) taskDone('plant', '種花'); drawBeds(); save(); refreshAll();
     } else if (b.water !== today) {
-      if (S.can <= 0) { toast('水桶是空的，先到水龍頭裝水 🚰'); return; }
+      if (S.can <= 0 && !rainNow()) { toast('水桶是空的，先到水龍頭裝水 🚰'); return; }
       if (!spend(3)) return;
-      S.can--; b.water = today; b.stage++; d.water++; addAttr('body', 1); drawBeds(); toast(b.stage >= 3 ? '花開了！🌸' : '澆好水了 💧'); if (d.water === 3) taskDone('water', '澆水'); save(); refreshAll();
+      if (!rainNow()) S.can--; b.water = today; b.stage++; d.water++; addAttr('body', 1); drawBeds(); toast(b.stage >= 3 ? '花開了！🌸' : '澆好水了 💧'); if (d.water === 3) taskDone('water', '澆水'); save(); refreshAll();
     }
   }
   // 水龍頭
@@ -8959,12 +8962,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
       '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + (CEVO[x.id] ? cname(x) : x.name) + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
-      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button><button type="button" class="lgb wks">🔧 同樂工坊</button><button type="button" class="lgb jb2">📋 校園打工</button><button type="button" class="lgb mk2">🛒 跳蚤市場</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
+      '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button>' + (vacNow() ? '<button type="button" class="lgb hwb">📓 ' + vacNow().hw + '</button>' : '') + '<button type="button" class="lgb wxb">🌤 氣象站</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button><button type="button" class="lgb wks">🔧 同樂工坊</button><button type="button" class="lgb jb2">📋 校園打工</button><button type="button" class="lgb mk2">🛒 跳蚤市場</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
       (S.badges.length ? '<div class="row">' + S.badges.map(b => '<span>🏅 ' + b + '</span>').join('') + '</div>' : '') +
       '<div class="sub" style="margin-top:8px">HP 做事會消耗，會自然恢復；喝水、找校護可快速補滿。MP（魔力）完成任務會增加，之後用在更多玩法。</div><button type="button" class="cl">關閉（B）</button></div>';
-    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.jb2').onclick = () => { closeBag(); setTimeout(jobBoard, 200); }; bagEl.querySelector('.mk2').onclick = () => { closeBag(); setTimeout(market, 200); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelectorAll('.qk button').forEach(b => { b.onclick = () => { const f = { wks: workshop, jb2: jobBoard, mk2: market }[b.dataset.q]; closeBag(); setTimeout(f, 200); }; }); bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(async () => { await playTitle(true); startOpening(true, true); }, 200); }; updateBars2();
+    bagEl.querySelector('.cl').onclick = closeBag; bagEl.querySelector('.x').onclick = closeBag; bagEl.querySelector('.lgb').onclick = () => { closeBag(); legendBook(); }; bagEl.querySelector('.jb2').onclick = () => { closeBag(); setTimeout(jobBoard, 200); }; bagEl.querySelector('.mk2').onclick = () => { closeBag(); setTimeout(market, 200); }; bagEl.querySelector('.wks').onclick = () => { closeBag(); setTimeout(workshop, 200); }; bagEl.querySelector('.rf1').onclick = () => { closeBag(); setTimeout(chapterMenu, 200); }; bagEl.querySelector('.syp').onclick = () => { closeBag(); setTimeout(synPractice, 200); }; bagEl.querySelectorAll('.qk button').forEach(b => { b.onclick = () => { const f = { wks: workshop, jb2: jobBoard, mk2: market }[b.dataset.q]; closeBag(); setTimeout(f, 200); }; }); { const hb = bagEl.querySelector('.hwb'); if (hb) hb.onclick = () => { closeBag(); setTimeout(hwBook, 200); }; bagEl.querySelector('.wxb').onclick = () => { closeBag(); setTimeout(wxStation, 200); }; } bagEl.querySelector('.rpo').onclick = () => { closeBag(); setTimeout(async () => { await playTitle(true); startOpening(true, true); }, 200); }; updateBars2();
     bagEl.querySelectorAll('[data-use="med"]').forEach(b => b.onclick = useMed);
     bagEl.querySelectorAll('.cp').forEach(b => b.onclick = () => { const x = COMPS.find(q => q.id === b.dataset.c); if (CP().have.includes(x.id)) { csSel = x.id; setComp(x.id); } else toast('🔒 ' + x.name + '：' + x.need + '（' + x.prog() + '）', 3600); });
     bagEl.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => careFeed(b.dataset.feed)); bagEl.querySelectorAll('[data-talk]').forEach(b => b.onclick = () => careTalk(b.dataset.talk)); bagEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => careBuy(b.dataset.buy));
@@ -9187,6 +9190,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     function ctx() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); mg = ac.createGain(); mg.gain.value = 0.85; mg.connect(ac.destination); } catch (e) { return null; } } if (ac.state === 'suspended') { try { ac.resume(); } catch (e) { /* 忽略 */ } } return ac; }
     function o(f, d, x) { x = x || {}; const t = ac.currentTime + (x.at || 0), os = ac.createOscillator(), g = ac.createGain(); os.type = x.type || 'sine'; os.frequency.setValueAtTime(f, t); if (x.f2) os.frequency.exponentialRampToValueAtTime(x.f2, t + d); const v = x.v || 0.12; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + (x.a || 0.008)); g.gain.exponentialRampToValueAtTime(0.0001, t + d); os.connect(g); g.connect(mg); os.start(t); os.stop(t + d + 0.03); }
     function n(d, x) { x = x || {}; if (!nb) { nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const a = nb.getChannelData(0); for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1; } const t = ac.currentTime + (x.at || 0), sr = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain(); sr.buffer = nb; fl.type = x.ft || 'lowpass'; fl.frequency.setValueAtTime(x.f || 1200, t); if (x.f2) fl.frequency.exponentialRampToValueAtTime(x.f2, t + d); g.gain.setValueAtTime(x.v || 0.15, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); sr.connect(fl); fl.connect(g); g.connect(mg); sr.start(t, Math.random() * 0.5); sr.stop(t + d + 0.03); }
+    const A = { on: false };
     const K = {
       click() { o(900, 0.05, { type: 'triangle', v: 0.07, f2: 640 }); },
       ok() { o(660, 0.09, { type: 'triangle', v: 0.09 }); o(990, 0.14, { type: 'triangle', v: 0.09, at: 0.07 }); },
@@ -9204,9 +9208,23 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       lose() { [392, 330, 262, 196].forEach((f, i) => o(f, 0.4, { v: 0.09, at: i * 0.2, f2: f * 0.97 })); },
       jump() { o(300, 0.16, { type: 'sine', v: 0.08, f2: 620 }); },
       land() { n(0.07, { f: 500, v: 0.1 }); },
+      thunder() { n(1.8, { f: 900, f2: 50, v: 0.32 }); o(55, 1.4, { type: 'sine', v: 0.22, f2: 35, a: 0.05 }); n(0.5, { f: 3000, f2: 200, v: 0.18, at: 0.02 }); },
       step() { step.k ^= 1; n(0.045, { f: step.k ? 700 : 520, v: 0.035 }); }
     };
     return {
+      amb(x) {
+        x = x || {}; if (S.noSfx) x = {}; if (!(x.rain || x.wind || x.cic) && !A.on) return; if (!ctx() || ac.state !== 'running') return;
+        if (!A.on) {
+          const nb2 = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), d = nb2.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+          const mk = (ft, f, q) => { const s = ac.createBufferSource(); s.buffer = nb2; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = ft; fl.frequency.value = f; if (q) fl.Q.value = q; const g = ac.createGain(); g.gain.value = 0; s.connect(fl); fl.connect(g); s.start(); return { g, fl }; };
+          A.rain = mk('bandpass', 2400, 0.4); A.rain.g.connect(mg); A.rum = mk('lowpass', 600); A.rum.g.connect(mg);
+          A.wind = mk('lowpass', 520); const wm = ac.createGain(); wm.gain.value = 0.6; A.wind.g.connect(wm); wm.connect(mg); const lf = ac.createOscillator(), lg = ac.createGain(); lf.frequency.value = 0.18; lg.gain.value = 0.4; lf.connect(lg); lg.connect(wm.gain); lf.start();
+          const co = ac.createGain(); co.gain.value = 0; const m1 = ac.createGain(), m2 = ac.createGain(); m1.gain.value = 0.5; m2.gain.value = 0.6; [5200, 5420].forEach(f => { const os = ac.createOscillator(); os.frequency.value = f; os.connect(co); os.start(); });
+          const l1 = ac.createOscillator(), g1 = ac.createGain(); l1.frequency.value = 17; g1.gain.value = 0.5; l1.connect(g1); g1.connect(m1.gain); l1.start(); const l2 = ac.createOscillator(), g2 = ac.createGain(); l2.frequency.value = 0.22; l2.type = 'triangle'; g2.gain.value = 0.55; l2.connect(g2); g2.connect(m2.gain); l2.start();
+          co.connect(m1); m1.connect(m2); m2.connect(mg); A.cic = { g: co }; A.on = true;
+        }
+        const t = ac.currentTime; A.rain.g.gain.setTargetAtTime((x.rain || 0) * 0.07, t, 1.2); A.rum.g.gain.setTargetAtTime((x.rain || 0) * 0.06, t, 1.2); A.wind.g.gain.setTargetAtTime((x.wind || 0) * 0.16, t, 1.5); A.cic.g.gain.setTargetAtTime((x.cic || 0) * 0.012, t, 2);
+      },
       ctx, on: () => !S.noSfx,
       play(k, gap) { if (S.noSfx) return; const now = Date.now(); if (now - (last[k] || 0) < (gap || 70)) return; last[k] = now; if (!ctx() || !K[k]) return; try { K[k](); } catch (e) { /* 無音效也能玩 */ } },
       toast(m) { m = String(m || ''); this.play(/失敗|不足|不夠|沒有|請先|無法|還不能|不能/.test(m) ? 'error' : /進化|覺醒/.test(m) ? 'evo' : /🎁|🪙|\+\d|獲得|收穫|完成|成為|解鎖/.test(m) ? 'coin' : 'pop', 150); }
@@ -9321,6 +9339,214 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     };
     return api;
   })();
+  /* ---------- 假期（暑假／寒假）與天候系統 ---------- */
+  /* 日期依「現實日期」，全班同一天的天氣相同（以日期當亂數種子，可預報）。 */
+  const WXS = {
+    sun: { n: '晴天', ic: '☀️', dark: 0, rain: 0, slant: 0, fog: [160, 900], spd: 1, th: 0 },
+    cloud: { n: '多雲', ic: '⛅', dark: 0.05, rain: 0, slant: 0, fog: [150, 860], spd: 1, th: 0 },
+    over: { n: '陰天', ic: '☁️', dark: 0.18, rain: 0, slant: 0, fog: [110, 700], spd: 1, th: 0 },
+    drizzle: { n: '小雨', ic: '🌦️', dark: 0.22, rain: 0.5, slant: 0.08, fog: [90, 560], spd: 0.96, th: 0 },
+    storm: { n: '雷雨', ic: '⛈️', dark: 0.4, rain: 1.0, slant: 0.18, fog: [60, 480], spd: 0.92, th: 1 },
+    mist: { n: '起霧', ic: '🌫️', dark: 0.1, rain: 0, slant: 0, fog: [12, 200], spd: 1, th: 0, white: 0.28 },
+    heavy: { n: '豪大雨', ic: '🌧️', dark: 0.5, rain: 1.5, slant: 0.32, fog: [30, 330], spd: 0.82, th: 1.4, ext: 1, wind: 0.5 },
+    typhoon: { n: '颱風假', ic: '🌀', dark: 0.58, rain: 2.0, slant: 0.65, fog: [20, 260], spd: 0.7, th: 0.8, ext: 1, wind: 1 }
+  };
+  const WXM = { // 每月基準：[晴, 多雲, 陰, 小雨, 雷雨, 霧] 權重（宜蘭：冬季多雨、梅雨、夏季午後雷陣雨）
+    1: [12, 20, 30, 33, 0, 5], 2: [12, 20, 30, 33, 0, 5], 3: [20, 25, 25, 25, 2, 3], 4: [20, 25, 25, 25, 2, 3], 5: [15, 20, 20, 27, 13, 5], 6: [15, 20, 20, 25, 15, 5],
+    7: [35, 25, 5, 10, 25, 0], 8: [35, 25, 5, 10, 25, 0], 9: [25, 20, 15, 25, 10, 5], 10: [25, 20, 15, 25, 10, 5], 11: [10, 20, 25, 35, 0, 10], 12: [10, 20, 25, 35, 0, 10]
+  };
+  const WXT = { 1: 16, 2: 17, 3: 19, 4: 22, 5: 25, 6: 28, 7: 30, 8: 30, 9: 28, 10: 25, 11: 22, 12: 18 };
+  const WXORD = ['sun', 'cloud', 'over', 'drizzle', 'storm', 'mist'];
+  let wxDate = null, wxForce = null;   // 測試用：覆寫日期／天氣
+  const wxToday = () => wxDate || new Date();
+  const dAdd = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
+  const typRaw = d => { const p = { 7: 0.02, 8: 0.03, 9: 0.04, 10: 0.02 }[d.getMonth() + 1] || 0; return p > 0 && rng('typ' + realKey(d))() < p; };
+  const isTyp = d => typRaw(d) && !typRaw(dAdd(d, -1));          // 颱風假不會連續兩天（避免太極端）
+  function wxOf(d) {
+    const key = realKey(d), r = rng('wx' + key), m = d.getMonth() + 1;
+    const hp = [0, 0, 0, 0, 0, 0, 0.02, 0.02, 0.06, 0.06, 0.02, 0.02, 0.02], u1 = r(), u2 = r(), u3 = r(), u4 = r(), s1 = r(), s2 = r(), s3 = r(), th = r();
+    const typ = isTyp(d), heavy = !typ && (m === 5 || m === 6 ? u1 < 0.06 : m === 8 || m === 9 ? u1 < 0.04 : u1 < 0.02), cold = !typ && !heavy && ((m === 12 || m === 1 || m === 2) ? u2 < 0.1 : (m === 11 || m === 3) ? u2 < 0.02 : false);
+    const wt = WXM[m], tot = wt.reduce((a, b) => a + b, 0); let acc = 0, base = 0; for (let i = 0; i < 6; i++) { acc += wt[i] / tot; if (u3 < acc) { base = i; break; } }
+    let ph;
+    if (typ) ph = ['typhoon', 'typhoon', 'typhoon']; else if (heavy) ph = ['heavy', 'heavy', 'heavy'];
+    else {
+      const id = WXORD[base]; ph = [id, id, id]; const i0 = Math.min(3, base);
+      if (base === 5) { ph = ['mist', 'cloud', 'cloud']; }
+      else {
+        if (s1 < 0.25 && i0 > 0) ph[0] = WXORD[i0 - 1]; else if (s1 > 0.85 && i0 < 3) ph[0] = WXORD[i0 + 1];
+        if (s2 < 0.2 && i0 > 0) ph[2] = WXORD[i0 - 1]; else if (s2 > 0.8 && i0 < 3) ph[2] = WXORD[i0 + 1];
+        if ((m === 7 || m === 8) && (id === 'sun' || id === 'cloud') && th < 0.35) ph[1] = 'storm';   // 夏季午後雷陣雨
+        if (s3 < 0.15 && id !== 'sun') ph[2] = 'over';
+      }
+    }
+    const sunny = ph[1] === 'sun' ? 2 : ph[1] === 'storm' || ph[1] === 'drizzle' ? -2 : 0, temp = Math.round(WXT[m] + sunny + (cold ? -6 : 0) + (typ ? -2 : 0) + Math.round((u4 - 0.5) * 5));
+    return { key, ph, ext: typ ? 'typhoon' : heavy ? 'heavy' : null, cold, temp };
+  }
+  const wxPhase = () => { const h = L.clock ? L.clock.h : 8; return h < 12 ? 0 : h < 18 ? 1 : 2; };
+  const wxCur = () => { const w = wxOf(wxToday()), id = wxForce || w.ph[wxPhase()]; return Object.assign({ id, w }, WXS[id]); };
+  const typhoonNow = () => { const c = wxCur(); return c.id === 'typhoon'; };
+  const rainNow = () => { const c = wxCur(); return c.rain > 0; };
+  /* 假期：暑假 7/1–8/31、寒假 2/1–2/21 */
+  function vacOf(d) {
+    const y = d.getFullYear(), m = d.getMonth() + 1, dd = d.getDate();
+    if (m === 7 || m === 8) { const day = (m === 7 ? dd : 31 + dd); return { id: 'summer', name: '暑假', ic: '🏖️', hw: '暑假作業', day, total: 62, left: 62 - day, key: 'summer' + y, badge: '🏖 暑假達人', need: 30 }; }
+    if (m === 2 && dd <= 21) return { id: 'winter', name: '寒假', ic: '⛄', hw: '寒假作業', day: dd, total: 21, left: 21 - dd, key: 'winter' + y, badge: '⛄ 寒假達人', need: 14 };
+    return null;
+  }
+  const vacNow = () => vacOf(wxToday());
+  const jobMax = () => JOBMAX + (vacNow() ? 2 : 0);
+  /* 畫面：暗角、霧、雨、閃電 */
+  const wxEl = mkEl('div', 'gWx'), rainCv = mkEl('canvas', 'gRain'), wxChip = mkEl('button', 'gWxChip');
+  wxChip.type = 'button';
+  const WXST = { dark: 0, white: 0, rain: 0, slant: 0, fn: 160, ff: 900, flash: 0, th: 0, nextTh: 6, wind: 0, drops: [] };
+  function wxResize() { rainCv.width = innerWidth; rainCv.height = innerHeight; }
+  addEventListener('resize', wxResize); wxResize();
+  let wxLast = 0, wxAcc = 0, wxId = '', wxVacKey = '';
+  function wxFrame(now) {
+    requestAnimationFrame(wxFrame);
+    const dt = Math.min(0.1, (now - wxLast) / 1000); wxLast = now; if (document.hidden) return;
+    const intro = document.body.classList.contains('intro'), c = wxCur(), st = WXST, k = Math.min(1, dt * 1.6), tg = intro ? WXS.sun : c;
+    st.dark += (tg.dark - st.dark) * k; st.white += ((tg.white || 0) - st.white) * k; st.rain += (tg.rain - st.rain) * k; st.slant += (tg.slant - st.slant) * k; st.wind += ((tg.wind || 0) - st.wind) * k;
+    st.fn += (tg.fog[0] - st.fn) * k; st.ff += (tg.fog[1] - st.ff) * k; st.th = tg.th;
+    if (scene.fog && (c.id !== 'sun' || Math.abs(scene.fog.far - 900) > 2 || Math.abs(st.ff - 900) > 2)) { scene.fog.near = st.fn; scene.fog.far = st.ff; }
+    const nightK = typeof isNight !== 'undefined' && isNight ? 0.6 : 1;
+    wxEl.style.background = 'rgba(' + (st.white > 0.02 ? '225,232,240' : '28,38,58') + ',' + (st.white > 0.02 ? st.white : st.dark * nightK).toFixed(3) + ')';
+    wxEl.style.boxShadow = st.wind > 0.05 ? 'inset 0 0 ' + Math.round(st.wind * 140) + 'px rgba(10,20,40,' + (0.3 * st.wind).toFixed(2) + ')' : 'none';
+    /* 閃電 */
+    if (st.th > 0 && !intro) { st.nextTh -= dt * st.th; if (st.nextTh <= 0) { st.nextTh = 7 + Math.random() * 9; st.flash = 1; const dl = 0.35 + Math.random() * 1.4; setTimeout(() => { try { SFX.play('thunder', 800); } catch (e) { /* 忽略 */ } }, dl * 1000); if (Math.random() < 0.5) setTimeout(() => { st.flash = 0.8; }, 140); } }
+    st.flash = Math.max(0, st.flash - dt * 3);
+    wxEl.style.setProperty('--fl', st.flash.toFixed(3));
+    /* 雨 */
+    const cx = rainCv.getContext('2d'); if (st.rainOn || st.rain > 0.02) cx.clearRect(0, 0, rainCv.width, rainCv.height); st.rainOn = st.rain > 0.02 && !intro;
+    if (st.rain > 0.02 && !intro) {
+      const want = Math.min(360, Math.round(st.rain * 150)), W = rainCv.width, H = rainCv.height, dr = st.drops;
+      while (dr.length < want) dr.push({ x: Math.random() * (W + 200) - 100, y: Math.random() * H, l: 10 + Math.random() * 16, v: 700 + Math.random() * 500, a: 0.25 + Math.random() * 0.4 });
+      if (dr.length > want) dr.length = want;
+      cx.lineWidth = 1.2; const sl = st.slant;
+      dr.forEach(p => { p.y += p.v * dt * (0.8 + st.rain * 0.3); p.x += p.v * dt * sl * 0.9; if (p.y > H) { p.y = -20; p.x = Math.random() * (W + 200) - 100; } cx.strokeStyle = 'rgba(205,220,240,' + p.a.toFixed(2) + ')'; cx.beginPath(); cx.moveTo(p.x, p.y); cx.lineTo(p.x + p.l * sl, p.y + p.l); cx.stroke(); });
+    }
+    /* 移動速度、環境音、標籤 */
+    window.__spd = intro ? 1 : c.spd;
+    wxAcc += dt; if (wxAcc > 0.8) { wxAcc = 0; wxUi(c, intro); }
+  }
+  function wxUi(c, intro) {
+    const v = vacNow(), vk = v ? v.id : '', night = typeof isNight !== 'undefined' && isNight;
+    try { SFX.amb(intro || !L.ready ? {} : { rain: Math.min(1.4, WXST.rain), wind: WXST.wind + (WXST.rain > 1 ? 0.2 : 0), cic: v && v.id === 'summer' && !night && WXST.rain < 0.3 ? 1 : 0 }); } catch (e) { /* 忽略 */ }
+    const sig = c.id + '|' + vk + '|' + (v ? v.day : 0) + '|' + c.w.temp + '|' + (c.w.cold ? 1 : 0);
+    if (wxChip.dataset.sig !== sig) {
+      wxChip.dataset.sig = sig; wxChip.className = c.ext ? 'ext' : '';
+      wxChip.innerHTML = '<span>' + c.ic + '</span><b>' + c.w.temp + '°</b>' + (c.w.cold ? '<i>🥶</i>' : '') + (v ? '<em>' + v.ic + '</em>' : '');
+      wxChip.title = c.n + ' ' + c.w.temp + '°C' + (v ? '・' + v.name : '');
+    }
+    if (c.id !== wxId) {
+      const first = wxId === ''; wxId = c.id;
+      if (!first && !intro) wxAnnounce(c, false);
+    }
+  }
+  function wxAnnounce(c, first) {
+    const v = vacNow(); let m = '';
+    if (c.id === 'typhoon') m = '🌀 颱風假！今天停止上班上課，戶外風雨很大，跑跳都變慢了。待在安全的地方，打工與市場今天休息。';
+    else if (c.id === 'heavy') m = '🌧️ 豪雨特報！雨勢很大、路面積水，移動會變慢，也要小心雷擊。';
+    else if (c.id === 'storm') m = '⛈️ 雷雨來了，記得躲雨！（雨天澆花不用水桶）';
+    else if (c.id === 'drizzle') m = '🌦️ 下起小雨了。（雨天澆花不用水桶）';
+    else if (c.id === 'mist') m = '🌫️ 起霧了，遠方看不太清楚。';
+    else if (c.id === 'over') m = '☁️ 天空變陰了。';
+    else if (c.id === 'sun' && !first) m = '☀️ 天氣放晴了！';
+    else if (c.id === 'cloud' && !first) m = '⛅ 雲變多了。';
+    if (c.w.cold && first) m += (m ? '\n' : '') + '🥶 今天有寒流，氣溫 ' + c.w.temp + '°C，出門要穿暖一點。';
+    if (first && v) m = v.ic + ' ' + v.name + '第 ' + v.day + ' 天（還有 ' + v.left + ' 天）！' + (m ? '\n' + m : '') + '\n背包的「' + v.hw + '」每天做完有獎勵，假期打工班數 +2。';
+    if (m) toast(m, c.ext ? 6500 : 4500);
+  }
+  requestAnimationFrame(wxFrame);
+  { let done = false; const iv = setInterval(() => { if (done || document.body.classList.contains('intro') || !L.ready) return; if (typeof opActive !== 'undefined' && opActive) return; done = true; clearInterval(iv); setTimeout(() => wxAnnounce(wxCur(), true), 1800); }, 1000); }
+  /* 氣象站（點右上角天氣標籤） */
+  function wxStation() {
+    if (opActive || dlgOpen) return; const d0 = wxToday(), c = wxCur(), v = vacNow(), PH = ['上午', '下午', '晚間'], wd = ['日', '一', '二', '三', '四', '五', '六'];
+    let tx = '現在：' + c.ic + c.n + '　' + c.w.temp + '°C' + (c.w.cold ? '　🥶 寒流' : '') + '\n今天：' + c.w.ph.map((p, i) => PH[i] + WXS[p].ic).join('　') + '\n';
+    if (c.ext) tx += '⚠️ ' + (c.id === 'typhoon' ? '颱風假：停止上班上課，打工與市場休息，移動速度大減' : '豪雨特報：移動變慢、小心雷擊與積水') + '\n';
+    tx += '\n未來三天：\n';
+    for (let i = 1; i <= 3; i++) { const d = dAdd(d0, i), w = wxOf(d); tx += (d.getMonth() + 1) + '/' + d.getDate() + '（' + wd[d.getDay()] + '）' + WXS[w.ph[1]].ic + WXS[w.ph[1]].n + ' ' + w.temp + '°' + (w.ext === 'typhoon' ? '　🌀預報颱風假' : w.ext ? '　⚠豪雨特報' : '') + (w.cold ? '　🥶寒流' : '') + '\n'; }
+    const nv = (() => { if (v) return null; for (let i = 1; i <= 366; i++) { const x = dAdd(d0, i), y = vacOf(x); if (y) return { n: y.name, i }; } return null; })();
+    tx += '\n' + (v ? v.ic + v.name + '第 ' + v.day + ' 天（剩 ' + v.left + ' 天）' : nv ? '📅 距離下次放假（' + nv.n + '）還有 ' + nv.i + ' 天' : '');
+    const bt = [{ label: '🛡 防災小學堂', pri: !!c.ext, fn: () => setTimeout(disasterQuiz, 120) }];
+    if (v) bt.unshift({ label: '📓 ' + v.hw, pri: true, fn: () => setTimeout(hwBook, 120) });
+    bt.push({ label: '關閉' });
+    say('🌤 校園氣象站', tx, bt, AV(0));
+  }
+  wxChip.addEventListener('click', wxStation);
+  /* 防災小學堂：颱風／豪雨知識問答（每個災害日第一次通關有獎勵；平常也能練習） */
+  const DQ = {
+    typ: [
+      ['颱風來臨前，下列哪一項準備最適合？', '準備手電筒、乾糧與飲用水', ['把所有門窗打開通風', '到海邊看大浪', '把腳踏車停在溪邊']],
+      ['颱風天最應該避免做什麼？', '到溪邊、海邊看浪', ['待在室內看氣象', '關緊門窗', '準備備用電池']],
+      ['學校是否因颱風停止上課，由誰宣布？', '各縣市政府', ['學校同學投票', '便利商店', '路上的行人']],
+      ['停電時用手電筒比蠟燭安全，主要是因為？', '不會引起火災', ['比較便宜', '比較亮到刺眼', '可以煮東西']],
+      ['強風時走在路上，要遠離什麼？', '招牌、樹木與電線桿', ['學校的牆壁內側', '有遮蔽的騎樓', '室內的走廊']],
+      ['颱風過後看到路上掉落的電線，該怎麼辦？', '不要碰，遠離並通報（119 或台電 1911）', ['撿起來看看', '用樹枝挑開', '拍照後踩過去']],
+      ['颱風前，陽台的盆栽應該怎麼處理？', '搬進室內或固定好', ['留在欄杆上', '全部擺到最外側', '用盆栽擋住門']],
+      ['看氣象署的「颱風路徑潛勢預報」，是為了知道什麼？', '颱風可能經過的地方與時間', ['今天午餐吃什麼', '誰的成績最好', '手機有幾格電']]
+    ],
+    rain: [
+      ['豪大雨時，前方地下道積水，應該怎麼做？', '不要硬闖，改走其他路', ['加速衝過去', '騎車比較快過', '在裡面等雨停']],
+      ['打雷時在空曠的操場，最安全的做法是？', '立刻進入建築物避雷', ['撐著金屬傘繼續走', '躲在大樹下', '繼續打球']],
+      ['接獲「土石流警戒」時，應該怎麼辦？', '往高處、垂直溪流方向撤離', ['沿著溪流往下游跑', '留在河邊看', '躲在地下室']],
+      ['水已淹到膝蓋以上，徒步通行很危險，是因為？', '水流與暗溝可能把人沖倒', ['鞋子會變重', '會弄髒衣服', '會變得比較矮']],
+      ['雨季前，學校和家裡應該先做什麼？', '清理排水溝與落水管', ['把排水孔堵起來', '多堆放雜物', '把水桶倒滿垃圾']]
+    ]
+  };
+  function disasterQuiz() {
+    if (opActive || dlgOpen) return; const c = wxCur(), kind = c.id === 'heavy' ? 'rain' : c.id === 'typhoon' ? 'typ' : (rng('dqk' + realKey(wxToday()))() < 0.5 ? 'typ' : 'rain'), pool = (DQ[kind].concat(kind === 'rain' ? DQ.typ.slice(0, 2) : [])), qs = shuffled(pool, Math.random).slice(0, 5);
+    S.wx = S.wx || { dq: {} }; const k = realKey(wxToday()), first = c.ext && !S.wx.dq[k]; let i = 0, ok = 0;
+    const next = () => {
+      if (i >= qs.length) {
+        const pass = ok >= 4; let msg = '答對 ' + ok + ' / 5 題。' + (pass ? '\n你很懂得保護自己和大家！' : '\n再複習一下，下次一定更好！');
+        if (pass && first) { S.wx.dq[k] = 1; addPts(25, '防災小學堂通關'); S.coin = (S.coin || 0) + 30; msg += '\n🎁 災害日獎勵：+25 點、🪙+30'; if (!S.badges.includes('🛡 防災小達人')) { S.badges.push('🛡 防災小達人'); msg += '\n🏅 獲得徽章「防災小達人」'; } save(); refreshAll(); }
+        else if (pass && c.ext) msg += '\n（今天的獎勵已經領過囉）'; else if (pass) msg += '\n（颱風假或豪雨特報當天通關才有獎勵，平常可以當練習）';
+        say('🛡 防災小學堂', msg, [{ label: '再練習一次', fn: () => setTimeout(disasterQuiz, 120) }, { label: '結束' }], AV(0)); return;
+      }
+      const q = qs[i]; const opts = shuffled([q[1]].concat(q[2]), Math.random);
+      say('🛡 防災小學堂（' + (i + 1) + '/5）', q[0], opts.map(o => ({ label: o, fn: () => { const g = o === q[1]; if (g) ok++; toast(g ? '✅ 答對了！' : '❌ 正確答案：' + q[1], 2200); i++; setTimeout(next, 350); } })), AV(0));
+    };
+    next();
+  }
+  /* 假期作業本：每天三件小任務（閱讀、運動、日記） */
+  const HWQ = [
+    ['台灣最高的山是？', '玉山', ['阿里山', '合歡山', '雪山']], ['光合作用需要什麼才能進行？', '陽光、水與二氧化碳', ['月光與沙子', '只要糖', '鹽與油']], ['「一日之計在於晨」的意思最接近？', '早晨是做事的好時機', ['晚上才能讀書', '早餐要吃很久', '一天只有早上']],
+    ['蘭陽平原位在哪個縣市？', '宜蘭縣', ['花蓮縣', '苗栗縣', '澎湖縣']], ['水結成冰會發生什麼變化？', '體積變大', ['體積變小', '變成氣體', '變成油']], ['下列哪個是再生能源？', '太陽能', ['煤炭', '石油', '天然氣']],
+    ['地球繞太陽一圈大約要多久？', '一年', ['一天', '一個月', '十年']], ['「守株待兔」告訴我們什麼？', '不要只靠運氣，要努力', ['兔子很笨', '樹很重要', '要多種樹']], ['台灣有一座離島在福建沿海外，它是？', '金門縣', ['宜蘭縣', '桃園市', '嘉義縣']],
+    ['人體最大的器官是？', '皮膚', ['心臟', '胃', '大腦']], ['下列哪一種動作可以減少垃圾？', '自備環保杯與餐具', ['每次用新的塑膠袋', '把垃圾丟到河裡', '多買不用的東西']], ['夏天運動後最好補充什麼？', '白開水', ['大量含糖飲料', '熱湯', '咖啡']]
+  ];
+  const HWMOOD = [['😄', '好開心'], ['😌', '很平靜'], ['🤩', '超期待'], ['😴', '有點累']], HWSENT = ['今天我學到新的事情。', '今天我幫忙了家人或朋友。', '今天我完成了自己的目標。'];
+  function hwOf(v) { S.vac = S.vac || {}; const r = S.vac[v.key] || (S.vac[v.key] = { days: {}, diary: [], rw: 0 }); return r; }
+  function hwFull(r) { return Object.keys(r.days).filter(k => r.days[k] === 7).length; }
+  function hwBook() {
+    if (opActive || dlgOpen) return; const v = vacNow(); if (!v) { toast('現在不是假期，沒有作業本', 2400); return; }
+    const r = hwOf(v), dk = realKey(wxToday()), b = r.days[dk] || 0, full = hwFull(r), last = r.diary.slice(-2).map(x => x.m + ' ' + x.t).join('\n');
+    say('📓 ' + v.hw + '（第 ' + v.day + ' 天）', '今天的進度：' + ((b & 1) ? '✅' : '⬜') + '閱讀　' + ((b & 2) ? '✅' : '⬜') + '運動　' + ((b & 4) ? '✅' : '⬜') + '日記\n每項 +8 點、全做完再 +15 點。已全勤 ' + full + ' 天（' + v.need + ' 天得「' + v.badge + '」徽章；每 7 天送一本初級經驗書）。' + (last ? '\n\n最近的日記：\n' + last : ''),
+      [{ label: (b & 1 ? '✅' : '📖') + ' 閱讀', fn: () => setTimeout(() => hwDo(v, 1), 120) }, { label: (b & 2 ? '✅' : '🏃') + ' 運動', fn: () => setTimeout(() => hwDo(v, 2), 120) }, { label: (b & 4 ? '✅' : '✍️') + ' 日記', fn: () => setTimeout(() => hwDo(v, 4), 120) }, { label: '關閉' }], AV(0));
+  }
+  function hwDone(v, bit) {
+    const r = hwOf(v), dk = realKey(wxToday()); const before = r.days[dk] || 0; r.days[dk] = before | bit;
+    addPts(8, v.hw + '：' + (bit === 1 ? '閱讀' : bit === 2 ? '運動' : '日記')); let extra = '';
+    if (r.days[dk] === 7 && before !== 7) { addPts(15, v.hw + '今日全勤'); S.coin = (S.coin || 0) + 10; const f = hwFull(r); if (f % 7 === 0) { matAdd('book', 1); extra += '\n🎁 全勤滿 ' + f + ' 天：初級經驗書 ×1'; } if (f >= v.need && !S.badges.includes(v.badge)) { S.badges.push(v.badge); extra += '\n🏅 獲得徽章「' + v.badge + '」！'; } }
+    save(); refreshAll(); if (extra) toast(extra.trim(), 5000);
+  }
+  function hwDo(v, bit) {
+    const r = hwOf(v), dk = realKey(wxToday()), b = r.days[dk] || 0;
+    if (b & bit) { toast('這一項今天已經完成囉', 1800); setTimeout(hwBook, 300); return; }
+    if (bit === 1) {
+      const q = HWQ[Math.floor(rng('hw' + dk)() * HWQ.length)], opts = shuffled([q[1]].concat(q[2]), Math.random);
+      say('📖 閱讀小測驗', q[0], opts.map(o => ({ label: o, fn: () => { if (o === q[1]) { toast('✅ 答對了！', 1500); hwDone(v, 1); setTimeout(hwBook, 500); } else { toast('❌ 再想想看', 1800); setTimeout(() => hwDo(v, 1), 400); } } })), AV(4));
+    } else if (bit === 2) {
+      opActive = true; let n = 0, t = 6, fin = false; const el = mkEl('div', 'gHwSp'); el.innerHTML = '<div class="bx"><div class="big">🏃 運動時間！</div><p>在 6 秒內連點 <b>20</b> 下！</p><button type="button" class="tp">跑！</button><div class="cnt">0 / 20　⏱ 6</div></div>';
+      const cnt = el.querySelector('.cnt'), end = ok => { if (fin) return; fin = true; clearInterval(iv); el.remove(); opActive = false; if (ok) { toast('💪 運動完成！', 1800); hwDone(v, 2); } else toast('差一點點，再試一次！', 2000); setTimeout(hwBook, 500); };
+      el.querySelector('.tp').onclick = () => { n++; SFX.play('click', 20); cnt.textContent = n + ' / 20　⏱ ' + t; if (n >= 20) end(true); };
+      const iv = setInterval(() => { t--; cnt.textContent = n + ' / 20　⏱ ' + Math.max(0, t); if (t <= 0) end(n >= 20); }, 1000);
+    } else {
+      say('✍️ 今天的日記', '今天心情如何？', HWMOOD.map(m => ({ label: m[0] + ' ' + m[1], fn: () => setTimeout(() => say('✍️ 今天的日記', '選一句話記下來：', HWSENT.map(t => ({ label: t, fn: () => { r.diary.push({ d: dk, m: m[0], t: t }); if (r.diary.length > 30) r.diary.shift(); toast('📝 日記寫好了', 1500); hwDone(v, 4); setTimeout(hwBook, 500); } })), AV(0)), 120) })), AV(0));
+    }
+  }
+  L.wx = { setDate: d => { wxDate = d ? new Date(d) : null; wxId = ''; }, force: id => { wxForce = id || null; }, cur: wxCur, of: wxOf, vacOf, vac: vacNow, forecast: n => wxOf(dAdd(wxToday(), n)), station: wxStation, quiz: disasterQuiz, hw: hwBook, state: WXST, isTyp, DQ, HWQ };
   /* ---------- 開場劇情＋新手教學＋回合制戰鬥 ---------- */
   let opActive = false, opSkip = false, opWait = null, opAu = null;
   const opEl = mkEl('div', 'gOp'), riftEl = mkEl('div', 'gRift'), batEl = mkEl('div', 'gBat'), tutEl = mkEl('div', 'gTut'), sloEl = mkEl('div', 'gSlo');
@@ -9710,20 +9936,20 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     });
   }
   async function doJob(id) {
-    if (opActive) return; const j = jobS(), job = JOBS.find(x => x.id === id);
+    if (opActive) return; if (typhoonNow()) { toast('🌀 颱風假，打工休息', 2400); return; } const j = jobS(), job = JOBS.find(x => x.id === id);
     if (lvOf() < job.lv) { toast('🔒 需要 LV.' + job.lv + ' 才能做這份工作', 2400); return; }
-    if (j.n >= JOBMAX) { say('📋 打工布告欄', '今天的體力用完了（每個遊戲日最多 ' + JOBMAX + ' 班），明天再來吧！', [{ label: '好' }], AV(0)); return; }
+    if (j.n >= jobMax()) { say('📋 打工布告欄', '今天的體力用完了（每個遊戲日最多 ' + jobMax() + ' 班），明天再來吧！', [{ label: '好' }], AV(0)); return; }
     opActive = true; let r; try { r = await jobRun(id); } finally { opActive = false; }
     if (r < 0) { toast('中途離開，沒有薪水喔', 2200); return; }
     r = Math.max(0, Math.min(1, r));
-    j.n++; j.t = (j.t || 0) + 1; const bonus = job.bonus.indexOf(pastOf()) >= 0 ? 1.3 : 1, rk0 = jRank((j.t || 1) - 1), pay = Math.max(4, Math.round(job.base * r * bonus * rk0[2])), rk1 = jRank(j.t);
+    j.n++; j.t = (j.t || 0) + 1; const bonus = job.bonus.indexOf(pastOf()) >= 0 ? 1.3 : 1, rk0 = jRank((j.t || 1) - 1), aft = isTyp(dAdd(wxToday(), -1)) ? 1.2 : 1, pay = Math.max(4, Math.round(job.base * r * bonus * rk0[2] * aft)), rk1 = jRank(j.t);
     S.coin = (S.coin || 0) + pay; addPts(5, '打工：' + job.n.slice(2)); save(); refreshAll();
-    say(job.n + ' 下班！', (r >= 0.9 ? '表現超棒！' : r >= 0.5 ? '做得不錯！' : '下次再加油！') + '\n成績 ' + Math.round(r * 100) + ' 分，薪水 🪙' + pay + (bonus > 1 ? '（天賦加成 +30%）' : '') + (rk0[2] > 1 ? '（' + rk0[1] + ' +' + Math.round((rk0[2] - 1) * 100) + '%）' : '') + (rk1[0] > rk0[0] ? '\n🎉 晉升為「' + rk1[1] + '」！之後薪水 +' + Math.round((rk1[2] - 1) * 100) + '%' : '') + '\n今日剩餘班數：' + (JOBMAX - j.n) + '　累計打工 ' + j.t + ' 班',
+    say(job.n + ' 下班！', (r >= 0.9 ? '表現超棒！' : r >= 0.5 ? '做得不錯！' : '下次再加油！') + '\n成績 ' + Math.round(r * 100) + ' 分，薪水 🪙' + pay + (bonus > 1 ? '（天賦加成 +30%）' : '') + (aft > 1 ? '（颱風災後復原加成 +20%）' : '') + (rk0[2] > 1 ? '（' + rk0[1] + ' +' + Math.round((rk0[2] - 1) * 100) + '%）' : '') + (rk1[0] > rk0[0] ? '\n🎉 晉升為「' + rk1[1] + '」！之後薪水 +' + Math.round((rk1[2] - 1) * 100) + '%' : '') + '\n今日剩餘班數：' + (jobMax() - j.n) + '　累計打工 ' + j.t + ' 班',
       [{ label: '再來一班', pri: true, fn: () => setTimeout(jobBoard, 150) }, { label: '下班' }], AV(pastOf() >= 0 ? pastOf() : 0));
   }
   function jobBoard() {
-    if (opActive || dlgOpen) return; const j = jobS(), rk = jRank(j.t || 0), nx = JRANK.find(x => x[0] > (j.t || 0)), lv = lvOf();
-    say('📋 校園打工布告欄', '賺代幣，到「跳蚤市場」換好東西！\n今日班數：' + j.n + ' / ' + JOBMAX + '　🪙' + (S.coin || 0) + '\n資歷：' + rk[1] + (rk[2] > 1 ? '（薪水 +' + Math.round((rk[2] - 1) * 100) + '%）' : '') + '・累計 ' + (j.t || 0) + ' 班' + (nx ? '（再 ' + (nx[0] - (j.t || 0)) + ' 班升「' + nx[1] + '」）' : '') + '\n工作分四級：初級 LV.1、中級 LV.10、高級 LV.30、特級 LV.60；級別越高時薪越高。',
+    if (opActive || dlgOpen) return; if (typhoonNow()) { say('📋 校園打工布告欄', '🌀 颱風假，今天停止上班上課，打工休息。\n（可以到氣象站玩「防災小學堂」，通關有獎勵！）', [{ label: '🌤 氣象站', fn: () => setTimeout(wxStation, 120) }, { label: '關閉' }], AV(0)); return; } const j = jobS(), rk = jRank(j.t || 0), nx = JRANK.find(x => x[0] > (j.t || 0)), lv = lvOf();
+    say('📋 校園打工布告欄', '賺代幣，到「跳蚤市場」換好東西！\n今日班數：' + j.n + ' / ' + jobMax() + '　🪙' + (S.coin || 0) + '\n資歷：' + rk[1] + (rk[2] > 1 ? '（薪水 +' + Math.round((rk[2] - 1) * 100) + '%）' : '') + '・累計 ' + (j.t || 0) + ' 班' + (nx ? '（再 ' + (nx[0] - (j.t || 0)) + ' 班升「' + nx[1] + '」）' : '') + '\n工作分四級：初級 LV.1、中級 LV.10、高級 LV.30、特級 LV.60；級別越高時薪越高。',
       JOBS.map(x => ({ label: (lv >= x.lv ? '' : '🔒LV.' + x.lv + ' ') + JTIER[x.tier] + '｜' + x.n + '｜時薪約 🪙' + x.base, fn: () => setTimeout(() => { if (lv < x.lv) { say(x.n, '🔒 需要 LV.' + x.lv + ' 才能做這份工作（你目前 LV.' + lv + '）。\n' + x.d, [{ label: '返回', fn: () => setTimeout(jobBoard, 120) }], AV(0)); return; } say(x.n, x.d + '\n級別：' + JTIER[x.tier] + '　基本時薪 🪙' + x.base + '\n天賦加成：' + x.bn, [{ label: '開始上班', pri: true, fn: () => setTimeout(() => doJob(x.id), 120) }, { label: '返回', fn: () => setTimeout(jobBoard, 120) }], AV(0)); }, 120) })).concat([{ label: '關閉' }]), AV(0));
   }
   const MK = [
@@ -9739,7 +9965,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const spec = () => { let h = 0; String(dayKey()).split('').forEach(c => { h = (h * 31 + c.charCodeAt(0)) % 9973; }); return MK[1 + h % (MK.length - 1)].id; };
   const mkPrice = m => Math.round(m.p * (m.id === spec() ? 0.7 : 1));
   function market() {
-    if (opActive || dlgOpen) return; const m = mkS();
+    if (opActive || dlgOpen) return; if (typhoonNow()) { say('🛒 同樂跳蚤市場', '🌀 颱風假，今天休市。明天再來吧！', [{ label: '關閉' }], AV(3)); return; } const m = mkS();
     say('🛒 同樂跳蚤市場', '歡迎光臨！每個遊戲日更新限量與特價。\n🪙' + (S.coin || 0) + '　材料：' + matStr() + '\n今日特價：' + MK.find(x => x.id === spec()).n + '（7 折）',
       MK.map(x => { const left = x.lim - (m.b[x.id] || 0); return { label: x.n + '｜🪙' + mkPrice(x) + (x.id === spec() ? ' 🔥特價' : '') + (x.lim < 99 ? '｜剩 ' + left : ''), fn: () => setTimeout(() => buy(x), 120) }; }).concat([{ label: '💰 賣出多餘材料', fn: () => setTimeout(sellMenu, 120) }, { label: '關閉' }]), AV(3));
   }
