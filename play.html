@@ -8129,7 +8129,9 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   ];
   const CP = () => { if (!S.comp || !Array.isArray(S.comp.have)) S.comp = { have: ['tbot'], active: 'tbot' }; if (!S.comp.have.includes('tbot')) S.comp.have.push('tbot'); if (!S.met) S.met = []; return S.comp; };
   const compOn = id => { const c = S.comp; return !!(c && c.active === id && c.have && c.have.includes(id) && csOf(id).full > 0); };
-  const compImg = (c, t) => { const a = window.__tlCompanions && window.__tlCompanions[c.i]; return a ? a[t === undefined ? level() : t] || '' : ''; };
+  const compImg = (c, t) => { const a = window.__tlCompanions && window.__tlCompanions[c.i]; return a ? a[t === undefined ? Math.min(4, cStage(c.id)) : t] || '' : ''; };
+  function cStage(id) { return (S.cs && S.cs[id] && S.cs[id].evo) || 0; }
+  const STG_COL = ['#9aa3a8', '#2e9b45', '#e0a200', '#6a3fd0', '#e0562d'];
   function checkComps() {
     if (!L.ready) return; const c = CP(); let got = null;
     COMPS.forEach(x => { if (!c.have.includes(x.id) && x.ok()) { c.have.push(x.id); got = x; } });
@@ -8139,11 +8141,11 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
   /* 跟隨精靈：圓形頭像貼圖（依目前階級換圖） */
   let cSp = null, cKey = '', cTex = null;
   function applyComp() {
-    if (!L.ready) return; const c = CP(), x = COMPS.find(q => q.id === c.active), key = x ? x.id + ':' + level() : '';
+    if (!L.ready) return; const c = CP(), x = COMPS.find(q => q.id === c.active), key = x ? x.id + ':' + cStage(x.id) : '';
     if (!x) { if (cSp) cSp.visible = false; cKey = ''; return; }
     if (key === cKey && cSp) { cSp.visible = true; return; }
     cKey = key; const cv = document.createElement('canvas'); cv.width = cv.height = 128; const g = cv.getContext('2d');
-    const draw = im => { g.clearRect(0, 0, 128, 128); g.save(); g.beginPath(); g.arc(64, 64, 58, 0, 7); g.clip(); g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); if (im) g.drawImage(im, 0, 0, 128, 128); g.restore(); g.lineWidth = 7; g.strokeStyle = TIERS[level()][4]; g.beginPath(); g.arc(64, 64, 58, 0, 7); g.stroke(); };
+    const draw = im => { g.clearRect(0, 0, 128, 128); g.save(); g.beginPath(); g.arc(64, 64, 58, 0, 7); g.clip(); g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); if (im) g.drawImage(im, 0, 0, 128, 128); g.restore(); g.lineWidth = 7; g.strokeStyle = STG_COL[cStage(x.id)]; g.beginPath(); g.arc(64, 64, 58, 0, 7); g.stroke(); };
     draw(null); const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding;
     const src = compImg(x); if (src) { const im = new Image(); im.onload = () => { if (cKey === key) { draw(im); tex.needsUpdate = true; } }; im.src = src; }
     if (!cSp) { cSp = sprite(tex, [0.85, 0.85], PL.x, PL.y + 1.2, PL.z, 29); cSp.userData.first = true; }
@@ -9270,7 +9272,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
           else if (cid === 'tbot') { en = Math.min(100, en + 5 * ev); m = '分析弱點，連攜能量 +' + 5 * ev; }
           else if (cid === 'sprout') { php = Math.min(100, php + 3 * ev); m = '灑下花瓣，隊伍 HP +' + 3 * ev; }
           else { php = Math.min(100, php + 2 * ev); en = Math.min(100, en + 3 * ev); m = '貼心守護，HP +' + 2 * ev + '、能量 +' + 3 * ev; }
-          log = cx.ic + ' ' + CEVO[cid][ev] + ' ' + m + '！'; draw(); await sleep(800);
+          log = '✨'.repeat(ev) + ' ' + cx.ic + ' ' + CEVO[cid][ev] + ' ' + m + '！'; draw(); await sleep(800);
           if (cleared()) { finish(true); return; }
         }
         await foe();
@@ -9563,6 +9565,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     dog: ['汪汪', '守護犬 汪汪', '光輝獵犬 汪汪'], tbot: ['小T', '小T Pro', '小T Ultra'], cat: ['星貓', '月影貓', '星河貓神'], sprout: ['芽芽', '花精靈 芽芽', '世界樹靈 芽芽'], bunny: ['兔兔咪', '月兔 兔兔咪', '月光兔仙']
   };
   const CSUP = { dog: '撲咬敵人（傷害 6×階）', tbot: '分析弱點（連攜能量 +5×階）', cat: '爪擊（傷害 7×階）', sprout: '花瓣治療（隊伍 HP +3×階）', bunny: '貼心守護（HP +2×階、能量 +3×階）' };
+  const CTITLE = { dog: ['忠實小跟班', '森林守護者', '光輝騎士犬'], tbot: ['見習助理', '校園智囊', '同樂最強 AI'], cat: ['夜行小探險家', '月影巡守', '星河貓神'], sprout: ['剛發芽的小花苗', '花園小精靈', '世界樹的守護靈'], bunny: ['害羞小白兔', '月光小跳跳', '月光兔仙子'] };
   const cevo = id => (csOf(id).evo || 0);
   const cname = x => CEVO[x.id][cevo(x.id)];
   const CEVC = [null, { bond: 50, seed: 2, coin: 100, hp: 100, n: '★' }, { bond: 75, seed: 3, coin: 300, purple: 1, shard: 1, hp: 180, n: '★★' }];
@@ -9584,11 +9587,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function compEvoMenu() {
     if (opActive || dlgOpen) return; const have = COMPS.filter(x => CP().have.includes(x.id) && CEVO[x.id]);
     say('🐾 夥伴進化試煉', '好感夠高的夥伴，可以通過「默契測驗＋試煉戰」進化（最高 ★★）。進化後會在戰鬥中主動支援你！\n夥伴同行時才會在戰鬥出手。',
-      have.map(x => ({ label: x.ic + ' ' + cname(x) + '｜好感 ' + Math.round(csOf(x.id).bond) + (cevo(x.id) >= 2 ? '｜已完全進化' : '｜' + CSUP[x.id].split('（')[0]), fn: () => setTimeout(() => compEvoOf(x), 120) })).concat([{ label: '返回', fn: () => setTimeout(workshop, 120) }]), AV(2));
+      have.map(x => ({ label: x.ic + ' ' + cname(x) + '【' + CTITLE[x.id][cevo(x.id)] + '】｜好感 ' + Math.round(csOf(x.id).bond) + (cevo(x.id) >= 2 ? '｜已完全進化' : '｜' + CSUP[x.id].split('（')[0]), fn: () => setTimeout(() => compEvoOf(x), 120) })).concat([{ label: '返回', fn: () => setTimeout(workshop, 120) }]), AV(2));
   }
   async function compEvoOf(x) {
     const st = csOf(x.id), e = cevo(x.id), c = CEVC[e + 1];
-    if (!c) { say('🐾 ' + cname(x), '已經進化到最終型態「' + cname(x) + '」！\n戰鬥支援：' + CSUP[x.id], [{ label: '返回', fn: () => setTimeout(compEvoMenu, 120) }], AV(2)); return; }
+    if (!c) { say('🐾 ' + cname(x), '目前已進化到「' + cname(x) + '」（稱號：' + CTITLE[x.id][e] + '）！\n戰鬥支援：' + CSUP[x.id] + '\n\n🔒 更多進化形態（更華麗的造型與特效）將在 LV100 解鎖，敬請期待！', [{ label: '返回', fn: () => setTimeout(compEvoMenu, 120) }], AV(2)); return; }
     const lack = []; if (st.bond < c.bond) lack.push('好感需 ' + c.bond + '（目前 ' + Math.round(st.bond) + '）'); if (has('seed') < c.seed) lack.push('🌱×' + c.seed + '（有 ' + has('seed') + '）'); if ((S.coin || 0) < c.coin) lack.push('🪙' + c.coin); if (c.purple && has('purple') < c.purple) lack.push('🟣×' + c.purple); if (c.shard && has('shard') < c.shard) lack.push('💠×' + c.shard); if (st.full < 50) lack.push('飽足需 ≥50（先餵牠吃東西）');
     const info = x.ic + ' ' + cname(x) + ' → ' + CEVO[x.id][e + 1] + ' ' + c.n + '\n戰鬥支援：' + CSUP[x.id] + '\n費用：🌱×' + c.seed + (c.purple ? ' 🟣×' + c.purple : '') + (c.shard ? ' 💠×' + c.shard : '') + ' 🪙' + c.coin;
     if (lack.length) { say('🐾 夥伴進化', info + '\n\n尚未達成：\n・' + lack.join('\n・'), [{ label: '返回', fn: () => setTimeout(compEvoMenu, 120) }], AV(2)); return; }
@@ -9600,7 +9603,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       if (!w) await talkSeq([['小T', '默契還不夠喔，多陪陪牠再來吧！', -1]]);
       else { await talkSeq([['小T', '嗶嗶！默契測驗通過。接下來是試煉戰——你和 ' + x.name + ' 一起上！', -1]]); w = await battle({ title: '🐾 夥伴試煉戰', allies: [], enemies: [{ n: '試煉幻影', ic: '👻', hp: c.hp, atk: 5 }] }); }
       riftOff();
-      if (w) { costM('seed', c.seed); if (c.purple) costM('purple', c.purple); if (c.shard) costM('shard', c.shard); S.coin -= c.coin; st.evo = e + 1; st.bond = Math.min(100, st.bond + 5); save(); refreshAll(); if (bagOpen) renderBag(); flashRift(); await talkSeq([['進化！', x.ic + ' ' + x.name + ' 進化為「' + CEVO[x.id][st.evo] + '」' + c.n + '！\n戰鬥支援：' + CSUP[x.id], 2]]); toast('🐾 ' + CEVO[x.id][st.evo] + ' 誕生！（帶著牠出戰才會支援）', 5200); }
+      if (w) { costM('seed', c.seed); if (c.purple) costM('purple', c.purple); if (c.shard) costM('shard', c.shard); S.coin -= c.coin; st.evo = e + 1; st.bond = Math.min(100, st.bond + 5); save(); applyComp(); refreshAll(); if (bagOpen) renderBag(); flashRift(); await talkSeq([['進化！', x.ic + ' ' + x.name + ' 進化為「' + CEVO[x.id][st.evo] + '」' + c.n + '！\n獲得專屬稱號【' + CTITLE[x.id][st.evo] + '】、新造型與光環。\n戰鬥支援：' + CSUP[x.id], 2]]); toast('🐾 ' + CEVO[x.id][st.evo] + ' 誕生！（帶著牠出戰才會支援）', 5200); }
       else toast('試煉失敗，材料沒有消耗，可以再挑戰', 3600);
     } finally { riftOff(); opActive = false; }
   }
