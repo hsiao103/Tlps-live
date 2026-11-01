@@ -8954,7 +8954,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     bagEl.innerHTML = '<div class="pn"><button type="button" class="x" aria-label="關閉">✕</button><div class="top">' + avHtml('bv') + '<div><h3>' + (pa ? pa[1] + ' ' : '') + nm + '</h3><div class="sub" style="margin:0">LV.' + lv + '・' + TIERS[level()][1] + '（' + TIERS[level()][2] + '）・' + TITLES[level()][1] + (pa ? '<br>前世：' + pa[0] + '【' + pa[2] + '】' : '<br>尚未選擇前世身分') + '</div></div></div>' +
       '<div class="vit">' + bar('hp', 'HP', 'bHp') + bar('mp', 'MP', 'bMp') + bar('xp', 'EXP', 'bXp') + '</div>' + radar() +
       '<details class="pvd"><summary>🔓 屬性解鎖資格（' + PRIV.filter(x => S.attr[x[0]] >= x[1]).length + '/' + PRIV.length + '）</summary><div class="pv">' + PRIV.map(x => '<span class="' + (S.attr[x[0]] >= x[1] ? 'ok' : '') + '">' + x[2] + (S.attr[x[0]] >= x[1] ? ' ✅' : '（' + ATTR.find(a => a[0] === x[0])[1] + ' ' + x[1] + '，之後開放）') + '</span>').join('') + '</div></details>' +
-      '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + x.name + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
+      '<div class="sub" style="margin:4px 0 4px">🐾 夥伴（點一下帶著走／再點一下收回）</div><div class="cmp">' + COMPS.map(x => { const have = CP().have.includes(x.id), on = CP().active === x.id, im = compImg(x); return '<button type="button" class="cp' + (on ? ' on' : '') + (have ? '' : ' lk') + '" data-c="' + x.id + '" title="' + x.name + '：' + (have ? x.eff : x.need) + '">' + (im ? '<img src="' + im + '" alt="">' : '<i>' + x.ic + '</i>') + '<b>' + (CEVO[x.id] ? cname(x) : x.name) + '</b><small>' + (have ? (on ? '同行中' : '已加入') : x.prog()) + '</small></button>'; }).join('') + '</div><div class="sub">' + (function () { const x = COMPS.find(q => q.id === CP().active); return x ? x.ic + ' ' + x.name + '：' + x.eff : '尚未帶夥伴'; })() + '</div>' + careHtml() +
       '<div class="row"><button type="button" class="lgb">👻 傳說圖鑑 ' + legendCount() + '/' + LEGENDS.length + '</button><button type="button" class="lgb rpo">🎬 重看開場</button><button type="button" class="lgb syp">🤝 連攜技訓練</button><button type="button" class="lgb rf1">🌀 宇宙裂隙</button><button type="button" class="lgb wks">🔧 同樂工坊</button><button type="button" class="lgb jb2">📋 校園打工</button><button type="button" class="lgb mk2">🛒 跳蚤市場</button></div><div class="row">' + Object.keys(NPCDEF).map(k => { const f = favInfo(k); return '<span>' + NPCDEF[k].tag.split(' ')[0] + ' ' + NPCDEF[k].name.split(' ')[0] + ' ' + '♥'.repeat(f.l) + '♡'.repeat(4 - f.l) + ' ' + f.name + '</span>'; }).join('') + '<span>⏱ 今天已玩 ' + Math.floor((D().play || 0) / 60) + ' 分</span></div>' +
       '<div class="sub" style="margin-bottom:0">🎒 背包（' + items.length + ' / ' + bagCap() + ' 格）　升級會變大</div><div class="grid">' + g + '</div>' +
       '<div class="row"><span>' + (clubOf() ? clubOf().ic + ' ' + clubOf().name + '・' + RANKS[clubRank()][1] + '（活動 ' + S.club.n + ' 次）' : '🎪 未加入社團') + '</span><span>🪣 水桶 ' + S.can + '/' + canMax() + '</span><span>🏅 徽章 ' + S.badges.length + '</span><span>🔥 連續 ' + S.streak + ' 天</span></div>' +
@@ -9262,6 +9262,17 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         const n = party.length - 1; actI = n > 0 ? 1 + Math.floor(Math.random() * n) : -1;
         if (n > 0) { let tot = 0; for (let i = 0; i < n; i++) { const al = alive(); if (!al.length) break; tot += hit(al[Math.floor(Math.random() * al.length)], 8 + Math.floor(Math.random() * 3)); } log = '同伴們一起攻擊，造成 ' + tot + ' 傷害！'; draw(); await sleep(800); }
         if (cleared()) { finish(true); return; }
+        const cid = CP().active, ev = cid ? cevo(cid) : 0;
+        if (cid && ev > 0 && alive().length) {
+          const cx = COMPS.find(q => q.id === cid); let m = '';
+          if (cid === 'dog') { const t2 = alive()[Math.floor(Math.random() * alive().length)]; m = '撲咬 ' + t2.n + '，造成 ' + hit(t2, 6 * ev) + ' 傷害'; }
+          else if (cid === 'cat') { const t2 = alive().sort((a, b) => b.hp - a.hp)[0]; m = '爪擊 ' + t2.n + '，造成 ' + hit(t2, 7 * ev) + ' 傷害'; }
+          else if (cid === 'tbot') { en = Math.min(100, en + 5 * ev); m = '分析弱點，連攜能量 +' + 5 * ev; }
+          else if (cid === 'sprout') { php = Math.min(100, php + 3 * ev); m = '灑下花瓣，隊伍 HP +' + 3 * ev; }
+          else { php = Math.min(100, php + 2 * ev); en = Math.min(100, en + 3 * ev); m = '貼心守護，HP +' + 2 * ev + '、能量 +' + 3 * ev; }
+          log = cx.ic + ' ' + CEVO[cid][ev] + ' ' + m + '！'; draw(); await sleep(800);
+          if (cleared()) { finish(true); return; }
+        }
         await foe();
       }
       async function bossTurn() {
@@ -9392,7 +9403,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (opActive || dlgOpen) return; if (pastOf() < 0) { toast('請先選擇前世身分', 2400); return; }
     const pk = pastOf();
     say('🔧 同樂工坊', '材料：' + matStr() + '　🪙' + (S.coin || 0) + '\n' + GEARS.map(g => g[1] + g[2] + ' Lv' + gearLv(g[0])).join('　') + '\n前世覺醒：' + (S.evo ? '🌟' + evoName(pk) : PASTS[pk][0]) + ' Lv' + awkLv() + '（主動技威力 +' + awkLv() * 25 + '%）',
-      [{ label: '📘 使用初級經驗書（+30 點）', fn: () => setTimeout(useBook, 120) }, { label: '🔩 強化裝備', fn: () => setTimeout(gearMenu, 120) }, { label: '🌱 用芽芽種子餵夥伴', fn: () => setTimeout(feedSeed, 120) }, { label: '💠 前世覺醒', fn: () => setTimeout(awaken, 120) }, { label: '🌟 進化試煉', fn: () => setTimeout(evolveTrial, 120) }, { label: '關閉' }], AV(2));
+      [{ label: '📘 使用初級經驗書（+30 點）', fn: () => setTimeout(useBook, 120) }, { label: '🔩 強化裝備', fn: () => setTimeout(gearMenu, 120) }, { label: '🌱 用芽芽種子餵夥伴', fn: () => setTimeout(feedSeed, 120) }, { label: '💠 前世覺醒', fn: () => setTimeout(awaken, 120) }, { label: '🌟 前世進化試煉', fn: () => setTimeout(evolveTrial, 120) }, { label: '🐾 夥伴進化試煉', fn: () => setTimeout(compEvoMenu, 120) }, { label: '關閉' }], AV(2));
   }
   function useBook() { if (has('book') < 1) { say('同樂工坊', '沒有初級經驗書了。通關「宇宙裂隙」可以獲得！', [{ label: '返回', fn: () => setTimeout(workshop, 120) }], AV(2)); return; } costM('book', 1); addPts(30, '使用初級經驗書'); save(); refreshAll(); setTimeout(workshop, 300); }
   function gearMenu() {
@@ -9547,6 +9558,53 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   const flashRift = () => { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); bell(523, 0); bell(784, 0.15); bell(1047, 0.3); };
   L.evolve = evolveTrial;
+  /* ---------- 夥伴進化試煉 ---------- */
+  const CEVO = {
+    dog: ['汪汪', '守護犬 汪汪', '光輝獵犬 汪汪'], tbot: ['小T', '小T Pro', '小T Ultra'], cat: ['星貓', '月影貓', '星河貓神'], sprout: ['芽芽', '花精靈 芽芽', '世界樹靈 芽芽'], bunny: ['兔兔咪', '月兔 兔兔咪', '月光兔仙']
+  };
+  const CSUP = { dog: '撲咬敵人（傷害 6×階）', tbot: '分析弱點（連攜能量 +5×階）', cat: '爪擊（傷害 7×階）', sprout: '花瓣治療（隊伍 HP +3×階）', bunny: '貼心守護（HP +2×階、能量 +3×階）' };
+  const cevo = id => (csOf(id).evo || 0);
+  const cname = x => CEVO[x.id][cevo(x.id)];
+  const CEVC = [null, { bond: 50, seed: 2, coin: 100, hp: 100, n: '★' }, { bond: 75, seed: 3, coin: 300, purple: 1, shard: 1, hp: 180, n: '★★' }];
+  async function compQuiz(x) {
+    const others = COMPS.filter(q => q.id !== x.id && CARE[q.id]);
+    const sets = [
+      ['最愛吃什麼？', CARE[x.id].food[1], others.map(q => CARE[q.id].food[1])],
+      ['的個性是？', CARE[x.id].tone, others.map(q => CARE[q.id].tone)],
+      ['的特殊能力是？', x.eff, others.map(q => q.eff)]
+    ];
+    let ok = 0;
+    for (let i = 0; i < 3; i++) {
+      const [q, right, wrong] = sets[i], opts = shuffled([right].concat(shuffled(wrong, Math.random).slice(0, 2)), Math.random);
+      const pick = await ask('💞 默契測驗（' + (i + 1) + '/3）', x.ic + ' ' + x.name + q, opts, AV(pastOf() >= 0 ? pastOf() : 0));
+      if (opts[pick] === right) ok++;
+    }
+    return ok >= 2;
+  }
+  function compEvoMenu() {
+    if (opActive || dlgOpen) return; const have = COMPS.filter(x => CP().have.includes(x.id) && CEVO[x.id]);
+    say('🐾 夥伴進化試煉', '好感夠高的夥伴，可以通過「默契測驗＋試煉戰」進化（最高 ★★）。進化後會在戰鬥中主動支援你！\n夥伴同行時才會在戰鬥出手。',
+      have.map(x => ({ label: x.ic + ' ' + cname(x) + '｜好感 ' + Math.round(csOf(x.id).bond) + (cevo(x.id) >= 2 ? '｜已完全進化' : '｜' + CSUP[x.id].split('（')[0]), fn: () => setTimeout(() => compEvoOf(x), 120) })).concat([{ label: '返回', fn: () => setTimeout(workshop, 120) }]), AV(2));
+  }
+  async function compEvoOf(x) {
+    const st = csOf(x.id), e = cevo(x.id), c = CEVC[e + 1];
+    if (!c) { say('🐾 ' + cname(x), '已經進化到最終型態「' + cname(x) + '」！\n戰鬥支援：' + CSUP[x.id], [{ label: '返回', fn: () => setTimeout(compEvoMenu, 120) }], AV(2)); return; }
+    const lack = []; if (st.bond < c.bond) lack.push('好感需 ' + c.bond + '（目前 ' + Math.round(st.bond) + '）'); if (has('seed') < c.seed) lack.push('🌱×' + c.seed + '（有 ' + has('seed') + '）'); if ((S.coin || 0) < c.coin) lack.push('🪙' + c.coin); if (c.purple && has('purple') < c.purple) lack.push('🟣×' + c.purple); if (c.shard && has('shard') < c.shard) lack.push('💠×' + c.shard); if (st.full < 50) lack.push('飽足需 ≥50（先餵牠吃東西）');
+    const info = x.ic + ' ' + cname(x) + ' → ' + CEVO[x.id][e + 1] + ' ' + c.n + '\n戰鬥支援：' + CSUP[x.id] + '\n費用：🌱×' + c.seed + (c.purple ? ' 🟣×' + c.purple : '') + (c.shard ? ' 💠×' + c.shard : '') + ' 🪙' + c.coin;
+    if (lack.length) { say('🐾 夥伴進化', info + '\n\n尚未達成：\n・' + lack.join('\n・'), [{ label: '返回', fn: () => setTimeout(compEvoMenu, 120) }], AV(2)); return; }
+    const go = await ask('🐾 夥伴進化', info + '\n\n先通過默契測驗（3 題對 2 題），再打贏試煉戰。失敗不扣材料。', ['接受試煉', '再準備一下'], AV(2));
+    if (go !== 0) return;
+    opActive = true; opSkip = false; riftOn();
+    try {
+      let w = await compQuiz(x);
+      if (!w) await talkSeq([['小T', '默契還不夠喔，多陪陪牠再來吧！', -1]]);
+      else { await talkSeq([['小T', '嗶嗶！默契測驗通過。接下來是試煉戰——你和 ' + x.name + ' 一起上！', -1]]); w = await battle({ title: '🐾 夥伴試煉戰', allies: [], enemies: [{ n: '試煉幻影', ic: '👻', hp: c.hp, atk: 5 }] }); }
+      riftOff();
+      if (w) { costM('seed', c.seed); if (c.purple) costM('purple', c.purple); if (c.shard) costM('shard', c.shard); S.coin -= c.coin; st.evo = e + 1; st.bond = Math.min(100, st.bond + 5); save(); refreshAll(); if (bagOpen) renderBag(); flashRift(); await talkSeq([['進化！', x.ic + ' ' + x.name + ' 進化為「' + CEVO[x.id][st.evo] + '」' + c.n + '！\n戰鬥支援：' + CSUP[x.id], 2]]); toast('🐾 ' + CEVO[x.id][st.evo] + ' 誕生！（帶著牠出戰才會支援）', 5200); }
+      else toast('試煉失敗，材料沒有消耗，可以再挑戰', 3600);
+    } finally { riftOff(); opActive = false; }
+  }
+  L.compEvo = compEvoMenu;
   /* 開場主流程 */
   async function startOpening(replay) {
     if (opActive || dlgOpen) return; opActive = true; opSkip = false;
