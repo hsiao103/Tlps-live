@@ -9611,11 +9611,21 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   L.workshop = workshop;
   /* ---------- 校園打工＋跳蚤市場（代幣的用途） ---------- */
   const jobEl = mkEl('div', 'gJob');
+  /* 打工分四級（依玩家等級解鎖）：初級 LV.1、中級 LV.10、高級 LV.30、特級 LV.60；時薪基準 24／40／60／100 */
+  const JTIER = ['', '初級', '中級', '高級', '特級'];
   const JOBS = [
-    { id: 'shop', n: '🥤 合作社店員', d: '依客人的需求，挑出正確的商品結帳（5 位客人）', bonus: [1, 2], bn: '偶像・工程師 +30%' },
-    { id: 'lib', n: '📚 圖書館整書', d: '依號碼由小到大，盡快點完所有書（9 本）', bonus: [4], bn: '魔法師 +30%' },
-    { id: 'lunch', n: '🍳 午餐幫手', d: '記住配菜出現的順序，再依序點一次（最多 4 關）', bonus: [3], bn: '廚師 +30%' }
+    { id: 'shop', tier: 1, lv: 1, base: 24, n: '🥤 合作社店員', d: '依客人的需求，挑出正確的商品結帳（5 位客人）', bonus: [1, 2], bn: '偶像・工程師 +30%' },
+    { id: 'lib', tier: 1, lv: 1, base: 24, n: '📚 圖書館整書', d: '依號碼由小到大，盡快點完所有書（9 本）', bonus: [4], bn: '魔法師 +30%' },
+    { id: 'lunch', tier: 1, lv: 1, base: 24, n: '🍳 午餐幫手', d: '記住配菜出現的順序，再依序點一次（最多 4 關）', bonus: [3], bn: '廚師 +30%' },
+    { id: 'pair', tier: 2, lv: 10, base: 40, n: '🎨 美勞助教', d: '翻牌配對 6 組作品，翻得越少分數越高', bonus: [1], bn: '偶像 +30%' },
+    { id: 'ref', tier: 2, lv: 10, base: 40, n: '🚩 運動會裁判', d: '旗子會在格子裡冒出來，趕在消失前點到（8 次）', bonus: [0], bn: '勇者 +30%' },
+    { id: 'math', tier: 3, lv: 30, base: 60, n: '🔬 實驗助手', d: '快速心算 6 題，每題 9 秒內選出正確答案', bonus: [2, 4], bn: '工程師・魔法師 +30%' },
+    { id: 'lights', tier: 3, lv: 30, base: 60, n: '🛠 設備維修', d: '點格子會切換自己與上下左右的燈，把燈全部關掉！', bonus: [2], bn: '工程師 +30%' },
+    { id: 'chief', tier: 4, lv: 60, base: 100, n: '🎪 校慶總籌', d: '連續主持 3 項隨機工作，取平均成績（含初級到高級的工作）', bonus: [0, 1, 3], bn: '勇者・偶像・廚師 +30%' }
   ];
+  /* 打工資歷（依累計班數）：薪水加成 */
+  const JRANK = [[0, '見習生', 1], [10, '正式員工', 1.05], [30, '資深員工', 1.1], [60, '店長', 1.15]];
+  const jRank = t => { let r = JRANK[0]; JRANK.forEach(x => { if (t >= x[0]) r = x; }); return r; };
   const JOBMAX = 6;
   const jobS = () => { const d = dayKey(); if (!S.job || S.job.d !== d) S.job = { d: d, n: 0, t: (S.job && S.job.t) || 0 }; return S.job; };
   const jobShell = (title, info) => { jobEl.innerHTML = '<div class="jp"><div class="jh"><b>' + title + '</b><button type="button" class="jx">離開（不計薪）</button></div><div class="ji">' + info + '</div><div class="jb"></div></div>'; jobEl.classList.add('show'); return jobEl.querySelector('.jb'); };
@@ -9633,13 +9643,13 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
           box = jobShell('🥤 合作社店員', '第 ' + (r + 1) + ' / 5 位客人：想買 <b>' + need.join(' ＋ ') + '</b>');
           box.innerHTML = '<div class="jg">' + shuffled(ALL, Math.random).map(x => '<button type="button" class="jc" data-i="' + x + '">' + x + '</button>').join('') + '</div><button type="button" class="jo">結帳</button>'; bind();
           box.querySelectorAll('.jc').forEach(b => b.onclick = () => { const x = b.dataset.i; if (sel.has(x)) { sel.delete(x); b.classList.remove('on'); } else { sel.add(x); b.classList.add('on'); } });
-          box.querySelector('.jo').onclick = () => { if (sel.size === 2 && need.every(x => sel.has(x))) { ok++; toast('✔ 結帳正確！', 900); } else toast('✘ 拿錯了…', 900); r++; setTimeout(round, 350); };
+          box.querySelector('.jo').onclick = ev => { if (ev && ev.currentTarget.dataset.d) return; ev.currentTarget.dataset.d = 1; if (sel.size === 2 && need.every(x => sel.has(x))) { ok++; toast('✔ 結帳正確！', 900); } else toast('✘ 拿錯了…', 900); r++; setTimeout(round, 350); };
         }; round();
       } else if (id === 'lib') {
         let nxt = 1, pen = 0; box = jobShell('📚 圖書館整書', '依序點 1 → 9（點錯 +2 秒）');
         box.innerHTML = '<div class="jg g3">' + shuffled([1, 2, 3, 4, 5, 6, 7, 8, 9], Math.random).map(n => '<button type="button" class="jc bk" data-n="' + n + '">📕<small>' + n + '</small></button>').join('') + '</div>'; bind();
         box.querySelectorAll('.jc').forEach(b => b.onclick = () => { if (+b.dataset.n === nxt) { b.classList.add('on'); b.disabled = true; nxt++; if (nxt > 9) { const t = (Date.now() - T0) / 1000 + pen; done(Math.max(0.3, Math.min(1, (35 - t) / 20))); } } else { pen += 2; b.classList.add('bad'); setTimeout(() => b.classList.remove('bad'), 300); } });
-      } else {
+      } else if (id === 'lunch') {
         const FD = ['🥕', '🍅', '🥬', '🌽']; let lv = 0, seq = []; box = jobShell('🍳 午餐幫手', '看配菜亮起的順序，再依序點一次');
         const play = async () => {
           if (lv >= 4) return done(1); seq = Array.from({ length: 2 + lv }, () => Math.floor(Math.random() * 4)); let busy = true; let pos = 0;
@@ -9649,23 +9659,72 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
           busy = false; box.querySelector('.jm').textContent = '換你了！';
           bs.forEach(b => b.onclick = () => { if (busy) return; const q = +b.dataset.i; tone(300 + q * 100, 0.2, 0.15, 'triangle'); if (q === seq[pos]) { pos++; if (pos >= seq.length) { busy = true; lv++; setTimeout(play, 500); } } else { busy = true; done(lv / 4); } });
         }; play();
+      } else if (id === 'pair') {
+        const IC = ['🎨', '✂️', '📏', '🖌️', '🧵', '📐']; let moves = 0, found = 0, first = null, lock = false;
+        box = jobShell('🎨 美勞助教', '翻開兩張一樣的作品就配對成功（翻越少越好）');
+        box.innerHTML = '<div class="jg">' + shuffled(IC.concat(IC), Math.random).map((x, i) => '<button type="button" class="jc" data-i="' + i + '" data-v="' + x + '">❓</button>').join('') + '</div><div class="jm">已翻 0 次</div>'; bind();
+        const cs = box.querySelectorAll('.jc');
+        cs.forEach(b => b.onclick = () => {
+          if (lock || b.classList.contains('on') || b === first) return; b.textContent = b.dataset.v; b.classList.add('on'); tone(500, 0.08, 0.12, 'triangle');
+          if (!first) { first = b; return; }
+          moves++; box.querySelector('.jm').textContent = '已翻 ' + moves + ' 次'; const a = first; first = null;
+          if (a.dataset.v === b.dataset.v) { found++; a.disabled = b.disabled = true; if (found >= 6) setTimeout(() => done(Math.max(0.3, Math.min(1, 1 - (moves - 6) / 14))), 500); }
+          else { lock = true; setTimeout(() => { a.textContent = b.textContent = '❓'; a.classList.remove('on'); b.classList.remove('on'); lock = false; }, 650); }
+        });
+      } else if (id === 'ref') {
+        let n = 0, hit = 0; box = jobShell('🚩 運動會裁判', '看到 🚩 就點！共 8 次');
+        box.innerHTML = '<div class="jg g3">' + [0, 1, 2, 3, 4, 5].map(i => '<button type="button" class="jc" data-i="' + i + '">⬜</button>').join('') + '</div><div class="jm">第 1 / 8 次</div>'; bind();
+        const cs = [...box.querySelectorAll('.jc')]; let cur = -1, tm = null, alive = true;
+        const next = () => {
+          if (!alive) return; if (n >= 8) return done(hit / 8);
+          cs.forEach(c => { c.textContent = '⬜'; c.classList.remove('on'); }); box.querySelector('.jm').textContent = '第 ' + (n + 1) + ' / 8 次　命中 ' + hit;
+          setTimeout(() => { if (!alive) return; let q; do { q = Math.floor(Math.random() * 6); } while (q === cur); cur = q; cs[q].textContent = '🚩'; tone(700, 0.08, 0.12, 'triangle'); const my = ++n; tm = setTimeout(() => { if (cur === q && my === n) { cur = -1; next(); } }, Math.max(520, 950 - n * 50)); }, 350 + Math.random() * 500);
+        };
+        cs.forEach((b, i) => b.onclick = () => { if (cur === i) { hit++; cur = -1; b.classList.add('on'); b.textContent = '✔'; tone(900, 0.1, 0.14, 'triangle'); clearTimeout(tm); setTimeout(next, 250); } });
+        const jx = jobEl.querySelector('.jx'); jx.onclick = () => { alive = false; clearTimeout(tm); done(-1); }; next();
+      } else if (id === 'math') {
+        let q = 0, ok = 0, tm = null, alive = true; box = jobShell('🔬 實驗助手', '9 秒內選出正確答案');
+        const ask = () => {
+          if (!alive) return; if (q >= 6) return done(ok / 6);
+          const a = 3 + Math.floor(Math.random() * 12), b = 2 + Math.floor(Math.random() * 9), op = ['+', '−', '×'][Math.floor(Math.random() * 3)], ans = op === '+' ? a + b : op === '−' ? a - b : a * b;
+          const opts = new Set([ans]); while (opts.size < 4) { const d = Math.floor(Math.random() * 7) - 3 || 4; opts.add(ans + d * (op === '×' ? 2 : 1)); }
+          box.innerHTML = '<div class="jm" style="font-size:26px">' + a + ' ' + op + ' ' + b + ' = ？</div><div class="jg g2">' + shuffled([...opts], Math.random).map(v => '<button type="button" class="jc" style="font-size:24px" data-v="' + v + '">' + v + '</button>').join('') + '</div><div class="jm">第 ' + (q + 1) + ' / 6 題　答對 ' + ok + '</div>'; bind();
+          jobEl.querySelector('.jx').onclick = () => { alive = false; clearTimeout(tm); done(-1); };
+          const fin = good => { clearTimeout(tm); if (good) ok++; q++; setTimeout(ask, 350); };
+          box.querySelectorAll('.jc').forEach(bt => bt.onclick = () => { const g = +bt.dataset.v === ans; bt.classList.add(g ? 'on' : 'bad'); tone(g ? 880 : 200, 0.12, 0.14, g ? 'triangle' : 'square'); box.querySelectorAll('.jc').forEach(x => { x.disabled = true; }); fin(g); });
+          tm = setTimeout(() => { box.querySelectorAll('.jc').forEach(x => { x.disabled = true; }); toast('⏰ 時間到', 700); fin(false); }, 9000);
+        }; ask();
+      } else if (id === 'lights') {
+        const g = Array(9).fill(0), press = i => { const x = i % 3, y = Math.floor(i / 3); [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(d => { const nx = x + d[0], ny = y + d[1]; if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3) g[ny * 3 + nx] ^= 1; }); };
+        const sol = shuffled([0, 1, 2, 3, 4, 5, 6, 7, 8], Math.random).slice(0, 4 + Math.floor(Math.random() * 2)); sol.forEach(press); if (g.every(v => !v)) press(4);
+        const par = sol.length; let moves = 0; box = jobShell('🛠 設備維修', '把所有燈關掉（💡亮／⚫滅）　最少約 ' + par + ' 步');
+        const draw = () => { box.innerHTML = '<div class="jg g3">' + g.map((v, i) => '<button type="button" class="jc" data-i="' + i + '">' + (v ? '💡' : '⚫') + '</button>').join('') + '</div><div class="jm">步數 ' + moves + '</div>'; bind(); box.querySelectorAll('.jc').forEach(b => b.onclick = () => { press(+b.dataset.i); moves++; tone(400, 0.06, 0.1, 'triangle'); if (g.every(v => !v)) { draw(); setTimeout(() => done(Math.max(0.3, Math.min(1, par / moves))), 500); } else draw(); }); };
+        draw();
+      } else if (id === 'chief') {
+        (async () => {
+          const pool = ['shop', 'lib', 'lunch', 'pair', 'ref', 'math', 'lights'], pick = shuffled(pool, Math.random).slice(0, 3), rs = [];
+          for (let i = 0; i < 3; i++) { toast('🎪 第 ' + (i + 1) + ' / 3 項：' + JOBS.find(x => x.id === pick[i]).n, 1400); await new Promise(r => setTimeout(r, 900)); const r = await jobRun(pick[i]); if (r < 0) { res(-1); return; } rs.push(r); }
+          res(rs.reduce((a, b) => a + b, 0) / 3);
+        })();
       }
     });
   }
   async function doJob(id) {
     if (opActive) return; const j = jobS(), job = JOBS.find(x => x.id === id);
+    if (lvOf() < job.lv) { toast('🔒 需要 LV.' + job.lv + ' 才能做這份工作', 2400); return; }
     if (j.n >= JOBMAX) { say('📋 打工布告欄', '今天的體力用完了（每個遊戲日最多 ' + JOBMAX + ' 班），明天再來吧！', [{ label: '好' }], AV(0)); return; }
     opActive = true; let r; try { r = await jobRun(id); } finally { opActive = false; }
     if (r < 0) { toast('中途離開，沒有薪水喔', 2200); return; }
-    j.n++; j.t = (j.t || 0) + 1; const bonus = job.bonus.indexOf(pastOf()) >= 0 ? 1.3 : 1, pay = Math.max(4, Math.round(24 * r * bonus));
+    r = Math.max(0, Math.min(1, r));
+    j.n++; j.t = (j.t || 0) + 1; const bonus = job.bonus.indexOf(pastOf()) >= 0 ? 1.3 : 1, rk0 = jRank((j.t || 1) - 1), pay = Math.max(4, Math.round(job.base * r * bonus * rk0[2])), rk1 = jRank(j.t);
     S.coin = (S.coin || 0) + pay; addPts(5, '打工：' + job.n.slice(2)); save(); refreshAll();
-    say(job.n + ' 下班！', (r >= 0.9 ? '表現超棒！' : r >= 0.5 ? '做得不錯！' : '下次再加油！') + '\n成績 ' + Math.round(r * 100) + ' 分，薪水 🪙' + pay + (bonus > 1 ? '（天賦加成 +30%）' : '') + '\n今日剩餘班數：' + (JOBMAX - j.n) + '　累計打工 ' + j.t + ' 班',
+    say(job.n + ' 下班！', (r >= 0.9 ? '表現超棒！' : r >= 0.5 ? '做得不錯！' : '下次再加油！') + '\n成績 ' + Math.round(r * 100) + ' 分，薪水 🪙' + pay + (bonus > 1 ? '（天賦加成 +30%）' : '') + (rk0[2] > 1 ? '（' + rk0[1] + ' +' + Math.round((rk0[2] - 1) * 100) + '%）' : '') + (rk1[0] > rk0[0] ? '\n🎉 晉升為「' + rk1[1] + '」！之後薪水 +' + Math.round((rk1[2] - 1) * 100) + '%' : '') + '\n今日剩餘班數：' + (JOBMAX - j.n) + '　累計打工 ' + j.t + ' 班',
       [{ label: '再來一班', pri: true, fn: () => setTimeout(jobBoard, 150) }, { label: '下班' }], AV(pastOf() >= 0 ? pastOf() : 0));
   }
   function jobBoard() {
-    if (opActive || dlgOpen) return; const j = jobS();
-    say('📋 校園打工布告欄', '賺代幣，到「跳蚤市場」換好東西！\n今日班數：' + j.n + ' / ' + JOBMAX + '　🪙' + (S.coin || 0) + '\n（時薪最高約 🪙24，天賦加成 +30%）',
-      JOBS.map(x => ({ label: x.n + '｜' + x.bn, fn: () => setTimeout(() => say(x.n, x.d + '\n天賦加成：' + x.bn, [{ label: '開始上班', pri: true, fn: () => setTimeout(() => doJob(x.id), 120) }, { label: '返回', fn: () => setTimeout(jobBoard, 120) }], AV(0)), 120) })).concat([{ label: '關閉' }]), AV(0));
+    if (opActive || dlgOpen) return; const j = jobS(), rk = jRank(j.t || 0), nx = JRANK.find(x => x[0] > (j.t || 0)), lv = lvOf();
+    say('📋 校園打工布告欄', '賺代幣，到「跳蚤市場」換好東西！\n今日班數：' + j.n + ' / ' + JOBMAX + '　🪙' + (S.coin || 0) + '\n資歷：' + rk[1] + (rk[2] > 1 ? '（薪水 +' + Math.round((rk[2] - 1) * 100) + '%）' : '') + '・累計 ' + (j.t || 0) + ' 班' + (nx ? '（再 ' + (nx[0] - (j.t || 0)) + ' 班升「' + nx[1] + '」）' : '') + '\n工作分四級：初級 LV.1、中級 LV.10、高級 LV.30、特級 LV.60；級別越高時薪越高。',
+      JOBS.map(x => ({ label: (lv >= x.lv ? '' : '🔒LV.' + x.lv + ' ') + JTIER[x.tier] + '｜' + x.n + '｜時薪約 🪙' + x.base, fn: () => setTimeout(() => { if (lv < x.lv) { say(x.n, '🔒 需要 LV.' + x.lv + ' 才能做這份工作（你目前 LV.' + lv + '）。\n' + x.d, [{ label: '返回', fn: () => setTimeout(jobBoard, 120) }], AV(0)); return; } say(x.n, x.d + '\n級別：' + JTIER[x.tier] + '　基本時薪 🪙' + x.base + '\n天賦加成：' + x.bn, [{ label: '開始上班', pri: true, fn: () => setTimeout(() => doJob(x.id), 120) }, { label: '返回', fn: () => setTimeout(jobBoard, 120) }], AV(0)); }, 120) })).concat([{ label: '關閉' }]), AV(0));
   }
   const MK = [
     { id: 'lunch', n: '🍱 營養便當', p: 25, lim: 99, d: 'HP、MP 全部回滿' },
@@ -9695,7 +9754,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const ks = Object.keys(SELLP).filter(k => has(k) > 0);
     say('💰 賣出材料', '收購價比售價低喔，確定不需要再賣！\n材料：' + matStr(), ks.map(k => { const mt = MATS.find(q => q[0] === k); return { label: mt[1] + mt[2] + ' ×' + has(k) + '｜賣 1 個 🪙' + SELLP[k], fn: () => { costM(k, 1); S.coin = (S.coin || 0) + SELLP[k]; save(); refreshAll(); toast('賣出 ' + mt[2] + '，🪙+' + SELLP[k], 2000); setTimeout(sellMenu, 300); } }; }).concat([{ label: '返回', fn: () => setTimeout(market, 120) }]), AV(3));
   }
-  L.job = { board: jobBoard, market };
+  L.job = { board: jobBoard, market, run: jobRun, doJob, JOBS };
   function stall(x, z, col, name, ic, act, id) {
     const p = snap(x, z, { maxR: 5 }) || { x: x, y: 0.03, z: z }, g = new T.Group(); g.position.set(p.x, p.y, p.z); G.add(g);
     const cn = new T.Mesh(new T.BoxGeometry(2.6, 1.0, 1.0), gm(0x8b5a2b)); cn.position.y = 0.5; g.add(cn);
