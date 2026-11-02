@@ -6,6 +6,6 @@
   const first = String(s.name || s.email).split(/[\s@]/)[0];
   b.textContent = '登出・' + first; b.style.maxWidth = '9em'; b.style.overflow = 'hidden'; b.style.textOverflow = 'ellipsis';
   b.onclick = () => { A.signOut(); location.href = (A.cfg.visitorPage || 'index.html'); };
-  const t = m.querySelector('#gearT');   /* 手機直式設定面板很長：登出放在最上面（標題下第一格） */
-  m.insertBefore(b, t ? t.nextSibling : m.firstChild);
+  const t = m.querySelector('#gearT'); m.insertBefore(b, t ? t.nextSibling : m.firstChild);   /* 登出放最上面 */
+  if (((A.cfg.adminEmails || []).map(x => x.toLowerCase())).indexOf(String(s.email).toLowerCase()) >= 0) { const ad = document.createElement('button'); ad.type = 'button'; ad.id = 'bAdm'; ad.textContent = '🛠 管理後台'; ad.onclick = () => { location.href = 'admin.html'; }; m.appendChild(ad); }
 })();

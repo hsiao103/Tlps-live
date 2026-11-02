@@ -124,3 +124,7 @@
 ## 聊天測試頁（stage63）
 - 網址：play-chat.html（正式版 play.html 不受影響）。內含多人同場、聊天、管理後台 admin.html。
 - 需先在 Supabase SQL Editor 執行 supabase-mp.sql，並確認 Realtime 已啟用。
+
+## 正式版上架聊天（stage66）
+- play.html 即聊天版（多人同場、聊天、管理後台 admin.html）。需已在 Supabase 執行 supabase-mp.sql 並啟用 Realtime。
+- 取消搜尋圖示；⚙ 與天氣溫度併為一個膠囊（左溫度、右齒輪）。
