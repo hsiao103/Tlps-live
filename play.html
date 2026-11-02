@@ -8204,19 +8204,25 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     const tp = petTop(g, K, stage, 0.92, 0.34, 0.42, 0.58); g.scale.setScalar(0.95 + 0.06 * stage);
     return { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.55, base: 0, hop: 0.05, mode: 'trot', fx: (now) => { star.rotation.y = now / 500; } };
   }
-  function buildBunny(stage) {
-    const g = new T.Group(), K = petKit(g), M = K.M, fur = M(0xfff3ee), pink = M(0xffb3c7), sc = STG_COL[stage] || '#9aa3a8';
-    const body = new T.Group(); g.add(body); K.sp(0.22, fur, 0, 0.3, -0.04, body); K.sp(0.16, M(0xffffff), 0, 0.27, 0.12, body);
-    const head = new T.Group(); head.position.set(0, 0.52, 0.2); body.add(head); K.sp(0.17, fur, 0, 0, 0, head); K.sp(0.03, M(0x222222), -0.075, 0.02, 0.145, head); K.sp(0.03, M(0x222222), 0.075, 0.02, 0.145, head); K.sp(0.012, M(0xffffff), -0.07, 0.03, 0.17, head); K.sp(0.012, M(0xffffff), 0.08, 0.03, 0.17, head); K.sp(0.03, pink, 0, -0.03, 0.165, head);
-    K.sp(0.05, pink, -0.1, -0.05, 0.12, head).scale.set(1, 0.7, 0.6); K.sp(0.05, pink, 0.1, -0.05, 0.12, head).scale.set(1, 0.7, 0.6);
-    const ears = [-1, 1].map(sg => { const e = new T.Group(); e.position.set(sg * 0.07, 0.12, -0.02); head.add(e); const o = K.sp(0.05, fur, 0, 0.16, 0, e); o.scale.set(0.8, 3.2, 0.5); const i = K.sp(0.03, pink, 0, 0.16, 0.012, e); i.scale.set(0.7, 3.0, 0.5); e.rotation.z = sg * 0.14; return e; });
-    const tail = new T.Group(); tail.position.set(0, 0.32, -0.25); g.add(tail); K.sp(0.07, M(0xffffff), 0, 0, -0.03, tail);
-    const legs = [[-0.1, 0.12], [0.1, 0.12], [-0.1, -0.12], [0.1, -0.12]].map((q, i) => { const l = new T.Group(); l.position.set(q[0], 0.12, q[1]); g.add(l); const f = K.sp(i > 1 ? 0.075 : 0.055, fur, 0, -0.06, i > 1 ? -0.01 : 0.02, l); f.scale.set(0.9, 0.8, i > 1 ? 1.5 : 1.2); return l; });
-    const sh = K.add(new T.Mesh(new T.CircleGeometry(0.28, 16), new T.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2, depthWrite: false })), 0, 0.02, 0); sh.rotation.x = -Math.PI / 2;
-    if (stage >= 1) { const bd = K.add(new T.Mesh(new T.ConeGeometry(0.1, 0.17, 4), M(sc)), 0, 0.36, 0.24, g); bd.rotation.x = Math.PI; bd.rotation.y = Math.PI / 4; }
-    if (stage >= 2) { const cp = K.add(new T.Mesh(new T.PlaneGeometry(0.3, 0.34), M(sc, { side: T.DoubleSide })), 0, 0.36, -0.2, g); cp.rotation.x = 0.4; }
-    const tp = petTop(g, K, stage, 1.0, 0.18, 0.42, 0.55); g.scale.setScalar(0.95 + 0.06 * stage);
-    return { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.6, base: 0, hop: 0.16, mode: 'hop' };
+  function buildBunny(stage) {   // 擬人化：直立的兔耳少女／少年，修長、穿外套、會揮手走路
+    const g = new T.Group(), K = petKit(g), M = K.M, fur = M(0xfff3ee), pink = M(0xffb3c7), coat = M(0xff9fbd), coat2 = M(0xffffff), pants = M(0x6f7fcf), shoe = M(0xd9534f), sc = STG_COL[stage] || '#9aa3a8';
+    const body = new T.Group(); g.add(body);
+    const torso = K.cyl(0.1, 0.075, 0.3, coat, 0, 0.5, 0, body); K.cyl(0.103, 0.103, 0.05, coat2, 0, 0.35, 0, body); K.cyl(0.075, 0.1, 0.06, coat2, 0, 0.64, 0, body); K.sp(0.012, M(0xffd54a), 0, 0.52, 0.098, body); K.sp(0.012, M(0xffd54a), 0, 0.45, 0.092, body);
+    const head = new T.Group(); head.position.set(0, 0.8, 0); body.add(head); K.sp(0.15, fur, 0, 0, 0, head).scale.set(1, 0.95, 0.95);
+    K.sp(0.028, M(0x222222), -0.062, 0.015, 0.128, head); K.sp(0.028, M(0x222222), 0.062, 0.015, 0.128, head); K.sp(0.011, M(0xffffff), -0.057, 0.025, 0.152, head); K.sp(0.011, M(0xffffff), 0.067, 0.025, 0.152, head); K.sp(0.022, pink, 0, -0.03, 0.145, head);
+    K.sp(0.035, pink, -0.095, -0.035, 0.1, head).scale.set(1, 0.65, 0.5); K.sp(0.035, pink, 0.095, -0.035, 0.1, head).scale.set(1, 0.65, 0.5);
+    const mth = K.bx(0.04, 0.008, 0.008, M(0xb86a7a), 0, -0.06, 0.143, head);
+    const ears = [-1, 1].map(sg => { const e = new T.Group(); e.position.set(sg * 0.07, 0.12, -0.01); head.add(e); const o = K.sp(0.045, fur, 0, 0.15, 0, e); o.scale.set(0.8, 3.6, 0.5); const i = K.sp(0.026, pink, 0, 0.15, 0.012, e); i.scale.set(0.7, 3.3, 0.5); e.rotation.z = sg * 0.12; return e; });
+    const arms = [-1, 1].map(sg => { const a = new T.Group(); a.position.set(sg * 0.14, 0.62, 0); body.add(a); K.cyl(0.03, 0.026, 0.22, coat, 0, -0.1, 0, a); K.sp(0.032, fur, 0, -0.23, 0, a); return a; });
+    const legs = [-1, 1].map(sg => { const l = new T.Group(); l.position.set(sg * 0.065, 0.34, 0); g.add(l); K.cyl(0.04, 0.034, 0.3, pants, 0, -0.14, 0, l); const sh = K.bx(0.06, 0.04, 0.11, shoe, 0, -0.3, 0.02, l); return l; });
+    const tail = new T.Group(); tail.position.set(0, 0.38, -0.1); body.add(tail); K.sp(0.05, M(0xffffff), 0, 0, -0.02, tail);
+    const shd = K.add(new T.Mesh(new T.CircleGeometry(0.22, 16), new T.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2, depthWrite: false })), 0, 0.02, 0); shd.rotation.x = -Math.PI / 2;
+    if (stage >= 1) { const sf = K.add(new T.Mesh(new T.TorusGeometry(0.095, 0.03, 6, 16), M(sc)), 0, 0.67, 0, body); sf.rotation.x = Math.PI / 2; const tl = K.bx(0.05, 0.16, 0.02, M(sc), 0.05, 0.58, 0.09, body); tl.rotation.z = 0.15; }
+    if (stage >= 2) { const cp = K.add(new T.Mesh(new T.PlaneGeometry(0.3, 0.5), M(sc, { side: T.DoubleSide })), 0, 0.46, -0.1, body); cp.rotation.x = 0.12; }
+    const tp = petTop(g, K, stage, 1.3, 0.0, 0.6, 0.7); g.scale.setScalar(0.95 + 0.06 * stage);
+    const P = { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.95, base: 0, hop: 0.03, mode: 'trot' };
+    P.fx = (now, w) => { arms.forEach((a, i) => { const sw = Math.sin(P.ph + (i ? 0 : Math.PI)) * 0.7 * w; a.rotation.x = sw; a.rotation.z = (i ? -1 : 1) * (0.12 + Math.sin(now / 600 + i) * 0.05 * (1 - w)); }); if (w < 0.1 && Math.sin(now / 2300) > 0.97) arms[1].rotation.z = -2.4 + Math.sin(now / 90) * 0.3; };
+    return P;
   }
   function buildSprout(stage) {
     const g = new T.Group(), K = petKit(g), M = K.M, skin = M(0x7ccf6a), lite = M(0xc8f0a8), leaf = M(0x3f9f4a), sc = STG_COL[stage] || '#9aa3a8';
