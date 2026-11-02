@@ -6,5 +6,6 @@
   const first = String(s.name || s.email).split(/[\s@]/)[0];
   b.textContent = '登出・' + first; b.style.maxWidth = '9em'; b.style.overflow = 'hidden'; b.style.textOverflow = 'ellipsis';
   b.onclick = () => { A.signOut(); location.href = (A.cfg.visitorPage || 'index.html'); };
-  m.appendChild(b);
+  const t = m.querySelector('#gearT');   /* 手機直式設定面板很長：登出放在最上面（標題下第一格） */
+  m.insertBefore(b, t ? t.nextSibling : m.firstChild);
 })();
