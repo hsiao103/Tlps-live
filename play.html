@@ -4666,6 +4666,16 @@ function classLights(on) {
 }
 const GRYROOF = mat(0xa8aba8, { side: T.DoubleSide }), SOLARL = mat(0xa9c4dc, { side: T.DoubleSide }), PLANT = mat(0x5f9a45), BAND = mat(0x9a9a98), TACT = mat(0xe8c43a), COLW = mat(0xf4f4ef), TOWD = mat(0x4a4d52), POSTER = [0xe9d6b0, 0xc9dbe9, 0xe8c4c4, 0xd5e8cf].map(c => mat(c)), DARK = mat(0x2b2f35);
 /* ===== 校舍產生器：走廊在 open 側，教室在另一側，端部可有雙跑樓梯 ===== */
+
+/* ===== 課桌椅幾何（合併成單一幾何，教室用 InstancedMesh 重複使用）===== */
+function mergeBoxGeos(list) {
+  const pos = [], nor = [], uv = [];
+  list.forEach(q => { const g = new T.BoxGeometry(q[0], q[1], q[2]).toNonIndexed(); g.translate(q[3], q[4], q[5]); pos.push(...g.attributes.position.array); nor.push(...g.attributes.normal.array); uv.push(...g.attributes.uv.array); });
+  const G2 = new T.BufferGeometry(); G2.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); G2.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); G2.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); return G2;
+}
+const DESKG = mergeBoxGeos([[0.62, 0.04, 0.46, 0, 0.7, 0], [0.04, 0.68, 0.04, -0.27, 0.34, -0.18], [0.04, 0.68, 0.04, 0.27, 0.34, -0.18], [0.04, 0.68, 0.04, -0.27, 0.34, 0.18], [0.04, 0.68, 0.04, 0.27, 0.34, 0.18], [0.5, 0.14, 0.3, 0, 0.58, 0.02]]);
+const CHAIRG = mergeBoxGeos([[0.36, 0.04, 0.36, 0, 0.42, 0], [0.04, 0.4, 0.04, -0.15, 0.2, -0.15], [0.04, 0.4, 0.04, 0.15, 0.2, -0.15], [0.04, 0.4, 0.04, -0.15, 0.2, 0.15], [0.04, 0.4, 0.04, 0.15, 0.2, 0.15], [0.36, 0.3, 0.04, 0, 0.64, -0.17]]);
+const CHAIRM = mat(0x4a86c8);
 const BUILDINGS = [];
 const BAY = 4.6, CORR = 2.4, WT = 0.25;
 function bld(o) {
@@ -4803,16 +4813,39 @@ function bld(o) {
       if (!isWC) for (let q = 0; q < 2; q++) for (let r2 = 0; r2 < 2; r2++) { const lu = dm + (q ? 1 : -1) * rwi * 0.22, lv = CORR + (Dr - CORR) * (r2 ? 0.7 : 0.32); R(lu - 0.7, lv - 0.12, lu + 0.7, lv + 0.12, y1 - 0.38, y1 - 0.31, M.lampM, { noShadow: true }); }   // 教室天花板燈管（夜間會亮）
       if (isWC) { const ns = rwi > 5 ? 3 : 2; for (let q = 0; q < ns; q++) { const pu2 = a + 0.8 + q * ((rwi - 1.6) / ns); R(pu2, Dr - 2.6, pu2 + 0.06, Dr - 0.3, y0, y0 + 1.9, M.wallIn, { noShadow: true }); } }
       else if (isHall) R(a + 2, Dr - 2.6, b - 2, Dr - 0.3, y0, y0 + 0.9, M.concrete, { noShadow: true });      // 禮堂：只有舞台，不設課桌椅
+      else if ((o.names && o.names[k] && o.names[k][i]) === '健康中心') {   // 保健室：清空，兩張病床＋一張辦公桌
+        const bedM = mat(0xdfe6ea), matM = mat(0xf4f7f9), pilM = mat(0xffffff), blkM = mat(0x58b8c8), fr = mat(0x8b95a0);
+        [dm - 2.6, dm + 1.4].forEach(bu => {
+          const v1 = Dr - 0.5, v0 = v1 - 2.0;
+          R(bu, v0, bu + 1.0, v1, y0 + 0.08, y0 + 0.36, bedM, { noShadow: true });                        // 床架
+          R(bu + 0.04, v0 + 0.04, bu + 0.96, v1 - 0.04, y0 + 0.36, y0 + 0.5, matM, { noShadow: true });   // 床墊
+          R(bu + 0.1, v1 - 0.5, bu + 0.9, v1 - 0.08, y0 + 0.5, y0 + 0.6, pilM, { noShadow: true });       // 枕頭
+          R(bu + 0.02, v0 + 0.02, bu + 0.98, v0 + 1.35, y0 + 0.5, y0 + 0.56, blkM, { noShadow: true });   // 被子
+          R(bu, v1 - 0.06, bu + 1.0, v1, y0 + 0.08, y0 + 0.95, fr, { noShadow: true });                   // 床頭板
+          R(bu, v0, bu + 1.0, v0 + 0.05, y0 + 0.08, y0 + 0.62, fr, { noShadow: true });                   // 床尾板
+        });
+        const dkM = M.desk, ou = a + 1.6, ov = CORR + 1.2;                                                // 辦公桌＋椅
+        R(ou, ov, ou + 1.5, ov + 0.75, y0 + 0.7, y0 + 0.76, dkM, { noShadow: true });
+        [[ou + 0.05, ov + 0.05], [ou + 1.4, ov + 0.05], [ou + 0.05, ov + 0.65], [ou + 1.4, ov + 0.65]].forEach(q => R(q[0], q[1], q[0] + 0.05, q[1] + 0.05, y0 + 0.08, y0 + 0.7, dkM, { noShadow: true }));
+        R(ou + 0.5, ov + 0.95, ou + 1.0, ov + 1.45, y0 + 0.42, y0 + 0.47, fr, { noShadow: true }); R(ou + 0.5, ov + 1.4, ou + 1.0, ov + 1.45, y0 + 0.47, y0 + 0.9, fr, { noShadow: true });
+        [[ou + 0.52, ov + 0.97], [ou + 0.93, ov + 0.97], [ou + 0.52, ov + 1.38], [ou + 0.93, ov + 1.38]].forEach(q => R(q[0], q[1], q[0] + 0.05, q[1] + 0.05, y0 + 0.08, y0 + 0.42, fr, { noShadow: true }));
+      }
       else {
         if (isHall) R(a + 2, Dr - 2.6, b - 2, Dr - 0.3, y0, y0 + 0.9, M.concrete, { noShadow: true }); else R(dm - 1.8, Dr - 0.36, dm + 1.8, Dr - 0.3, y0 + 0.9, y0 + 2.3, M.board, { noShadow: true });
-        R(a + 0.4, CORR + 0.5, a + 0.9, CORR + 1.4, y0 + 0.08, y0 + 0.75, M.desk, { noShadow: true });
+        const pu = P(1, 0), pv0 = P(0, 0), pv1 = P(0, -1), dxv = pv1[0] - pv0[0], dzv = pv1[1] - pv0[1], yaw = Math.atan2(-dxv, -dzv);   // 椅背朝走廊側（-v）
         const cols = Math.max(3, Math.floor((rwi - 1.6) / 1.25)), rows = isHall ? 6 : 4;
-        const inst = new T.InstancedMesh(new T.BoxGeometry(0.6, 0.7, 0.45), M.desk, cols * rows), mt = new T.Matrix4();
+        const dI = new T.InstancedMesh(DESKG, M.desk, cols * rows + 1), cI = new T.InstancedMesh(CHAIRG, CHAIRM, cols * rows + 1), mt = new T.Matrix4(), ms = new T.Matrix4();
         for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-          const p = P(a + 0.9 + c * ((rwi - 1.8) / Math.max(1, cols - 1)), CORR + 2.0 + r * ((Dr - CORR - (isHall ? 6.2 : 4.0)) / (rows - 1)));
-          mt.setPosition(p[0], y0 + 0.43, p[1]); inst.setMatrixAt(r * cols + c, mt);
+          const vv = CORR + 2.0 + r * ((Dr - CORR - (isHall ? 6.2 : 4.0)) / (rows - 1)), uu = a + 0.9 + c * ((rwi - 1.8) / Math.max(1, cols - 1));
+          const p = P(uu, vv), q = P(uu, vv - 0.5);
+          mt.makeRotationY(yaw); mt.setPosition(p[0], y0 + 0.08, p[1]); dI.setMatrixAt(r * cols + c, mt);
+          mt.makeRotationY(yaw); mt.setPosition(q[0], y0 + 0.08, q[1]); cI.setMatrixAt(r * cols + c, mt);
         }
-        (CTX ? CTX.group : scene).add(inst);
+        { const p = P(a + 0.9, CORR + 0.9), q = P(a + 0.9, CORR + 1.75);   // 老師講桌＋椅（放大）
+          mt.makeRotationY(yaw); ms.makeScale(1.5, 1.08, 1.5); mt.multiply(ms); mt.setPosition(p[0], y0 + 0.08, p[1]); dI.setMatrixAt(rows * cols, mt);
+          mt.makeRotationY(yaw + Math.PI); mt.setPosition(q[0], y0 + 0.08, q[1]); cI.setMatrixAt(rows * cols, mt); }
+        dI.castShadow = false; cI.castShadow = false; dI.frustumCulled = false; cI.frustumCulled = false;
+        (CTX ? CTX.group : scene).add(dI); (CTX ? CTX.group : scene).add(cI);
       }
       const lp = P(dm, CORR - 0.3), nm = o.names && o.names[k] && o.names[k][i];
       { const nm2 = nm || (o.id + '-' + (k + 1) + '0' + (i + 1)), key = o.id + '-' + (k + 1) + '-' + (i + 1); (info.rooms = info.rooms || []).push({ key, k: k + 1, i: i + 1, name: nm2 });
