@@ -10307,7 +10307,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const mpBcast = (ev, p) => mpSend('broadcast', { type: 'broadcast', event: ev, payload: p });
   const mpMeta = () => ({ n: mpNick(), l: lvOf(), k: CH.kind || 'boy', c: mpTier() });
   const mpTrack = () => mpSend('presence', { type: 'presence', event: 'track', payload: mpMeta() });
-  function mpStatus(t) { const e = document.querySelector('#gNet .st'); if (e) e.textContent = t; }
+  function mpStatus(t) { const e = document.querySelector('#gNet .st'); if (e) e.textContent = t; const w = document.querySelector('#gNet .warn'); if (w) { const bad = /^(尚未|未|加入失敗|離線)/.test(t); w.style.display = bad ? '' : 'none'; w.textContent = '⚠ ' + t; } }
   async function mpConnect() {
     if (MP.ws || MP.conn || !MP.on) return; if (MPS().off) { mpStatus('隱身中（未連線）'); return; }
     const C = window.TL_LIVE_CONFIG, room = mpRoom(); MP.room = room; MP.topic = 'realtime:tl-' + mpSlug(room); MP.ref = 0; MP.joinRef = '1'; MP.joined = false;
@@ -10431,7 +10431,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const log = document.querySelector('#gNet .log'); if (log) { const near = log.scrollHeight - log.scrollTop - log.clientHeight < 40; log.appendChild(mk()); while (log.children.length > 80) log.firstChild.remove(); if (near || cls === 'me') log.scrollTop = log.scrollHeight; }
     if (!MP.open && cls !== 'me') { if (who) { MP.unread++; const u = document.getElementById('gNetUn'); if (u) { u.textContent = MP.unread > 9 ? '9+' : MP.unread; u.style.display = ''; } } const fd = document.getElementById('gNetFeed'); if (fd && (who || cls === 'sys')) { const e = mk(); fd.appendChild(e); while (fd.children.length > 3) fd.firstChild.remove(); setTimeout(() => e.remove(), 9000); } }
   }
-  function mpCount() { const n = Object.keys(MP.roster).length || (MP.joined ? 1 : 0), e = document.getElementById('gNetN'); if (e) e.textContent = MP.joined ? '👥 ' + n : '👥 –'; const w = document.querySelector('#gNet .big'); if (w) w.style.display = n > 30 ? '' : 'none'; if (w) w.textContent = '這個房間有 ' + n + ' 人，畫面只會顯示離你最近的 24 位；可到「設定」換房間代碼。'; }
+  function mpCount() { const n = Object.keys(MP.roster).length || (MP.joined ? 1 : 0), e = document.getElementById('gNetN'); if (e) e.textContent = MP.joined ? '👥 ' + n : '👥 –'; const w = document.querySelector('#gNet .crowd'); if (w) w.style.display = n > 30 ? '' : 'none'; if (w) w.textContent = '這個房間有 ' + n + ' 人，畫面只會顯示離你最近的 24 位；可到「設定」換房間代碼。'; }
   function mpWho() {
     const el = document.querySelector('#gNet [data-p=who] .wl'); if (!el || !MP.open) return; el.textContent = '';
     const rows = Object.keys(MP.roster).map(k => ({ k, m: MP.roster[k], d: MP.peers[k] ? MP.peers[k].d : null })).sort((a, b) => (a.k === MP.uid ? -1 : b.k === MP.uid ? 1 : (a.d == null) - (b.d == null) || (a.d || 0) - (b.d || 0)));
@@ -10464,7 +10464,7 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
     const bar = mkEl('div', 'gNetBar'); bar.innerHTML = '<button type="button" id="gNetBtn" aria-label="聊天與線上玩家">💬<i id="gNetUn"></i></button><span id="gNetN">👥 –</span>'; mkEl('div', 'gNetFeed');
     const p = mkEl('div', 'gNet'); p.hidden = true;
     p.innerHTML = '<div class="h"><b>🌐 同樂聯機</b><span class="st">連線中…</span><button type="button" class="x" aria-label="關閉">✕</button></div><div class="tabs"><button type="button" data-t="chat" class="on">💬 聊天</button><button type="button" data-t="who">👥 線上</button><button type="button" data-t="set">⚙ 設定</button></div>'
-      + '<div class="pg" data-p="chat"><div class="big" style="display:none"></div><div class="log"></div><div class="qk"></div><form class="in"><input maxlength="40" placeholder="輸入訊息（40 字內）" autocomplete="off"><button type="submit">送出</button></form><div class="tip">請友善說話，不要透露真實姓名、電話或住址。聊天內容會被記錄，管理者可以查看。</div></div>'
+      + '<div class="pg" data-p="chat"><div class="big warn" style="display:none"></div><div class="big crowd" style="display:none"></div><div class="log"></div><div class="qk"></div><form class="in"><input maxlength="40" placeholder="輸入訊息（40 字內）" autocomplete="off"><button type="submit">送出</button></form><div class="tip">請友善說話，不要透露真實姓名、電話或住址。聊天內容會被記錄，管理者可以查看。</div></div>'
       + '<div class="pg" data-p="who" hidden><div class="wl"></div></div>'
       + '<div class="pg set" data-p="set" hidden><label>我的暱稱（10 字內，其他玩家看到的名字）</label><div class="r"><input class="nk" maxlength="10"><button type="button" class="sn">儲存</button></div><label>房間代碼（同一代碼的人才會在同一個地圖看到彼此；例如班級 301）</label><div class="r"><input class="rm" maxlength="16"><button type="button" class="sr">切換</button></div><div class="r"><button type="button" class="t" data-o="show">顯示其他玩家</button><button type="button" class="t" data-o="bub">聊天泡泡</button></div><div class="r"><button type="button" class="t" data-o="off">隱身離線（不連線）</button></div><div class="tip">暱稱不會自動使用真實姓名。隱身離線＝不連線也不被別人看到。</div></div>';
     const $q = s => p.querySelector(s), qk = $q('.qk');
@@ -10481,8 +10481,10 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
   }
   function mpReconnect() { clearTimeout(MP.rt); const ws = MP.ws; MP.ws = null; try { ws && ws.close(); } catch (e) { /* 忽略 */ } mpDrop(); MP.retry = 0; setTimeout(mpConnect, 300); }
   L.mpInit = async function (B, sess) {
-    if (MP.on) return; const bs = B && B.session && B.session(); if (!bs || !bs.uid || !B.configured()) return;
-    MP.on = true; MP.B = B; MP.uid = bs.uid; MP.email = (sess && sess.email) || bs.email || ''; mpUI(); mpCount();
+    if (MP.started) return; MP.started = true; mpUI();
+    if (!B || !B.configured || !B.configured()) { mpStatus('尚未啟用雲端（live-config.js 沒有設定 Supabase）'); return; }
+    const bs = B.session && B.session(); if (!bs || !bs.uid) { mpStatus('尚未登入雲端：請按「登出」後，重新用 Google 登入一次'); return; }
+    MP.on = true; MP.B = B; MP.uid = bs.uid; MP.email = (sess && sess.email) || bs.email || ''; mpCount();
     try { const a = await mpRest('tlps_live_mutes?select=user_id&user_id=eq.' + MP.uid, 'GET'); MP.muted = !!(a && a.length); } catch (e) { MP.muted = false; }
     mpConnect();
   };

@@ -17,7 +17,8 @@
   const L = window.__live, A = window.TLAUTH, B = window.TLCLOUD; if (!L || !A) return;
   const s = A.session(); L.loadFor(s ? s.email : 'guest');
   const st = () => L.getState();
-  if (!B || !B.configured()) { L.setCloudLabel('本機存檔（尚未啟用雲端）'); return; }
+  if (!B || !B.configured()) { L.setCloudLabel('本機存檔（尚未啟用雲端）'); if (L.mpInit) L.mpInit(B, s); return; }
+  if (L.mpInit) L.mpInit(B, s);   // 聊天按鈕一律顯示；沒登入雲端時面板會寫出原因
   let timer = 0, busy = false, dirty = false, ok = false;
   async function flush() {
     if (busy) { dirty = true; return; } busy = true; dirty = false;
