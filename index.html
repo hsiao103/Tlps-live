@@ -74,7 +74,7 @@ footer{margin-top:30px;font-size:12.5px;color:var(--muted)}
       const go = document.createElement('button'); go.className = 'big'; go.type = 'button'; go.textContent = '進入遊戲 ▶'; go.onclick = () => { location.href = play; };
       const out = document.createElement('button'); out.className = 'sm'; out.type = 'button'; out.textContent = '登出'; out.onclick = () => { A.signOut(); if (B) B.clear(); render(); };
       w.append(go, out); box.appendChild(w);
-      if (B && B.configured() && !B.session()) { let er = ''; try { er = localStorage.getItem('tl_sb_err') || ''; } catch (e) { /* 忽略 */ } msg('⚠ 目前沒有雲端登入，所以多人連線與跨裝置存檔不能用。請按「登出」後再登入一次。' + (er ? '\n上次雲端登入錯誤：' + er.slice(0, 160) : '')); }
+      if (B && B.configured() && !B.session()) { let er = ''; try { er = localStorage.getItem('tl_sb_err') || ''; } catch (e) { /* 忽略 */ } msg('⚠ 目前沒有雲端登入，所以跨裝置存檔不能用。請按「登出」後再登入一次。' + (er ? '\n上次雲端登入錯誤：' + er.slice(0, 160) : '')); }
       return;
     }
     if (!A.configured()) { msg('尚未設定 Google 登入（請管理者填寫 auth-config.js 的 clientId）。'); return; }

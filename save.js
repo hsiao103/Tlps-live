@@ -17,8 +17,7 @@
   const L = window.__live, A = window.TLAUTH, B = window.TLCLOUD; if (!L || !A) return;
   const s = A.session(); L.loadFor(s ? s.email : 'guest');
   const st = () => L.getState();
-  if (!B || !B.configured()) { L.setCloudLabel('本機存檔（尚未啟用雲端）'); if (L.mpInit) L.mpInit(B, s); return; }
-  if (L.mpInit) L.mpInit(B, s);   // 聊天按鈕一律顯示；沒登入雲端時面板會寫出原因
+  if (!B || !B.configured()) { L.setCloudLabel('本機存檔（尚未啟用雲端）'); return; }
   let timer = 0, busy = false, dirty = false, ok = false;
   async function flush() {
     if (busy) { dirty = true; return; } busy = true; dirty = false;
@@ -31,11 +30,11 @@
       const row = await B.pull();
       if (row === undefined) { if (first) L.setCloudLabel('本機存檔（重新登入即可同步雲端）'); return; }
       const mine = st(), cloud = row && row.data && row.data.v === 1 ? row.data : null;
-      if (!cloud) { L.setCloudLabel('☁ 已連線'); if (+mine.pts || +mine.t) flush(); ok = true; if (first && L.mpInit) L.mpInit(B, A.session()); return; }
+      if (!cloud) { L.setCloudLabel('☁ 已連線'); if (+mine.pts || +mine.t) flush(); ok = true; return; }
       const m = merge(mine, cloud), pm = +mine.pts || 0, pc = +cloud.pts || 0;
       if (pc > pm || (pc === pm && (+cloud.t || 0) > (+mine.t || 0))) { L.setState(m); L.setCloudLabel('☁ 已載入雲端進度（LV 與點數與其他裝置一致）'); }
       else { L.setCloudLabel('☁ 已連線'); if (first) L.setState(m); flush(); }
-      ok = true; if (first && L.mpInit) L.mpInit(B, A.session());
+      ok = true;
     } catch (e) { if (first) L.setCloudLabel('本機存檔（雲端暫時無法連線）'); }
   }
   const start = () => sync(true);
