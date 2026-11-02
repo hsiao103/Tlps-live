@@ -5645,7 +5645,7 @@ PLANMARK(__gym0, scene.children.length);   // 平面模式：風雨操場一併�
 { const sh = new T.Shape(); [[4.5, -101], [4.5, -63], [-11, -63], [-4.5, -101]].forEach((p, i) => i ? sh.lineTo(p[0], -p[1]) : sh.moveTo(p[0], -p[1]));
   const pm = new T.Mesh(new T.ShapeGeometry(sh), mat(0xd9d5ca)); pm.rotation.x = -Math.PI / 2; pm.position.y = 0.05; pm.receiveShadow = true; scene.add(pm); walk.push(pm); }
 // 遊戲器材區：兩座造型溜滑梯（恐龍、火箭）＋兩座蹺蹺板（原本四個方塊的位置）
-{ const A = (geo, m, x, y, z, g) => { const me = new T.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; g.add(me); return me; };
+{ const PG = window.PLAYG = { items: [] }; const A = (geo, m, x, y, z, g) => { const me = new T.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; g.add(me); return me; };
   const Bx = (w, h, d) => new T.BoxGeometry(w, h, d), Cy = (r1, r2, h, n) => new T.CylinderGeometry(r1, r2, h, n || 12), Sp = r => new T.SphereGeometry(r, 14, 10);
   const slideSurf = (g, x0, y0, x1, w, mt, rail) => {   // 由平台邊緣 (x0,y0) 斜降到地面 x1：滑道＋兩側護欄
     const dx = x1 - x0, dy = y0, L = Math.hypot(dx, dy), ang = -Math.atan2(dy, dx), cx = (x0 + x1) / 2, cy = y0 / 2 + 0.06;
@@ -5663,6 +5663,7 @@ PLANMARK(__gym0, scene.children.length);   // 平面模式：風雨操場一併�
     A(Sp(0.38), gr, -1.35, 1.2, 0, g); A(Bx(0.5, 0.22, 0.42), gr, -1.75, 1.12, 0, g); A(Sp(0.06), bk, -1.62, 1.38, 0.2, g); A(Sp(0.06), bk, -1.62, 1.38, -0.2, g); A(Sp(0.025), wh, -1.65, 1.41, 0.21, g); A(Sp(0.025), wh, -1.65, 1.41, -0.21, g);
     [0, 1, 2].forEach(i => A(new T.ConeGeometry(0.1, 0.3, 4), og, -1.3 + i * 0.22, 1.58 + i * 0.02, 0, g)); [-0.55, 0.55].forEach(zz => [-0.55, 0.55].forEach(xx => A(Cy(0.16, 0.2, 0.5, 8), dg, xx, 0.25, zz, g)));
     slideSurf(g, 0.7, 1.55, 3.6, 0.8, yl, og); ladder(g, 1.35, 0.7, 1.55, og); });
+  PG.items.push({ id: 'dino', kind: 'slide', name: '恐龍溜滑梯', ic: '🦖', x: -4.0, z: -90.0, r: 2.0, top: [-4.0, 1.65, -90.8], deck: [-4.0, 1.65, -91.5], from: [-3.3, 1.7, -91.5], to: [-0.4, 0.2, -91.5] });
   // 火箭溜滑梯：白色火箭身、紅色鼻錐、三片尾翼、舷窗；平台環繞火箭中段
   tower(-4.0, -84.5, g => { const wh = L3(0xf2f4f8), rd = L3(0xe0453a), bl = L3(0x3a8fd9), gy = L3(0x9aa4ad), yl = L3(0xf5c542);
     A(Cy(0.6, 0.7, 2.2, 18), wh, 0, 1.1, 0, g); A(new T.ConeGeometry(0.6, 1.0, 18), rd, 0, 2.7, 0, g); A(Cy(0.7, 0.7, 0.18, 18), rd, 0, 0.25, 0, g);
@@ -5670,13 +5671,50 @@ PLANMARK(__gym0, scene.children.length);   // 平面模式：風雨操場一併�
     [0, 1].forEach(i => { const w = A(Sp(0.16), bl, -0.55, 0.95 + i * 0.5, 0.12 + i * 0.2, g); w.scale.set(0.5, 1, 1); w.position.x = -0.56; });
     A(Cy(1.0, 1.0, 0.1, 20), gy, 0, 1.5, 0, g); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; A(Cy(0.03, 0.03, 0.55, 6), gy, Math.cos(a) * 0.95, 1.8, Math.sin(a) * 0.95, g); } A(new T.TorusGeometry(0.95, 0.03, 6, 24), gy, 0, 2.08, 0, g).rotation.x = Math.PI / 2;
     slideSurf(g, 1.0, 1.55, 3.9, 0.8, bl, rd); ladder(g, 1.5, 0.95, 1.55, yl); });
+  PG.items.push({ id: 'rocket', kind: 'slide', name: '火箭溜滑梯', ic: '🚀', x: -4.0, z: -83.0, r: 2.0, top: [-4.0, 1.65, -83.55], deck: [-4.0, 1.65, -84.5], from: [-3.0, 1.7, -84.5], to: [-0.1, 0.2, -84.5] });
   // 蹺蹺板（兩座，不同配色）：支點柱＋傾斜長板＋握把＋端部緩衝輪胎
   [[2.3, -88.6, 0xff8a3d, 0x2f8f5a, 0.2], [2.3, -84.0, 0x3a8fd9, 0xf5c542, -0.2]].forEach(q => { const g = new T.Group(); g.position.set(q[0], 0.05, q[1]); scene.add(g);
     const pl = L3(q[2]), tr = L3(q[3]), gy = L3(0x6e7680);
     const fu = A(Cy(0.09, 0.09, 0.9, 10), gy, 0, 0.45, 0, g); fu.rotation.x = Math.PI / 2; [-0.38, 0.38].forEach(zz => { const lg = A(Bx(0.1, 0.7, 0.1), gy, 0, 0.3, zz, g); lg.rotation.x = zz > 0 ? 0.3 : -0.3; A(Bx(0.4, 0.06, 0.12), gy, 0, 0.03, zz * 1.4, g); });
     const board = new T.Group(); board.position.set(0, 0.6, 0); board.rotation.z = q[4]; g.add(board);
     A(Bx(3.2, 0.1, 0.5), pl, 0, 0, 0, board); [-1, 1].forEach(sg => { A(Bx(0.5, 0.04, 0.54), tr, sg * 1.35, 0.07, 0, board); A(Bx(0.04, 0.4, 0.32), gy, sg * 1.08, 0.3, 0, board); A(Bx(0.04, 0.04, 0.5), gy, sg * 1.08, 0.5, 0, board); A(new T.TorusGeometry(0.14, 0.05, 6, 12), L3(0x2a2a2a), sg * 1.6, -0.15, 0, board).rotation.y = Math.PI / 2; });
-    box(q[0] - 0.2, q[1] - 0.45, q[0] + 0.2, q[1] + 0.45, 0.05, 0.9, M.steel, { wall: true, noShadow: true }).visible = false; }); }
+    box(q[0] - 0.2, q[1] - 0.45, q[0] + 0.2, q[1] + 0.45, 0.05, 0.9, M.steel, { wall: true, noShadow: true }).visible = false;
+    PG.items.push({ id: 'saw' + (q[4] > 0 ? 1 : 2), kind: 'saw', name: '蹺蹺板', ic: '⚖️', x: q[0] - 1.35, z: q[1], r: 1.9, cx: q[0], board, tilt: q[4] }); });
+  // ===== 其他遊具：鞦韆、攀爬架、沙坑、旋轉盤、搖搖馬，以及玩法說明牌 =====
+  const wd = L3(0xb8863f), rd2 = L3(0xd9534f), bl2 = L3(0x3a8fd9), gy2 = L3(0x6e7680), yl2 = L3(0xf5c542);
+  { const sg = new T.Group(); sg.position.set(1.8, 0.05, -77.0); scene.add(sg);   // 鞦韆組：A 字架＋兩座鞦韆
+    A(Cy(0.07, 0.07, 3.8, 10), rd2, 0, 2.4, 0, sg).rotation.z = Math.PI / 2;
+    [-1.8, 1.8].forEach(xx => [-1, 1].forEach(zz => { const lg = A(Cy(0.06, 0.06, 2.53, 8), rd2, xx, 1.2, zz * 0.4, sg); lg.rotation.x = -zz * Math.atan(0.8 / 2.4); }));
+    const pv = [-0.65, 0.65].map(sx => { const p = new T.Group(); p.position.set(sx, 2.4, 0); sg.add(p); [-0.22, 0.22].forEach(rx => A(Bx(0.03, 1.75, 0.03), gy2, rx, -0.875, 0, p)); A(Bx(0.55, 0.06, 0.28), bl2, 0, -1.78, 0, p); return p; });
+    [0.0, 3.6].forEach(xx => box(xx - 0.2, -77.3, xx + 0.2, -76.7, 0.05, 2.4, M.steel, { wall: true, noShadow: true }).visible = false);
+    PG.items.push({ id: 'swing', kind: 'swing', name: '鞦韆', ic: '🎠', x: 1.15, z: -75.7, r: 2.3, pv, px: 1.15, py: 2.45, pz: -77.0, L: 1.78 }); }
+  { const cg = new T.Group(); cg.position.set(-7.3, 0.05, -75.0); scene.add(cg); const bm = L3(0x4a86c8);   // 攀爬架：立方格架＋一層平台
+    [[-1.2, -1.2], [1.2, -1.2], [-1.2, 1.2], [1.2, 1.2]].forEach(q => A(Cy(0.06, 0.06, 2.3, 8), bm, q[0], 1.15, q[1], cg));
+    [0.7, 1.4, 2.1].forEach(y => { A(Bx(2.4, 0.05, 0.05), bm, 0, y, -1.2, cg); A(Bx(2.4, 0.05, 0.05), bm, 0, y, 1.2, cg); A(Bx(0.05, 0.05, 2.4), bm, -1.2, y, 0, cg); A(Bx(0.05, 0.05, 2.4), bm, 1.2, y, 0, cg); });
+    [-0.6, 0, 0.6].forEach(zz => A(Bx(2.4, 0.05, 0.05), bm, 0, 2.2, zz, cg)); [-0.6, 0.6].forEach(xx => A(Bx(0.05, 0.05, 2.4), bm, xx, 2.2, 0, cg));
+    A(Bx(1.2, 0.08, 1.2), wd, 0.6, 1.4, 0.6, cg); [0.7, 1.05].forEach(y => A(Bx(0.05, 0.05, 2.4), bm, -1.2 + 0.0, y, 0, cg));
+    box(-8.5, -76.2, -6.1, -73.8, 0.05, 2.3, M.steel, { wall: true, noShadow: true }).visible = false;
+    PG.items.push({ id: 'climb', kind: 'climb', name: '攀爬架', ic: '🧗', x: -7.3, z: -73.1, r: 2.2, top: [-6.7, 1.5, -74.4] }); }
+  { const sd = new T.Group(); sd.position.set(2.2, 0.05, -69.0); scene.add(sd);   // 沙坑
+    [-1.6, 1.6].forEach(zz => A(Bx(4.2, 0.25, 0.2), wd, 0, 0.125, zz, sd)); [-2.0, 2.0].forEach(xx => A(Bx(0.2, 0.25, 3.0), wd, xx, 0.125, 0, sd));
+    A(Bx(3.8, 0.15, 3.0), L3(0xe8d3a0), 0, 0.09, 0, sd); A(Cy(0.18, 0.14, 0.28, 12), rd2, 0.9, 0.28, 0.4, sd); A(Bx(0.05, 0.45, 0.05), yl2, 0.5, 0.3, -0.6, sd).rotation.z = 0.4; A(Bx(0.18, 0.04, 0.2), yl2, 0.62, 0.52, -0.6, sd);
+    [[-0.9, -0.3, 0.3], [-0.5, 0.3, 0.2], [1.2, -0.7, 0.22]].forEach(q => { const m = A(Sp(q[2]), L3(0xdcc48c), q[0], 0.15, q[1], sd); m.scale.y = 0.6; });
+    PG.items.push({ id: 'sand', kind: 'sand', name: '沙坑', ic: '🏖', x: 2.2, z: -69.0, r: 3.0 }); }
+  { const mg = new T.Group(); mg.position.set(-7.3, 0.05, -68.0); scene.add(mg); A(Cy(0.28, 0.35, 0.4, 12), gy2, 0, 0.2, 0, mg);   // 旋轉盤
+    const disc = new T.Group(); disc.position.y = 0.45; mg.add(disc); const cs = [0xe0453a, 0xf5c542, 0x3a8fd9, 0x58a868];
+    cs.forEach((c, i) => { const sc = new T.Mesh(new T.CylinderGeometry(1.3, 1.3, 0.1, 12, 1, false, i * Math.PI / 2, Math.PI / 2), L3(c)); sc.castShadow = true; disc.add(sc); });
+    A(Cy(0.05, 0.05, 1.0, 8), gy2, 0, 0.5, 0, disc); A(new T.TorusGeometry(1.1, 0.03, 6, 28), gy2, 0, 0.8, 0, disc).rotation.x = Math.PI / 2; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; A(Cy(0.03, 0.03, 0.75, 6), gy2, Math.cos(a) * 1.1, 0.4, Math.sin(a) * 1.1, disc); }
+    box(-7.6, -68.3, -7.0, -67.7, 0.05, 0.6, M.steel, { wall: true, noShadow: true }).visible = false;
+    PG.items.push({ id: 'merry', kind: 'merry', name: '旋轉盤', ic: '🎡', x: -7.3, z: -66.5, r: 2.4, disc, cx: -7.3, cz: -68.0, cy: 0.6 }); }
+  [[-0.6, -72.8, 0xf29ac4, 'horse1'], [-0.6, -70.4, 0xb8863f, 'horse2']].forEach(q => { const hg = new T.Group(); hg.position.set(q[0], 0.05, q[1]); scene.add(hg);   // 搖搖馬（頭朝 -z）
+    A(Cy(0.28, 0.32, 0.06, 12), gy2, 0, 0.03, 0, hg); const rider = new T.Group(); rider.position.y = 0.06; hg.add(rider); const bd = L3(q[2]), mn = L3(0xf5e6a8), bk = L3(0x1c1c1c);
+    A(Cy(0.07, 0.07, 0.55, 8), gy2, 0, 0.3, 0, rider); A(Sp(0.28), bd, 0, 0.78, 0, rider).scale.set(0.7, 0.65, 1.3); A(Sp(0.17), bd, 0, 1.1, -0.38, rider); A(Bx(0.16, 0.14, 0.22), bd, 0, 1.04, -0.55, rider);
+    [-0.07, 0.07].forEach(xx => { A(new T.ConeGeometry(0.05, 0.14, 4), bd, xx, 1.3, -0.34, rider); A(Sp(0.025), bk, xx * 1.6, 1.14, -0.5, rider); }); A(Bx(0.05, 0.3, 0.1), mn, 0, 1.1, -0.28, rider); A(new T.ConeGeometry(0.07, 0.3, 5), mn, 0, 0.82, 0.42, rider).rotation.x = -0.5; A(Bx(0.36, 0.04, 0.04), gy2, 0, 1.0, -0.25, rider);
+    box(q[0] - 0.25, q[1] - 0.25, q[0] + 0.25, q[1] + 0.25, 0.05, 0.6, M.steel, { wall: true, noShadow: true }).visible = false;
+    PG.items.push({ id: q[3], kind: 'horse', name: '搖搖馬', ic: '🐴', x: q[0], z: q[1], r: 1.5, rider, bx: q[0], bz: q[1] }); });
+  { const sg2 = new T.Group(); sg2.position.set(-1.3, 0.05, -64.4); scene.add(sg2); [-0.8, 0.8].forEach(xx => A(Bx(0.1, 1.5, 0.1), wd, xx, 0.75, 0, sg2)); A(Bx(1.9, 0.9, 0.08), L3(0xf3e3b8), 0, 1.3, 0, sg2); A(Bx(2.0, 0.06, 0.1), L3(0x8a5a35), 0, 1.78, 0, sg2); A(Bx(2.0, 0.06, 0.1), L3(0x8a5a35), 0, 0.84, 0, sg2);
+    label('🛝 遊樂場・玩法說明', -1.3, 2.7, -64.4, 2.0, '#fff4e0'); PG.sign = { x: -1.3, z: -62.9, r: 2.2 }; }
+  PG.items.push({ id: 'bar', kind: 'bar', name: '單槓', ic: '💪', x: 1.0, z: -91.4, r: 1.7, bx: 1.0, bz: -94.4 }); }
 [-96, -94.4, -92.8].forEach(z => box(-1.0, z, 3.0, z + 0.08, 0.05, 1.5, M.steel, { noShadow: true }));   // 單槓
 const __ps = scene.children.length;
 { const cx = -3.4, cz = -59.3, hs = 1.6, cw = 0.5, ch = 3.8;   // 涼亭：四根方柱（下黃上藍）＋淺藍四角錐屋頂
@@ -9962,6 +10000,81 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   ia({ id: 'islThrone', x: ISL.thr.x, get y() { return ISY(); }, z: ISL.thr.z, r: 2.2, txt: () => '👑 坐上王座', act: () => say('👑 天之城的王座', '你坐上王座，整個大廳都安靜下來。\n\n牆上的旗幟寫著：「學習、合作、快樂」。\n城堡的四座藍頂塔加上中央的紅頂主塔，剛好是五座——傳說，正是為了等待五位「轉生者」到齊。\n\n遠遠地，你彷彿聽見地面那座同樂校舍傳來的校歌迴音……', [{ label: '起身離開' }], AV(0)) });
   ia({ id: 'islChest', x: ISL.thr.cx, get y() { return ISY(); }, z: ISL.thr.cz, r: 2, txt: () => S.islChest ? '📦 空的寶箱' : '🎁 打開寶箱', act: () => { if (S.islChest) { toast('寶箱空了，下次再來看看吧', 2200); return; } S.islChest = 1; S.coin = (S.coin || 0) + 30; if (S.items) S.items.med = (S.items.med || 0) + 1; save(); refreshAll(); SFX.play('win', 200); toast('🎁 古老寶箱裡留著賢者的補給：金幣 +30、補血包 +1！', 3600); } });
 
+  /* ---------- 遊戲器材區：溜滑梯、蹺蹺板、鞦韆、攀爬架、沙坑、旋轉盤、搖搖馬、單槓（走近按 F 遊玩）---------- */
+  { const PG = window.PLAYG; if (PG && PG.items) {
+    const KINDS = [['slide', '🛝', '溜滑梯'], ['saw', '⚖️', '蹺蹺板'], ['swing', '🎠', '鞦韆'], ['climb', '🧗', '攀爬架'], ['sand', '🏖', '沙坑'], ['merry', '🎡', '旋轉盤'], ['horse', '🐴', '搖搖馬'], ['bar', '💪', '單槓']];
+    const V3 = a => ({ x: a[0], y: a[1], z: a[2] }), lerp = (a, b, t) => a + (b - a) * t, ez = t => t * t * (3 - 2 * t), sat = t => Math.max(0, Math.min(1, t));
+    let RIDE = null, sandAt = 0;
+    const pgD = () => { const d = D(); d.pg = d.pg || {}; d.pgk = d.pgk || {}; return d; };
+    const face = (dx, dz) => { PL.yaw = Math.atan2(-dx, -dz); };
+    const setP = (x, y, z) => { PL.x = x; PL.y = y; PL.z = z; PL.vy = 0; };
+    function ride(it, dur, upd, fin, hint) {
+      if (RIDE) return; if (!spend(1)) return;
+      RIDE = { it, t: 0, dur, upd, fin, push: 0, st: {} }; window.__spd = 0.000001; PL.vy = 0; if (hint) toast(hint, 3200);
+    }
+    function endRide() { const r = RIDE; RIDE = null; window.__spd = 1; PL.vy = 0; try { r.fin && r.fin(r); } catch (e) { /* 忽略 */ } reward(r.it, r); }
+    function reward(it, r) {
+      const d = pgD(), n = d.pg[it.id] = (d.pg[it.id] || 0) + 1; d.pgk[it.kind] = 1;
+      const pts = n === 1 ? 5 : n <= 3 ? 2 : 0; if (pts) addPts(pts, it.ic + ' 玩' + it.name + (n === 1 ? '（今天第一次）' : ''));
+      else toast(it.ic + ' ' + it.name + ' 好好玩！（今天的點數已領完，但還是很開心）', 2400);
+      S.mp = Math.min(mpMax(), S.mp + 3);
+      if (r && r.bonus) addPts(r.bonus, r.bonusWhy || '');
+      if (KINDS.every(k => d.pgk[k[0]]) && !d.pgAll) { d.pgAll = 1; setTimeout(() => { addPts(20, '🏅 遊樂場小達人：今天八種器材都玩過了！'); S.coin = (S.coin || 0) + 10; if (!S.pgBadge) { S.pgBadge = 1; setTimeout(() => toast('🏅 獲得稱號「遊樂場小達人」！', 3800), 1800); } }, 1500); }
+      save(); try { refreshAll(); } catch (e) { /* 忽略 */ }
+    }
+    L.pgTick = dt => {
+      if (!RIDE) return; const r = RIDE; r.t += dt; PL.vy = 0;
+      try { r.upd(r.t, dt, r); } catch (e) { RIDE = null; window.__spd = 1; return; }
+      if (r.t >= r.dur) endRide();
+    };
+    const playOf = {
+      slide(it) { const T0 = 3.2; const b = [it.x, 0.05, it.z], tp = it.top, dk = it.deck, fr = it.from, to = it.to;
+        ride(it, T0, t => { if (t < 1.0) { const u = ez(t / 1.0); setP(lerp(b[0], tp[0], u), lerp(b[1], tp[1], u), lerp(b[2], tp[2], u)); face(0, -1); }
+          else if (t < 1.4) { const u = (t - 1.0) / 0.4; setP(lerp(tp[0], dk[0], u), dk[1], lerp(tp[2], dk[2], u)); }
+          else if (t < 1.7) { const u = (t - 1.4) / 0.3; setP(lerp(dk[0], fr[0], u), fr[1], dk[2]); face(1, 0); }
+          else { const u = sat((t - 1.7) / 1.5), e = u * u * 0.6 + u * 0.4; setP(lerp(fr[0], to[0], e), lerp(fr[1], to[1], e), fr[2]); face(1, 0); } }, null, '🛝 爬上去～ 溜下來！'); },
+      saw(it) { const bd = it.board, cx = it.cx, z = it.z, base = 0.05 + 0.6; const t0 = bd.rotation.z;
+        ride(it, 6.4, t => { const th = 0.24 * Math.sin(t * 3.4) * sat(t / 0.6); bd.rotation.z = lerp(t0, th, sat(t / 0.6)); const lx = -1.35, ly = 0.12; setP(cx + lx * Math.cos(bd.rotation.z) - ly * Math.sin(bd.rotation.z), base + lx * Math.sin(bd.rotation.z) + ly * Math.cos(bd.rotation.z) - 0.45, z); face(1, 0); },
+          () => { bd.rotation.z = it.tilt; }, '⚖️ 坐穩囉，上上下下～'); },
+      swing(it) { const p = it.pv[0]; let ph = 0, A = 0.28; const L0 = it.L;
+        ride(it, 9, (t, dt, r) => { A = Math.min(0.95, 0.28 + r.push * 0.13) * sat(t / 0.8) + 0.0; ph += dt * (2.4 - A * 0.5); const th = A * Math.sin(ph); it.pv.forEach(q => { q.rotation.x = th * (q === p ? 1 : 0.85); });
+            setP(it.px, it.py - L0 * Math.cos(th) - 0.5, it.pz - L0 * Math.sin(th)); face(0, -1); r.maxA = Math.max(r.maxA || 0, A); },
+          r => { it.pv.forEach(q => { q.rotation.x = 0; }); if ((r.maxA || 0) >= 0.7) { r.bonus = 3; r.bonusWhy = '🎠 盪得好高好高！'; } }, '🎠 玩的時候按 F，可以用力盪得更高！'); },
+      climb(it) { const b = [it.x, 0.05, it.z], tp = it.top;
+        ride(it, 4.6, t => { if (t < 1.6) { const u = ez(t / 1.6); setP(lerp(b[0], tp[0], u), lerp(b[1], tp[1], u), lerp(b[2], tp[2], u)); face(0, 1); }
+          else if (t < 3.2) { setP(tp[0], tp[1], tp[2]); if (t > 1.7 && !RIDE.st.w) { RIDE.st.w = 1; toast('👀 哇，好高！看得到整個遊戲區耶！', 2600); } PL.yaw += 0.8 * 0.016; }
+          else { const u = ez((t - 3.2) / 1.4); setP(lerp(tp[0], b[0], u), lerp(tp[1], b[1], u), lerp(tp[2], b[2], u)); } },
+          r => { try { addAttr('body', 1); } catch (e) { /* 忽略 */ } }, '🧗 一格一格往上爬！'); },
+      merry(it) { const c = [it.cx, it.cy, it.cz]; let w = 1.2, ang = Math.PI * 0.5;
+        ride(it, 7.5, (t, dt, r) => { const tgt = Math.min(5.5, 1.6 + r.push * 1.0); w += (tgt * sat(1 - Math.max(0, t - 5.8) / 1.7) - w) * Math.min(1, dt * 1.6); ang += w * dt; it.disc.rotation.y -= w * dt; setP(c[0] + Math.cos(ang) * 0.85, c[1], c[2] + Math.sin(ang) * 0.85); PL.yaw = Math.atan2(-Math.cos(ang), -Math.sin(ang)) + Math.PI / 2; },
+          null, '🎡 抓緊囉！玩的時候按 F，幫忙推得更快'); },
+      horse(it) { const rd = it.rider;
+        ride(it, 5.2, t => { const th = 0.3 * Math.sin(t * 4.2) * sat(t / 0.5); rd.rotation.x = th; setP(it.bx, 0.11 + 0.85 * Math.cos(th) - 0.5, it.bz + 0.85 * Math.sin(th)); face(0, -1); }, () => { rd.rotation.x = 0; }, '🐴 駕～駕～'); },
+      bar(it) { const b = [it.x, 0.05, it.z];
+        ride(it, 5.0, t => { if (t < 0.6) { const u = ez(t / 0.6); setP(lerp(b[0], it.bx, u), 0.05, lerp(b[2], it.bz + 0.9, u)); face(0, -1); }
+          else if (t < 4.4) { const u = (t - 0.6) / 3.8, k = 0.5 - 0.5 * Math.cos(u * Math.PI * 6); setP(it.bx, 0.5 + 0.45 * k, it.bz + 0.9); face(0, -1); if (!RIDE.st.c || RIDE.st.c < Math.floor(u * 3) + 1) { RIDE.st.c = Math.floor(u * 3) + 1; if (RIDE.st.c <= 3) toast('💪 ' + RIDE.st.c + '！', 900); } }
+          else { setP(it.bx, 0.05, it.bz + 0.9); } },
+          () => { try { addAttr('body', 2); } catch (e) { /* 忽略 */ } }, '💪 引體向上三下！'); },
+      sand(it) { const now = performance.now(); if (now - sandAt < 700) return; sandAt = now; const d = pgD(); d.sd = (d.sd || 0) + 1;
+        if (d.sd > 12) { toast('🏖 今天已經挖了很多寶物，明天再來吧！', 2800); return; }
+        const r = Math.random(); let msg;
+        if (r < 0.45) { S.coin = (S.coin || 0) + 1; msg = '🐚 挖到一個漂亮的貝殼！（🪙+1）'; }
+        else if (r < 0.8) { S.coin = (S.coin || 0) + 3; msg = '🪙 挖到一枚小硬幣！（🪙+3）'; }
+        else if (r < 0.95) { addPts(2, '⭐ 挖到一顆小星星！'); msg = null; }
+        else { addPts(8, '🦴 哇！挖到恐龍化石！'); msg = null; }
+        if (msg) toast(msg, 2200); try { SFX.play('win', 80); } catch (e) { /* 忽略 */ }
+        S.pgSand = (S.pgSand || 0) + 1; if (S.pgSand % 3 === 0) { if (spend(1)) reward(it); } else toast('⛏ 再挖挖看（每挖 3 次算玩過一次沙坑）', 1800); save(); }
+    };
+    PG.items.forEach(it => {
+      ia({ id: 'pg_' + it.id, x: it.x, y: 0.05, z: it.z, r: it.r || 1.8, pen: -1,
+        txt: () => { if (RIDE) return RIDE.it === it && (it.kind === 'swing' || it.kind === 'merry') ? it.ic + ' 按 F ' + (it.kind === 'swing' ? '用力盪！' : '用力推！') : ''; return it.ic + ' ' + (it.kind === 'slide' ? '玩' : it.kind === 'sand' ? '挖沙' : it.kind === 'bar' ? '做引體向上' : it.kind === 'climb' ? '爬上去' : '玩') + it.name; },
+        act: () => { if (RIDE) { if (RIDE.it === it && (it.kind === 'swing' || it.kind === 'merry') && RIDE.push < 6) { RIDE.push++; toast(it.kind === 'swing' ? '💨 用力盪！' : '💨 推！', 700); } return; } if (S.hp !== undefined && S.hp < 1) { toast('體力不足 💤 先休息一下再來玩', 2600); return; } playOf[it.kind](it); } });
+    });
+    if (PG.sign) ia({ id: 'pg_sign', x: PG.sign.x, y: 0.05, z: PG.sign.z, r: PG.sign.r, pen: -1, txt: () => '🛝 看遊樂場玩法說明', act: () => {
+      const d = pgD(), row = KINDS.map(k => (d.pgk[k[0]] ? '✅' : '⬜') + ' ' + k[1] + k[2]).join('　');
+      say('🛝 遊樂場・玩法說明', '走到器材旁，按「F」（手機按橘色互動鈕）就能玩！\n\n🛝 溜滑梯：自己爬上去、溜下來（恐龍、火箭兩座）\n⚖️ 蹺蹺板：坐上去搖一搖\n🎠 鞦韆：玩的時候多按 F，盪得更高\n🧗 攀爬架：爬到最高層看風景\n🏖 沙坑：每挖 3 次算玩過一次，可能挖到寶物\n🎡 旋轉盤：玩的時候按 F 幫忙推\n🐴 搖搖馬：坐上去騎一騎\n💪 單槓：做 3 下引體向上（體能 +2）\n\n獎勵：每項每天第 1 次 +5 點、第 2～3 次各 +2 點；每次玩恢復 MP 3 點、消耗體力 1 點。\n八種都玩過 → 「遊樂場小達人」+20 點、🪙+10！\n\n今天：' + row + (S.pgBadge ? '\n🏅 你已經是「遊樂場小達人」囉！' : ''), [{ label: '我知道了，去玩！', pri: true }], AV(0)); } });
+    L.playground = { items: PG.items, get riding() { return !!RIDE; }, play: id => { const it = PG.items.find(x => x.id === id); if (it) playOf[it.kind](it); }, KINDS };
+  } }
   /* ---------- 浮空篇・故事線：三大怪談＋五件神器＋啟動傳送陣（目前只做劇情，關卡之後再設計） ---------- */
   const SPD = () => S.sp || (S.sp = { art: {} }), spArt = () => { const a = (S.sp && S.sp.art) || {}; return Object.keys(a).filter(k => a[k]).length; };
   const ARTS = { 0: ['小樂', '⚔️', '勇氣之劍', '操場'], 1: ['小同', '🎤', '星光麥克風', '禮堂'], 2: ['小創', '🔧', '機巧扳手', '電腦教室'], 3: ['小味', '🍳', '金牌鍋鏟', '涼亭・遊戲區'], 4: ['小知', '🔮', '星象魔導書', '校史室'] };
@@ -10023,6 +10136,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     Object.keys(spMemberMark).forEach(k => { spMemberMark[k].visible = !(S.sp && S.sp.art && S.sp.art[k]) && (k === '4' ? !(S.sp && S.sp.blue) : !!(S.sp && S.sp.blue)); }); };
   L.story = { get sp() { return SPD(); }, art: spArt, set h(v) { L.clock.h = v; } };
   function islTick(dt, night, c) {
+    if (L.pgTick) L.pgTick(dt);
     ISL.t += dt; const t = ISL.t, g = ISL.g;
     if (!g.userData.fix) g.position.y = 92 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
     if (ISL.wmat) ISL.wmat.color.setHex(night || c.dark > 0.3 ? 0xffd25a : 0x8a8f9c);
