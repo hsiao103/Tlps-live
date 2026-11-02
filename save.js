@@ -30,11 +30,11 @@
       const row = await B.pull();
       if (row === undefined) { if (first) L.setCloudLabel('本機存檔（重新登入即可同步雲端）'); return; }
       const mine = st(), cloud = row && row.data && row.data.v === 1 ? row.data : null;
-      if (!cloud) { L.setCloudLabel('☁ 已連線'); if (+mine.pts || +mine.t) flush(); ok = true; return; }
+      if (!cloud) { L.setCloudLabel('☁ 已連線'); if (+mine.pts || +mine.t) flush(); ok = true; if (first && L.mpInit) L.mpInit(B, A.session()); return; }
       const m = merge(mine, cloud), pm = +mine.pts || 0, pc = +cloud.pts || 0;
       if (pc > pm || (pc === pm && (+cloud.t || 0) > (+mine.t || 0))) { L.setState(m); L.setCloudLabel('☁ 已載入雲端進度（LV 與點數與其他裝置一致）'); }
       else { L.setCloudLabel('☁ 已連線'); if (first) L.setState(m); flush(); }
-      ok = true;
+      ok = true; if (first && L.mpInit) L.mpInit(B, A.session());
     } catch (e) { if (first) L.setCloudLabel('本機存檔（雲端暫時無法連線）'); }
   }
   const start = () => sync(true);

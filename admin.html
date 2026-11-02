@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>同樂宇宙｜管理後台</title>
+<style id="tlgate">html,body{visibility:hidden!important;background:#fff}</style>
+<script src="auth-config.js"></script><script src="auth.js"></script><script src="live-config.js"></script><script src="sb.js"></script>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1b2433;--mut:#6b7690;--pri:#2b6fe0;--line:#e3e8f0;--ok:#1c9a4b;--bad:#d9433f}
+@media (prefers-color-scheme:dark){:root{--bg:#10151f;--card:#18202e;--ink:#e8edf7;--mut:#8f9bb3;--line:#273247}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px;background:var(--pri);color:#fff}header h1{font-size:18px;margin:0;flex:1}header small{opacity:.85}
+header button,.btn{border:0;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;padding:6px 12px;font:inherit;cursor:pointer}
+main{max-width:1100px;margin:0 auto;padding:14px 16px 40px;display:grid;gap:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}.card .n{font-size:28px;font-weight:800}.card .l{color:var(--mut);font-size:12px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;overflow:hidden}section h2{margin:0 0 8px;font-size:15px}
+.tbl{overflow:auto;max-height:420px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);white-space:nowrap}td.m{white-space:normal;word-break:break-all;min-width:160px}th{position:sticky;top:0;background:var(--card);color:var(--mut)}
+.f{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}.f input,.f select{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:5px 8px;font:inherit}
+.b2{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:3px 8px;font:inherit;cursor:pointer}.b2.p{background:var(--pri);color:#fff;border-color:var(--pri)}.b2.d{color:var(--bad)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}svg text{fill:var(--mut);font-size:10px}.msg{padding:30px;text-align:center;color:var(--mut)}
+.tag{display:inline-block;border-radius:99px;padding:0 8px;font-size:11px;background:var(--bg);border:1px solid var(--line)}.on{color:var(--ok)}
+</style></head><body>
+<header><h1>🛠 同樂宇宙・管理後台</h1><small id="who"></small><button id="rf">⟳ 重新整理</button><button id="back">回遊戲</button></header>
+<main id="app"><div class="msg" id="st">載入中…</div></main>
+<script>
+(function(){
+const A=window.TLAUTH,B=window.TLCLOUD,C=window.TL_LIVE_CONFIG||{},$=s=>document.querySelector(s);
+const show=()=>{const g=document.getElementById('tlgate');if(g)g.remove()};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sess=A&&A.session(),admins=((A&&A.cfg.adminEmails)||[]).map(x=>x.toLowerCase());
+const deny=t=>{show();$('#app').innerHTML='<div class="msg">'+t+'</div>'};
+$('#back').onclick=()=>location.href=(A&&A.cfg.fullPage)||'play.html';
+if(!sess){location.replace((A.cfg.visitorPage||'index.html')+'?need=login');return}
+if(admins.indexOf(String(sess.email).toLowerCase())<0){deny('此帳號（'+esc(sess.email)+'）沒有管理權限。');return}
+if(!B||!B.configured()||!B.session()){deny('尚未取得雲端登入。請先回到登入頁以 Google 帳號登入一次，再開啟本頁。');return}
+show();$('#who').textContent=sess.email;
+async function get(path){const s=await B.token();if(!s)throw new Error('session');const r=await fetch(String(C.supabaseUrl).replace(/\/+$/,'')+'/rest/v1/'+path,{headers:{apikey:C.supabaseAnonKey,Authorization:'Bearer '+s.access}});if(!r.ok)throw new Error(path.split('?')[0]+' '+r.status);return r.json()}
+async function call(path,method,body,extra){const s=await B.token();const r=await fetch(String(C.supabaseUrl).replace(/\/+$/,'')+'/rest/v1/'+path,{method,headers:Object.assign({apikey:C.supabaseAnonKey,Authorization:'Bearer '+s.access,'Content-Type':'application/json'},extra||{}),body:body?JSON.stringify(body):undefined});if(!r.ok)throw new Error(method+' '+r.status)}
+const pad=n=>String(n).padStart(2,'0'),fmt=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes())},fmtT=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())};
+const day0=d=>{d=new Date(d);d.setHours(0,0,0,0);return d.getTime()};
+let SES=[],CHAT=[],MUTES={};
+function uniq(sessions,t0,t1){const s=new Set();sessions.forEach(x=>{if(x.a<t1&&x.b>=t0)s.add(x.user_id)});return s.size}
+function bars(vals,labels,color,w,h){const mx=Math.max(1,...vals),bw=(w-30)/vals.length;let o='<svg viewBox="0 0 '+w+' '+h+'" width="100%"><g>';vals.forEach((v,i)=>{const bh=(h-30)*v/mx;o+='<rect x="'+(24+i*bw+1)+'" y="'+(h-18-bh)+'" width="'+Math.max(1,bw-2)+'" height="'+bh+'" rx="2" fill="'+color+'"><title>'+labels[i]+'：'+v+' 人</title></rect>';if(v)o+='<text x="'+(24+i*bw+bw/2)+'" y="'+(h-21-bh)+'" text-anchor="middle">'+v+'</text>';if(labels.length<=12||i%3===0)o+='<text x="'+(24+i*bw+bw/2)+'" y="'+(h-5)+'" text-anchor="middle">'+labels[i]+'</text>'});return o+'</g><line x1="22" x2="'+w+'" y1="'+(h-18)+'" y2="'+(h-18)+'" stroke="currentColor" opacity=".2"/></svg>'}
+function render(){
+ const now=Date.now(),t0=day0(now),online=SES.filter(x=>x.b>=now-150000),ou=new Map();online.forEach(x=>ou.set(x.user_id,x));
+ const todayU=uniq(SES,t0,now+1),chatToday=CHAT.filter(c=>+new Date(c.created_at)>=t0).length;
+ // 尖峰（近 24 小時，每 5 分鐘取樣）
+ let peak=0,peakT=0;for(let t=now-86400000;t<=now;t+=300000){const s=new Set();SES.forEach(x=>{if(x.a<=t&&x.b>=t)s.add(x.user_id)});if(s.size>peak){peak=s.size;peakT=t}}
+ const dur=SES.filter(x=>x.a>=t0).map(x=>(x.b-x.a)/60000),avg=dur.length?Math.round(dur.reduce((a,b)=>a+b,0)/dur.length):0;
+ const hrs=[],hl=[];for(let i=23;i>=0;i--){const e=now-i*3600000,h0=Math.floor(e/3600000)*3600000;hrs.push(uniq(SES,h0,h0+3600000));hl.push(pad(new Date(h0).getHours()))}
+ const ds=[],dl=[];for(let i=6;i>=0;i--){const d0=day0(now-i*86400000);ds.push(uniq(SES,d0,d0+86400000));const d=new Date(d0);dl.push((d.getMonth()+1)+'/'+d.getDate())}
+ const rooms={};online.forEach(x=>{if(ou.get(x.user_id)===x)rooms[x.room||'lobby']=(rooms[x.room||'lobby']||0)+1});
+ const roomOpts=Array.from(new Set(CHAT.map(c=>c.room))).map(r=>'<option>'+esc(r)+'</option>').join('');
+ $('#app').innerHTML='<div class="cards"><div class="card"><div class="n">'+ou.size+'</div><div class="l">目前上線（2.5 分鐘內有動靜）</div></div><div class="card"><div class="n">'+todayU+'</div><div class="l">今日不重複上線人數</div></div><div class="card"><div class="n">'+peak+'</div><div class="l">近 24 小時尖峰同時在線'+(peak?'（'+fmt(peakT)+'）':'')+'</div></div><div class="card"><div class="n">'+chatToday+'</div><div class="l">今日聊天則數</div></div><div class="card"><div class="n">'+avg+'<small> 分</small></div><div class="l">今日平均連線時間</div></div></div>'
+ +'<div class="cols"><section><h2>近 24 小時各時段上線人數</h2>'+bars(hrs,hl,'#2b6fe0',480,170)+'</section><section><h2>近 7 天每日上線人數</h2>'+bars(ds,dl,'#1c9a4b',480,170)+'</section></div>'
+ +'<section><h2>目前在線 <small style="color:var(--mut)">'+Object.keys(rooms).map(r=>'<span class="tag">'+esc(r)+'：'+rooms[r]+'</span>').join(' ')+'</small></h2><div class="tbl"><table><thead><tr><th>暱稱</th><th>信箱</th><th>房間</th><th>Lv</th><th>連線開始</th><th>最後動靜</th><th></th></tr></thead><tbody>'
+ +(ou.size?Array.from(ou.values()).sort((a,b)=>b.b-a.b).map(x=>'<tr><td>'+esc(x.nick)+'</td><td>'+esc(x.email)+'</td><td>'+esc(x.room)+'</td><td>'+esc(x.lv)+'</td><td>'+fmt(x.a)+'</td><td>'+fmtT(x.b)+'</td><td>'+muteBtn(x.user_id,x.email)+'</td></tr>').join(''):'<tr><td colspan="7" class="msg">目前沒有人在線。</td></tr>')+'</tbody></table></div></section>'
+ +'<section><h2>聊天紀錄</h2><div class="f"><input type="date" id="fd"><input type="date" id="ft"><select id="fr"><option value="">全部房間</option>'+roomOpts+'</select><input id="fk" placeholder="關鍵字／暱稱／信箱"><button class="b2 p" id="fq">查詢</button><button class="b2" id="fx">匯出 CSV</button><span id="fc" style="color:var(--mut);align-self:center"></span></div><div class="tbl"><table><thead><tr><th>時間</th><th>房間</th><th>暱稱</th><th>信箱</th><th>內容</th><th></th></tr></thead><tbody id="cb"></tbody></table></div></section>'
+ +'<section><h2>禁言名單</h2><div id="mu"></div></section>';
+ const df=$('#fd'),dt=$('#ft');const iso=t=>{const d=new Date(t);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};df.value=iso(now-2*86400000);dt.value=iso(now);
+ $('#fq').onclick=chatRows;$('#fk').onkeydown=e=>{if(e.key==='Enter')chatRows()};$('#fx').onclick=csv;chatRows();muteList();bind();
+}
+const muteBtn=(uid,em)=>MUTES[uid]?'<button class="b2" data-un="'+uid+'">解除禁言</button>':'<button class="b2 d" data-mu="'+uid+'" data-em="'+esc(em)+'">禁言</button>';
+let rowsNow=[];
+function chatRows(){const f=$('#fd').value,t=$('#ft').value,r=$('#fr').value,k=$('#fk').value.trim().toLowerCase(),a=f?+new Date(f+'T00:00:00'):0,b=t?+new Date(t+'T23:59:59'):Infinity;
+ rowsNow=CHAT.filter(c=>{const x=+new Date(c.created_at);return x>=a&&x<=b&&(!r||c.room===r)&&(!k||(c.msg+c.nick+c.email).toLowerCase().indexOf(k)>=0)});
+ $('#fc').textContent='共 '+rowsNow.length+' 則（只載入最近 2000 則）';
+ $('#cb').innerHTML=rowsNow.length?rowsNow.slice(0,500).map(c=>'<tr><td>'+fmt(c.created_at)+'</td><td>'+esc(c.room)+'</td><td>'+esc(c.nick)+'</td><td>'+esc(c.email)+'</td><td class="m">'+esc(c.msg)+'</td><td>'+muteBtn(c.user_id,c.email)+' <button class="b2 d" data-del="'+c.id+'">刪除</button></td></tr>').join(''):'<tr><td colspan="6" class="msg">沒有符合的紀錄。</td></tr>';bind()}
+function muteList(){const ks=Object.keys(MUTES);$('#mu').innerHTML=ks.length?ks.map(k=>'<div>🔇 '+esc(MUTES[k].email||k)+' <button class="b2" data-un="'+k+'">解除</button></div>').join(''):'<div class="msg" style="padding:8px">沒有被禁言的人。</div>';bind()}
+function csv(){const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"',L=['時間,房間,暱稱,信箱,內容'].concat(rowsNow.map(c=>[new Date(c.created_at).toLocaleString('zh-TW',{hour12:false}),c.room,c.nick,c.email,c.msg].map(q).join(',')));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+L.join('\r\n')],{type:'text/csv'}));a.download='聊天紀錄_'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
+function bind(){document.querySelectorAll('[data-mu]').forEach(b=>b.onclick=async()=>{if(!confirm('確定禁言 '+b.dataset.em+'？對方將無法再發言（仍可看到別人的訊息）。'))return;try{await call('tlps_live_mutes?on_conflict=user_id','POST',{user_id:b.dataset.mu,email:b.dataset.em},{Prefer:'resolution=merge-duplicates,return=minimal'});MUTES[b.dataset.mu]={email:b.dataset.em};render()}catch(e){alert('操作失敗：'+e.message)}});
+ document.querySelectorAll('[data-un]').forEach(b=>b.onclick=async()=>{try{await call('tlps_live_mutes?user_id=eq.'+b.dataset.un,'DELETE');delete MUTES[b.dataset.un];render()}catch(e){alert('操作失敗：'+e.message)}});
+ document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('刪除這則聊天紀錄？此動作無法復原。'))return;try{await call('tlps_live_chat?id=eq.'+b.dataset.del,'DELETE');CHAT=CHAT.filter(c=>String(c.id)!==b.dataset.del);chatRows()}catch(e){alert('刪除失敗：'+e.message)}})}
+async function load(){
+ try{
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  const [s,c,m]=await Promise.all([get('tlps_live_sessions?select=*&last_seen=gte.'+since+'&order=started_at.desc&limit=5000'),get('tlps_live_chat?select=*&order=created_at.desc&limit=2000'),get('tlps_live_mutes?select=*')]);
+  SES=s.map(x=>({user_id:x.user_id,email:x.email,nick:x.nick,room:x.room,lv:x.lv,a:+new Date(x.started_at),b:+new Date(x.last_seen)}));CHAT=c;MUTES={};m.forEach(x=>{MUTES[x.user_id]=x});
+  const keep=['fd','ft','fr','fk'].map(i=>$('#'+i)&&$('#'+i).value);render();['fd','ft','fr','fk'].forEach((i,n)=>{if(keep[n]!=null&&keep[n]!==''&&$('#'+i))$('#'+i).value=keep[n]});chatRows();
+ }catch(e){$('#app').innerHTML='<div class="msg">讀取失敗：'+esc(e.message)+'<br>請確認已在 Supabase 執行 supabase-mp.sql，且 supabase-mp.sql 內 tl_is_admin() 含你的信箱。</div>'}}
+$('#rf').onclick=load;load();setInterval(()=>{if(!document.hidden)load()},30000);
+})();
+</script></body></html>
