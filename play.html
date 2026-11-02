@@ -9435,7 +9435,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     for (let i = 0; i < CLD.N; i++) {
       const c = new T.Group(), n = 4 + Math.floor(rr() * 3), w = 22 + rr() * 26;
       for (let j = 0; j < n; j++) { const m = new T.Mesh(g, CLD.mat), r = w * (0.35 + rr() * 0.3); m.scale.set(r, r * 0.45, r * 0.8); m.position.set((j - n / 2) * w * 0.38 + (rr() - 0.5) * 6, (rr() - 0.4) * 6, (rr() - 0.5) * 10); m.frustumCulled = false; c.add(m); }
-      const a = rr() * 6.283, d = 90 + rr() * 330; CLD.items.push({ g: c, ox: Math.cos(a) * d, oz: Math.sin(a) * d, y: 85 + rr() * 55, v: 0.6 + rr() * 0.8, rank: i / CLD.N, k: 0 }); c.rotation.y = rr() * 3; c.frustumCulled = false; CLD.grp.add(c);
+      const a = rr() * 6.283, d = 70 + rr() * 260; CLD.items.push({ g: c, ox: Math.cos(a) * d, oz: Math.sin(a) * d, y: 40 + rr() * 32, v: 0.6 + rr() * 0.8, rank: i / CLD.N, k: 0 }); c.rotation.y = rr() * 3; c.frustumCulled = false; CLD.grp.add(c);
     }
   })();
   const CLD_COVER = { sun: 0.22, cloud: 0.62, over: 1, mist: 0.5, drizzle: 1, storm: 1, heavy: 1, typhoon: 1 };
@@ -9451,7 +9451,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   /* ---------- 天空浮空島＋城堡：高掛在校園北方天空，緩緩上下飄浮 ---------- */
   const ISL = { g: new T.Group(), flag: null, win: [], sat: [], fall: null, t: 0 };
-  ISL.g.name = 'liveSkyIsland'; ISL.g.position.set(30, 62, -380); scene.add(ISL.g);
+  ISL.g.name = 'liveSkyIsland'; ISL.g.position.set(0, 52, -120); scene.add(ISL.g);
   (() => {
     const M = (c, o) => new T.MeshLambertMaterial(Object.assign({ color: c }, o || {})), add = (m, x, y, z, par) => { m.position.set(x, y, z); m.frustumCulled = false; (par || ISL.g).add(m); return m; }, rr = rng(4242);
     const rock = M(0x7a6a58), rock2 = M(0x62564a), grass = M(0x6fae4e), stone = M(0xe3dccb), stone2 = M(0xcfc6b2), roofB = M(0x3f6fd8), roofR = M(0xc8423b), wood = M(0x6b4a2b);
@@ -9479,7 +9479,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   })();
   function islTick(dt, night, c) {
     ISL.t += dt; const t = ISL.t, g = ISL.g;
-    if (!g.userData.fix) g.position.y = 62 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
+    if (!g.userData.fix) g.position.y = 52 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
     if (ISL.wmat) ISL.wmat.color.setHex(night || c.dark > 0.3 ? 0xffd25a : 0x8a8f9c);
     const fl = ISL.flag; if (fl) { const pa = fl.geometry.attributes.position, b = fl.userData.base; for (let i = 0; i < pa.count; i++) { const x = b[i * 3] + 2.5; pa.array[i * 3 + 2] = Math.sin(t * 4 + x * 1.2) * 0.35 * (x / 5); } pa.needsUpdate = true; }
     ISL.sat.forEach(q => { q.a += q.v * dt; q.m.position.set(Math.cos(q.a) * q.d, q.y + Math.sin(t * 0.6 + q.a * 3) * 1.5, Math.sin(q.a) * q.d); q.m.rotation.y += dt * 0.3; });
@@ -10492,7 +10492,7 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
 #gGear{right:16px!important;border-radius:0 22px 22px 0}
 #gWxChip{top:calc(12px + env(safe-area-inset-top,0px))!important;right:60px!important;height:44px;box-sizing:border-box;border-radius:22px 0 0 22px;border-right-width:0;padding:0 10px 0 12px;gap:3px;font-size:14px;z-index:31}
 @media (max-width:400px){#gWxChip{padding:0 7px 0 9px}#gWxChip i,#gWxChip em{display:none}}
-#gHud{width:340px}
+#gHud{width:392px}
 @media (max-width:700px){#gHud{width:min(292px,calc(100vw - 20px))}}
 @media (max-height:500px) and (orientation:landscape){#gNetFeed{top:calc(218px + env(safe-area-inset-top,0px));width:min(210px,40vw)}#gNetFeed .ln:nth-child(n+3){display:none}#gNet .log{height:min(80px,26vh)}#gNet{top:8px;max-height:calc(100vh - 16px)}}`;
     document.head.appendChild(css);
@@ -10551,6 +10551,7 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
   function mpReconnect() { clearTimeout(MP.rt); const ws = MP.ws; MP.ws = null; try { ws && ws.close(); } catch (e) { /* 忽略 */ } mpDrop(); MP.retry = 0; setTimeout(mpConnect, 300); }
   L.mpInit = async function (B, sess) {
     if (MP.started) return; MP.started = true; mpUI();
+    await new Promise(r => setTimeout(r, 3500));   /* 先讓遊戲素材與雲端存檔載入，連線與聊天延後再啟動，避免開場搶頻寬 */
     if (!B || !B.configured || !B.configured()) { mpStatus('尚未啟用雲端（live-config.js 沒有設定 Supabase）'); return; }
     const bs = B.session && B.session(); if (!bs || !bs.uid) { let er = ''; try { er = localStorage.getItem('tl_sb_err') || ''; } catch (e) { /* 忽略 */ } mpStatus('尚未登入雲端：請登出後重新用 Google 登入' + (er ? '（上次雲端登入錯誤：' + er.slice(0, 120) + '）' : '')); return; }
     MP.on = true; MP.B = B; MP.uid = bs.uid; MP.email = (sess && sess.email) || bs.email || ''; mpCount();
