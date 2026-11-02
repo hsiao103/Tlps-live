@@ -4813,6 +4813,53 @@ function bld(o) {
       if (!isWC) for (let q = 0; q < 2; q++) for (let r2 = 0; r2 < 2; r2++) { const lu = dm + (q ? 1 : -1) * rwi * 0.22, lv = CORR + (Dr - CORR) * (r2 ? 0.7 : 0.32); R(lu - 0.7, lv - 0.12, lu + 0.7, lv + 0.12, y1 - 0.38, y1 - 0.31, M.lampM, { noShadow: true }); }   // 教室天花板燈管（夜間會亮）
       if (isWC) { const ns = rwi > 5 ? 3 : 2; for (let q = 0; q < ns; q++) { const pu2 = a + 0.8 + q * ((rwi - 1.6) / ns); R(pu2, Dr - 2.6, pu2 + 0.06, Dr - 0.3, y0, y0 + 1.9, M.wallIn, { noShadow: true }); } }
       else if (isHall) R(a + 2, Dr - 2.6, b - 2, Dr - 0.3, y0, y0 + 0.9, M.concrete, { noShadow: true });      // 禮堂：只有舞台，不設課桌椅
+      else if ((o.names && o.names[k] && o.names[k][i]) === '圖書館') {   // 圖書館（兩間合併）：書牆、書架區、閱覽區、繪本區、櫃檯
+        let sd = 7; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+        const wood = mat(0xa0703c), woodD = mat(0x6e4a2a), tab = mat(0xdcb683), carp = mat(0x6aa6a0), carp2 = mat(0xe8a7b0), cnt = mat(0xc98b5a), cntT = mat(0x4a3a2c), pcM = mat(0x2d3a4a), bag = [mat(0xe0645a), mat(0x5aa0e0), mat(0xf0c040)];
+        const PAL = [0xd9534f, 0x5b8dd9, 0xf0b840, 0x58a868, 0x9b6bd0, 0xe27ba0, 0x4fb5b0, 0xf08a4a, 0xf2f2e8], books = [];
+        const bookRow = (alongU, fixed, dir, from, to, yB, levels, depth) => {          // 在書架面上排書：alongU＝沿 u 排；fixed＝面的位置；dir＝面朝向（±1）
+          for (let lv = 0; lv < levels; lv++) { let t = from; const yy = yB + lv * 0.4;
+            while (t < to - 0.12) { const w = 0.1 + rnd() * 0.12, h = 0.22 + rnd() * 0.12; if (t + w > to) break;
+              const f0 = fixed - (dir > 0 ? 0.17 : -0.03) , f1 = f0 + 0.2, c = PAL[Math.floor(rnd() * PAL.length)];
+              const lo = Math.min(f0, f1), hi = Math.max(f0, f1);
+              books.push(alongU ? { u0: t, u1: t + w, v0: dir > 0 ? fixed - 0.17 : fixed - 0.03, v1: dir > 0 ? fixed + 0.03 : fixed + 0.17, y: yy, h, c } : { v0: t, v1: t + w, u0: dir > 0 ? fixed - 0.17 : fixed - 0.03, u1: dir > 0 ? fixed + 0.03 : fixed + 0.17, y: yy, h, c });
+              t += w + (rnd() < 0.25 ? 0.12 : 0.015); } } };
+        const shelf = (u0, v0, u1, v1, h, wall) => R(u0, v0, u1, v1, y0 + 0.08, y0 + 0.08 + h, wood, wall ? W : { noShadow: true });
+        const vN = CORR + 0.35, vF = Dr - 0.35;
+        // 外牆書牆（窗下，矮）＋兩側高書牆
+        shelf(a + 0.7, vF - 0.4, b - 0.7, vF, 0.95, true); bookRow(true, vF - 0.4, -1, a + 0.8, b - 0.8, y0 + 0.2, 2, 0);
+        shelf(a + 0.2, vN + 1.2, a + 0.6, vF - 0.5, 2.0, true); bookRow(false, a + 0.6, 1, vN + 1.3, vF - 0.6, y0 + 0.2, 5, 0);
+        shelf(b - 0.6, vN + 1.2, b - 0.2, vF - 0.5, 2.0, true); bookRow(false, b - 0.6, -1, vN + 1.3, vF - 0.6, y0 + 0.2, 5, 0);
+        // 書架區：三排雙面書架（垂直走廊方向）
+        [8.4, 10.4, 12.4].forEach(uc => { shelf(uc - 0.25, CORR + 2.6, uc + 0.25, vF - 1.4, 1.95, true);
+          bookRow(false, uc - 0.25, -1, CORR + 2.7, vF - 1.5, y0 + 0.2, 4, 0); bookRow(false, uc + 0.25, 1, CORR + 2.7, vF - 1.5, y0 + 0.2, 4, 0); });
+        // 閱覽區：2×2 閱覽桌＋椅
+        const chairs = [], tbl = (u, v) => { R(u - 0.8, v - 0.4, u + 0.8, v + 0.4, y0 + 0.7, y0 + 0.76, tab, { noShadow: true });
+          [[-0.75, -0.35], [0.7, -0.35], [-0.75, 0.3], [0.7, 0.3]].forEach(q => R(u + q[0], v + q[1], u + q[0] + 0.05, v + q[1] + 0.05, y0 + 0.08, y0 + 0.7, tab, { noShadow: true }));
+          [[-0.4, -0.7, 0], [0.4, -0.7, 0], [-0.4, 0.7, 1], [0.4, 0.7, 1]].forEach(q => chairs.push([u + q[0], v + q[1], q[2]])); };
+        [4.4, 6.3].forEach(u => [6.0, 9.2].forEach(v => tbl(u, v)));
+        // 兒童繪本區：地毯、低書架、豆袋
+        R(14.8, 8.0, b - 0.8, vF - 0.6, y0 + 0.08, y0 + 0.1, carp2, { noShadow: true });
+        shelf(16.2, 9.5, 18.4, 9.9, 0.9, true); bookRow(true, 9.5, -1, 16.3, 18.3, y0 + 0.2, 2, 0); bookRow(true, 9.9, 1, 16.3, 18.3, y0 + 0.2, 2, 0);
+        [[15.6, 10.9, 0], [17.0, 11.3, 1], [18.4, 10.8, 2]].forEach(q => R(q[0] - 0.4, q[1] - 0.4, q[0] + 0.4, q[1] + 0.4, y0 + 0.08, y0 + 0.55, bag[q[2]], { noShadow: true }));
+        R(14.8, 4.0, b - 0.8, 7.6, y0 + 0.08, y0 + 0.1, carp, { noShadow: true });   // 自由閱讀角地毯＋矮沙發
+        R(15.2, 4.2, 17.0, 4.9, y0 + 0.08, y0 + 0.45, bag[1], { noShadow: true }); R(15.2, 4.1, 17.0, 4.3, y0 + 0.45, y0 + 0.85, bag[1], { noShadow: true });
+        R(17.8, 4.2, 19.6, 4.9, y0 + 0.08, y0 + 0.45, bag[0], { noShadow: true }); R(17.8, 4.1, 19.6, 4.3, y0 + 0.45, y0 + 0.85, bag[0], { noShadow: true });
+        // 借還書櫃檯
+        R(8.6, CORR + 0.5, 12.6, CORR + 1.2, y0 + 0.08, y0 + 1.05, cnt, W); R(8.5, CORR + 0.45, 12.7, CORR + 1.25, y0 + 1.05, y0 + 1.1, cntT, { noShadow: true });
+        R(9.2, CORR + 0.6, 9.9, CORR + 0.85, y0 + 1.1, y0 + 1.4, pcM, { noShadow: true }); R(11.2, CORR + 0.6, 11.9, CORR + 0.85, y0 + 1.1, y0 + 1.4, pcM, { noShadow: true });
+        // 補光：天花板燈管
+        [5.5, 9.0, 12.5, 16.0].forEach(lu => [4.2, 9.6].forEach(lv => R(lu - 0.7, lv - 0.12, lu + 0.7, lv + 0.12, y1 - 0.38, y1 - 0.31, M.lampM, { noShadow: true })));
+        // 窗：補足 3 扇→7 扇
+        [0.05, 0.35, 0.65, 0.95].forEach(fr => { const wu = Math.min(a + rwi * fr, b - 1.82); R(wu, Dr - 0.3, wu + 1.8, Dr + 0.05, y0 + 1.0, y0 + 2.5, M.glassLit, { noShadow: true }); });
+        // 實體化：書（單一 InstancedMesh、逐本上色）與椅子
+        const par = CTX ? CTX.group : scene, bI = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), new T.MeshLambertMaterial({ color: 0xffffff }), books.length), mt = new T.Matrix4(), ms = new T.Matrix4(), col = new T.Color();
+        books.forEach((bk2, n) => { const p0 = P(bk2.u0, bk2.v0), p1 = P(bk2.u1, bk2.v1), sx = Math.abs(p1[0] - p0[0]), sz = Math.abs(p1[1] - p0[1]);
+          mt.makeScale(sx, bk2.h, sz); mt.setPosition((p0[0] + p1[0]) / 2, y0 + 0.08 + bk2.y - y0 - 0.2 + bk2.h / 2 + 0.2, (p0[1] + p1[1]) / 2); bI.setMatrixAt(n, mt); bI.setColorAt(n, col.setHex(bk2.c)); });
+        bI.instanceMatrix.needsUpdate = true; if (bI.instanceColor) bI.instanceColor.needsUpdate = true; bI.frustumCulled = false; par.add(bI);
+        const pv0 = P(0, 0), pv1 = P(0, -1), yaw = Math.atan2(-(pv1[0] - pv0[0]), -(pv1[1] - pv0[1])), cI = new T.InstancedMesh(CHAIRG, CHAIRM, chairs.length);
+        chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(yaw + (q[2] ? Math.PI : 0)); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); }); cI.frustumCulled = false; par.add(cI);
+      }
       else if ((o.names && o.names[k] && o.names[k][i]) === '健康中心') {   // 保健室：清空，兩張病床＋一張辦公桌
         const bedM = mat(0xdfe6ea), matM = mat(0xf4f7f9), pilM = mat(0xffffff), blkM = mat(0x58b8c8), fr = mat(0x8b95a0);
         [dm - 2.6, dm + 1.4].forEach(bu => {
@@ -5144,7 +5191,7 @@ const legDoor = [{ end: 1, v0: 0, v1: 1.8, floors: [0, 1, 2] }];
   wl(X0 + 1.0, Z0 + 0.8, X0 + 1.5, Z1 - 0.8, y0, y0 + 0.5, M.concrete, { noShadow: true });           // 管道井示意
   label('4F 管道維修間', -27.65, y1 + 0.7, -27.5, 1.6, '#e8f0f6', '#1f3b57'); }
 LIFTR.push([__s, scene.children.length, __w, WALLS.length]); __s = scene.children.length; __w = WALLS.length;
-bld({ id: 'B', twoDoors: true, short: '教學區西樓', name: '教學區西樓（圖書館、忠班教室）', names: { 0: ['教學設備及檔案室', '1忠'], 1: ['5忠', '3忠'], 2: ['圖書館', '圖書館'] }, x0: 7.2, z0: -32.5, x1: 19.9, z1: -12.4, floors: 3, open: 'E', stair: 'none', towerU: 0, openEnd0: true, rooms: { n: 2, u0: 2.4, w: 8.85 }, roof: 'solar', gableU0: 6.5, gableU1: 19.6, gablePanels: [{ u0: 7.4, u1: 18.7 }], mini: '#3a6fb0', endDoors: legDoor, backDoors: [{ u0: 0.15, u1: 2.25, floors: [0, 1, 2], full: true }] });
+bld({ id: 'B', twoDoors: true, short: '教學區西樓', name: '教學區西樓（圖書館、忠班教室）', names: { 0: ['教學設備及檔案室', '1忠'], 1: ['5忠', '3忠'], 2: ['圖書館'] }, x0: 7.2, z0: -32.5, x1: 19.9, z1: -12.4, floors: 3, open: 'E', stair: 'none', towerU: 0, openEnd0: true, rooms: { n: 2, u0: 2.4, w: 8.85 }, boundsK: { 2: [2.4, 20.1] }, roof: 'solar', gableU0: 6.5, gableU1: 19.6, gablePanels: [{ u0: 7.4, u1: 18.7 }], mini: '#3a6fb0', endDoors: legDoor, backDoors: [{ u0: 0.15, u1: 2.25, floors: [0, 1, 2], full: true }] });
 // B 棟西北角突出的樓梯塔（依現場照片：磁磚牆、直立玻璃窗帶、頂部玻璃小閣；一樓挑空入口）
 { const X0 = -2.5, X1 = 2.5, Z0 = -38.6, ZB = -32.5, ZS = -34.2, WT2 = 0.25, FA = X0 + 3.5, FB = X0 + 1.5, ZF = -37.4;
   const GL = { wall: true, noShadow: true }, WL = { wall: true };
