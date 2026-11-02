@@ -4813,6 +4813,67 @@ function bld(o) {
       if (!isWC) for (let q = 0; q < 2; q++) for (let r2 = 0; r2 < 2; r2++) { const lu = dm + (q ? 1 : -1) * rwi * 0.22, lv = CORR + (Dr - CORR) * (r2 ? 0.7 : 0.32); R(lu - 0.7, lv - 0.12, lu + 0.7, lv + 0.12, y1 - 0.38, y1 - 0.31, M.lampM, { noShadow: true }); }   // 教室天花板燈管（夜間會亮）
       if (isWC) { const ns = rwi > 5 ? 3 : 2; for (let q = 0; q < ns; q++) { const pu2 = a + 0.8 + q * ((rwi - 1.6) / ns); R(pu2, Dr - 2.6, pu2 + 0.06, Dr - 0.3, y0, y0 + 1.9, M.wallIn, { noShadow: true }); } }
       else if (isHall) R(a + 2, Dr - 2.6, b - 2, Dr - 0.3, y0, y0 + 0.9, M.concrete, { noShadow: true });      // 禮堂：只有舞台，不設課桌椅
+      else if ((o.names && o.names[k] && o.names[k][i]) === '校長室') {   // 校長室：辦公桌區＋會議桌區＋沙發、書櫃、旗幟
+        const deskM = mat(0x6b4426), tblM = mat(0x8a5a35), rug = mat(0x8a2b2b), gold = mat(0xe0b432), sofaM = mat(0x5a6b8a), plM = mat(0x3c7a3a), potM = mat(0xb8663a), pcM2 = mat(0x2d3a4a), wbM = mat(0xf4f6f8), flB = mat(0x2a5aa8), flR = mat(0xd9534f), whiteM = mat(0xffffff);
+        const vN = CORR + 0.3, vF = Dr - 0.3, par = CTX ? CTX.group : scene, mt = new T.Matrix4(), chairs = [];
+        const yawOf = (bu, bv) => { const p0 = P(0, 0), p1 = P(bu, bv); return Math.atan2(-(p1[0] - p0[0]), -(p1[1] - p0[1])); };
+        const chair = (u, v, bu, bv) => chairs.push([u, v, yawOf(bu, bv)]);
+        const leg = (u, v, h, m) => R(u, v, u + 0.06, v + 0.06, y0 + 0.08, y0 + h, m, { noShadow: true });
+        // 會議區：地毯、長桌、八張椅、白板
+        R(dm - 3.3, 3.6, dm + 3.3, 9.0, y0 + 0.08, y0 + 0.1, rug, { noShadow: true });
+        R(dm - 2.3, 5.5, dm + 2.3, 7.1, y0 + 0.72, y0 + 0.78, tblM, { noShadow: true });
+        [[-2.2, 5.55], [2.14, 5.55], [-2.2, 7.0], [2.14, 7.0]].forEach(q => leg(dm + q[0], q[1], 0.72, tblM)); R(dm - 0.1, 5.7, dm + 0.1, 6.9, y0 + 0.1, y0 + 0.72, tblM, { noShadow: true });
+        [-1.5, -0.5, 0.5, 1.5].forEach(du => { chair(dm + du, 5.0, 0, -1); chair(dm + du, 7.6, 0, 1); }); chair(dm - 2.8, 6.3, -1, 0); chair(dm + 2.8, 6.3, 1, 0);
+        R(a + 0.2, 4.0, a + 0.25, 8.4, y0 + 1.0, y0 + 2.1, wbM, { noShadow: true }); R(a + 0.2, 3.95, a + 0.27, 4.0, y0 + 0.98, y0 + 2.12, gold, { noShadow: true });
+        // 辦公區：大辦公桌（含抽屜）、皮椅、兩張訪客椅、電腦、名牌
+        R(dm - 1.3, vF - 4.0, dm + 1.3, vF - 2.9, y0 + 0.72, y0 + 0.78, deskM, { noShadow: true });
+        R(dm - 1.3, vF - 3.9, dm - 0.6, vF - 3.0, y0 + 0.08, y0 + 0.72, deskM, W); R(dm + 0.6, vF - 3.9, dm + 1.3, vF - 3.0, y0 + 0.08, y0 + 0.72, deskM, W);
+        R(dm - 0.45, vF - 3.8, dm + 0.45, vF - 3.6, y0 + 0.78, y0 + 1.25, pcM2, { noShadow: true }); R(dm - 0.5, vF - 3.3, dm + 0.5, vF - 3.1, y0 + 0.78, y0 + 0.82, whiteM, { noShadow: true }); R(dm + 0.7, vF - 3.35, dm + 1.1, vF - 3.25, y0 + 0.78, y0 + 0.88, gold, { noShadow: true });
+        chair(dm, vF - 2.2, 0, 1); chair(dm - 0.6, vF - 4.9, 0, -1); chair(dm + 0.6, vF - 4.9, 0, -1);
+        // 後牆矮櫃＋獎盃、兩側旗幟
+        R(dm - 2.4, vF - 0.5, dm + 2.4, vF, y0 + 0.08, y0 + 0.9, deskM, W);
+        [-1.8, -0.6, 0.6, 1.8].forEach((du, n) => { R(dm + du - 0.12, vF - 0.35, dm + du + 0.12, vF - 0.15, y0 + 0.9, y0 + 0.96, gold, { noShadow: true }); R(dm + du - 0.03, vF - 0.28, dm + du + 0.03, vF - 0.22, y0 + 0.96, y0 + 1.12, gold, { noShadow: true }); R(dm + du - 0.1, vF - 0.37, dm + du + 0.1, vF - 0.13, y0 + 1.12, y0 + 1.32, gold, { noShadow: true }); });
+        [[dm - 3.4, flB], [dm + 3.4, flR]].forEach(q => { R(q[0], vF - 0.9, q[0] + 0.05, vF - 0.85, y0 + 0.08, y0 + 2.4, gold, { noShadow: true }); R(q[0] + 0.05, vF - 0.9, q[0] + 0.95, vF - 0.87, y0 + 1.6, y0 + 2.3, q[1], { noShadow: true }); });
+        // 東牆書櫃（含書）、西牆沙發組
+        R(b - 0.7, 9.8, b - 0.25, 15.3, y0 + 0.08, y0 + 2.0, deskM, W);
+        const bc = [0xd9534f, 0x5b8dd9, 0xf0b840, 0x58a868, 0x9b6bd0]; for (let lv = 0; lv < 4; lv++) { let t = 9.95; let n2 = 0; while (t < 15.1) { const w2 = 0.18 + ((n2 * 37) % 7) * 0.03; R(b - 0.72, t, b - 0.7, Math.min(t + w2, 15.2), y0 + 0.28 + lv * 0.45, y0 + 0.56 + lv * 0.45, mat(bc[(n2 + lv) % 5]), { noShadow: true }); t += w2 + 0.02; n2++; } }
+        R(a + 0.3, 10.4, a + 1.3, 13.0, y0 + 0.08, y0 + 0.5, sofaM, { noShadow: true }); R(a + 0.25, 10.4, a + 0.5, 13.0, y0 + 0.5, y0 + 0.95, sofaM, { noShadow: true });
+        R(a + 1.8, 10.8, a + 2.6, 12.6, y0 + 0.08, y0 + 0.45, tblM, { noShadow: true });
+        [[a + 0.5, vF - 0.5], [b - 1.2, vN + 0.4]].forEach(q => { R(q[0], q[1], q[0] + 0.5, q[1] + 0.5, y0 + 0.08, y0 + 0.45, potM, { noShadow: true }); R(q[0] + 0.05, q[1] + 0.05, q[0] + 0.45, q[1] + 0.45, y0 + 0.45, y0 + 1.3, plM, { noShadow: true }); });
+        const cI = new T.InstancedMesh(CHAIRG, mat(0x3c3c4c), chairs.length); chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(q[2]); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); }); cI.frustumCulled = false; par.add(cI);
+      }
+      else if ((o.names && o.names[k] && o.names[k][i]) === '校史室') {   // 校史室：校史文物展示（照片牆、年表、玻璃展示櫃、老校鐘、老課桌椅）
+        const wood = mat(0x5a3d22), glassM = mat(0xbfe6f2, { transparent: true, opacity: 0.3, depthWrite: false }), gold = mat(0xc9a24a), sepia = [mat(0xb89a74), mat(0xc8b18a), mat(0x9fb0b8), mat(0xc7a8a0)], red = mat(0x7a1f2b), brass = mat(0xd8a93a), paper = mat(0xf1e6c8), blue = mat(0x2f5f9a), white = mat(0xffffff), dkW = mat(0x3d2a18);
+        const vN = CORR + 0.3, vF = Dr - 0.3, par = CTX ? CTX.group : scene, mt = new T.Matrix4(), chairs = [], desks = [];
+        const cx = (u, v, y, w, d, h, m, opt) => R(u - w / 2, v - d / 2, u + w / 2, v + d / 2, y0 + y, y0 + y + h, m, opt || { noShadow: true });
+        const tag = (txt, u, v, yy) => { const q = P(u, v); label(txt, q[0], y0 + (yy || 2.0), q[1], 1.5, '#fff4e0'); };
+        // 照片牆：西、東牆各 4 組相框；走廊內牆兩面校史年表
+        [vN + 1.6, vN + 4.0, vN + 6.4, vN + 8.8].forEach((v, n) => { [[a + 0.2, 1], [b - 0.01, -1]].forEach(q => { const u = q[0], sg = q[1];
+          R(Math.min(u, u + 0.06 * sg), v - 0.7, Math.max(u, u + 0.06 * sg), v + 0.7, y0 + 1.0, y0 + 2.0, gold, { noShadow: true });
+          R(Math.min(u + 0.06 * sg, u + 0.09 * sg), v - 0.6, Math.max(u + 0.06 * sg, u + 0.09 * sg), v + 0.6, y0 + 1.1, y0 + 1.9, sepia[(n + (sg > 0 ? 0 : 2)) % 4], { noShadow: true }); }); });
+        [[a + 0.4, dm - 1.1], [dm + 1.1, b - 0.4]].forEach(q => { R(q[0], CORR + 0.2, q[1], CORR + 0.26, y0 + 1.0, y0 + 2.0, gold, { noShadow: true }); R(q[0] + 0.08, CORR + 0.26, q[1] - 0.08, CORR + 0.29, y0 + 1.08, y0 + 1.92, paper, { noShadow: true });
+          for (let t = 0; t < 4; t++) R(q[0] + 0.2, CORR + 0.29, q[1] - 0.2, CORR + 0.31, y0 + 1.25 + t * 0.16, y0 + 1.33 + t * 0.16, t % 2 ? blue : red, { noShadow: true }); });
+        // 三座玻璃展示櫃（中央一列）
+        const cases = [[dm, 5.2, '📜 古老藍圖'], [dm, 8.4, '🏆 歷屆獎盃'], [dm, 11.6, '📚 老課本與算盤']];
+        cases.forEach((c, n) => { const u = c[0], v = c[1];
+          cx(u, v, 0, 2.2, 1.2, 0.85, wood, W); cx(u, v, 0.85, 2.0, 1.0, 0.02, red); cx(u, v, 0.87, 2.2, 1.2, 0.5, glassM, { noShadow: true }); cx(u, v, 1.37, 2.2, 1.2, 0.04, wood);
+          if (n === 0) { cx(u, v, 0.89, 1.5, 0.8, 0.02, blue); [-0.5, 0, 0.5].forEach(du => cx(u + du, v, 0.91, 0.04, 0.7, 0.01, white)); [-0.2, 0.2].forEach(dv => cx(u, v + dv, 0.91, 1.4, 0.04, 0.01, white)); cx(u + 0.6, v - 0.3, 0.97, 0.16, 0.16, 0.12, paper); }   // 藍圖＋捲軸
+          if (n === 1) [-0.65, 0, 0.65].forEach((du, t) => { cx(u + du, v, 0.89, 0.34, 0.26, 0.06, brass); cx(u + du, v, 0.95, 0.06, 0.06, 0.2, brass); cx(u + du, v, 1.15, 0.26, 0.26, 0.16 + t * 0.03, brass); });   // 獎盃
+          if (n === 2) { [0, 1, 2].forEach(t => cx(u - 0.6, v - 0.2 + t * 0.02, 0.89 + t * 0.07, 0.5 - t * 0.05, 0.36, 0.07, mat([0xd9534f, 0x5b8dd9, 0xf0b840][t]))); cx(u + 0.3, v, 0.9, 0.7, 0.4, 0.04, dkW); cx(u + 0.3, v, 1.1, 0.7, 0.4, 0.04, dkW); cx(u + 0.3, v - 0.19, 0.9, 0.7, 0.03, 0.24, dkW); cx(u + 0.3, v + 0.19, 0.9, 0.7, 0.03, 0.24, dkW); [-0.25, -0.1, 0.05, 0.2, 0.3].forEach(du => cx(u + 0.3 + du, v, 0.9, 0.02, 0.36, 0.24, brass)); }   // 課本＋算盤
+          tag(c[2], u, v, 2.0); });
+        // 老校鐘（東南角）：木架＋銅鐘
+        { const u = b - 1.3, v = vF - 1.2; cx(u - 0.5, v, 0, 0.1, 0.1, 1.4, wood, W); cx(u + 0.5, v, 0, 0.1, 0.1, 1.4, wood, W); cx(u, v, 1.35, 1.2, 0.12, 0.1, wood);
+          const q = P(u, v), bell = new T.Mesh(new T.CylinderGeometry(0.14, 0.36, 0.55, 16), brass); bell.position.set(q[0], y0 + 0.9, q[1]); par.add(bell); const clap = new T.Mesh(new T.SphereGeometry(0.07, 8, 6), dkW); clap.position.set(q[0], y0 + 0.58, q[1]); par.add(clap); tag('🔔 老校鐘', u, v, 1.95); }
+        // 老課桌椅（西南角）：兩組深木色老式課桌椅
+        [[a + 1.5, vF - 1.0], [a + 2.7, vF - 1.0]].forEach((q, n) => { desks.push(q); chairs.push([q[0], q[1] - 0.5]); }); tag('🪑 老課桌椅', a + 2.1, vF - 1.0, 1.7);
+        const p0 = P(0, 0), p1 = P(0, -1), yaw = Math.atan2(-(p1[0] - p0[0]), -(p1[1] - p0[1]));
+        const dI = new T.InstancedMesh(DESKG, dkW, desks.length), cI = new T.InstancedMesh(CHAIRG, dkW, chairs.length);
+        desks.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(yaw); mt.setPosition(p[0], y0 + 0.08, p[1]); dI.setMatrixAt(n, mt); }); chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(yaw); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); });
+        dI.frustumCulled = false; cI.frustumCulled = false; par.add(dI); par.add(cI);
+        // 歷任校長肖像（東牆高處）與校徽
+        [vN + 2.5, vN + 5.2, vN + 7.9].forEach((v, n) => { R(b - 0.06, v - 0.45, b - 0.01, v + 0.45, y0 + 2.1, y0 + 2.7, gold, { noShadow: true }); R(b - 0.09, v - 0.38, b - 0.06, v + 0.38, y0 + 2.15, y0 + 2.65, sepia[n % 4], { noShadow: true }); });
+        tag('📷 校史照片牆', b - 0.5, vN + 5.2, 2.95);
+      }
       else if ((o.names && o.names[k] && o.names[k][i]) === '圖書館') {   // 圖書館（兩間合併）：書牆、書架區、閱覽區、繪本區、櫃檯
         let sd = 7; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
         const wood = mat(0xa0703c), woodD = mat(0x6e4a2a), tab = mat(0xdcb683), carp = mat(0x6aa6a0), carp2 = mat(0xe8a7b0), cnt = mat(0xc98b5a), cntT = mat(0x4a3a2c), pcM = mat(0x2d3a4a), bag = [mat(0xe0645a), mat(0x5aa0e0), mat(0xf0c040)];
