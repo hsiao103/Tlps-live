@@ -9493,12 +9493,17 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const flw = [0xff7aa8, 0xffd54a, 0xffffff]; for (let i = 0; i < 16; i++) { const a = rr() * 6.283, d = 16 + rr() * 20; if (Math.abs(a - 1.6) < 0.5) continue; add(new T.Mesh(new T.SphereGeometry(0.35, 5, 4), new T.MeshBasicMaterial({ color: flw[i % 3] })), Math.cos(a) * d, 5.3, Math.sin(a) * d); }
     // 洞穴（山丘＋石框＋黑洞口＋微光）
     const cx = 27, cz = 15, cv = hill(cx, cz, 10, 8, 0x8a7a64); cv.rotation.y = 0;
-    const dir = Math.atan2(cz, cx), ox = Math.cos(dir), oz = Math.sin(dir), ex = cx + ox * 8.6, ez = cz + oz * 8.6;
+    const dir = Math.atan2(cz, cx) + Math.PI / 2, ox = Math.cos(dir), oz = Math.sin(dir), ex = cx + ox * 8.6, ez = cz + oz * 8.6;
     const mouth = new T.Group(); mouth.position.set(ex, 4.8, ez); mouth.rotation.y = -dir + Math.PI / 2; ISL.g.add(mouth);
     add(new T.Mesh(new T.BoxGeometry(5, 5, 0.6), M(0x16120f)), 0, 2.5, 0, mouth); add(new T.Mesh(new T.CylinderGeometry(2.5, 2.5, 0.6, 12, 1, false, 0, Math.PI), M(0x16120f)), 0, 5, 0, mouth).rotation.x = Math.PI / 2;
     add(new T.Mesh(new T.BoxGeometry(1, 6, 1.1), rock2), -3, 3, 0.2, mouth); add(new T.Mesh(new T.BoxGeometry(1, 6, 1.1), rock2), 3, 3, 0.2, mouth); add(new T.Mesh(new T.BoxGeometry(7.4, 1.2, 1.1), rock2), 0, 6.8, 0.2, mouth);
     const glow = add(new T.Mesh(new T.SphereGeometry(0.7, 8, 6), new T.MeshBasicMaterial({ color: 0xffb347 })), 1.2, 1.2, 0.9, mouth); ISL.glow = glow;
     add(new T.Mesh(new T.DodecahedronGeometry(1.1, 0), rock), -3.8, 0.8, 1.6, mouth); add(new T.Mesh(new T.DodecahedronGeometry(0.8, 0), rock), 4, 0.6, 2, mouth);
+    // 道路：城堡大門 → 外牆門樓 → 蜿蜒到洞口
+    { const dirt = M(0xc9ad7a), edge = M(0xa88a5a), mx = ex + ox * 2.5, mz = ez + oz * 2.5, pts = [[0, 6], [0, 21], [1, 27], [7, 29.5], [14, 28], [mx - 2, mz - 4], [mx, mz]];
+      for (let i = 0; i < pts.length - 1; i++) { const [x1, z1] = pts[i], [x2, z2] = pts[i + 1], L = Math.hypot(x2 - x1, z2 - z1), a = Math.atan2(x2 - x1, z2 - z1); const m = add(new T.Mesh(new T.BoxGeometry(4.2, 0.2, L + 1.2), dirt), (x1 + x2) / 2, 5.08, (z1 + z2) / 2); m.rotation.y = a; const sd = add(new T.Mesh(new T.BoxGeometry(5, 0.12, L + 1.2), edge), (x1 + x2) / 2, 5.04, (z1 + z2) / 2); sd.rotation.y = a; add(new T.Mesh(new T.CylinderGeometry(2.1, 2.1, 0.2, 10), dirt), x2, 5.08, z2); }
+      for (let i = 0; i < 14; i++) { const k = Math.floor(i / 2) % (pts.length - 1), q = pts[k], r2 = pts[k + 1], t2 = (i % 2) * 0.5 + 0.2, px = q[0] + (r2[0] - q[0]) * t2, pz = q[1] + (r2[1] - q[1]) * t2; add(new T.Mesh(new T.DodecahedronGeometry(0.45, 0), stone2), px + (i % 4 < 2 ? -2.7 : 2.7), 5.3, pz); }
+      ISL.g.children.slice().forEach(g => { if (g.type === 'Group' && g.position.y === 5) { for (let i = 0; i < pts.length - 1; i++) { const [x1, z1] = pts[i], [x2, z2] = pts[i + 1], dx = x2 - x1, dz = z2 - z1, u = Math.max(0, Math.min(1, ((g.position.x - x1) * dx + (g.position.z - z1) * dz) / (dx * dx + dz * dz))); if (Math.hypot(g.position.x - x1 - dx * u, g.position.z - z1 - dz * u) < 4.2) { ISL.g.remove(g); break; } } } }); }
     // 環繞小雲朵
     const cm = new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.92, emissive: 0x8899aa, emissiveIntensity: 0.25 }); ISL.cl = [];
     for (let i = 0; i < 4; i++) { const g = new T.Group(); [[0, 0, 0, 3], [3, -0.4, 0.5, 2.3], [-3, -0.3, -0.4, 2.4], [1, 1.2, 0, 2.2]].forEach(q => add(sph(q[3], cm), q[0], q[1], q[2], g)); g.scale.setScalar(0.7 + rr() * 0.4); g.frustumCulled = false; ISL.g.add(g); ISL.cl.push({ g, a: i * 1.6 + rr(), d: 54 + rr() * 12, y: 10 + rr() * 30, v: 0.025 + rr() * 0.03 }); }
