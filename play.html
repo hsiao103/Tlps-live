@@ -9436,7 +9436,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     for (let i = 0; i < CLD.N; i++) {
       const c = new T.Group(), n = 4 + Math.floor(rr() * 3), w = 22 + rr() * 26;
       for (let j = 0; j < n; j++) { const m = new T.Mesh(g, CLD.mat), r = w * (0.35 + rr() * 0.3); m.scale.set(r, r * 0.45, r * 0.8); m.position.set((j - n / 2) * w * 0.38 + (rr() - 0.5) * 6, (rr() - 0.4) * 6, (rr() - 0.5) * 10); m.frustumCulled = false; c.add(m); }
-      const a = rr() * 6.283, d = 70 + rr() * 260; CLD.items.push({ g: c, ox: Math.cos(a) * d, oz: Math.sin(a) * d, y: 40 + rr() * 32, v: 0.6 + rr() * 0.8, rank: i / CLD.N, k: 0 }); c.rotation.y = rr() * 3; c.frustumCulled = false; CLD.grp.add(c);
+      const a = rr() * 6.283, d = 25 + Math.sqrt(rr()) * 305; CLD.items.push({ g: c, ox: Math.cos(a) * d, oz: Math.sin(a) * d, y: 40 + rr() * 32, v: 0.6 + rr() * 0.8, rank: i / CLD.N, k: 0 }); c.rotation.y = rr() * 3; c.frustumCulled = false; CLD.grp.add(c);
     }
   })();
   const CLD_COVER = { sun: 0.22, cloud: 0.62, over: 1, mist: 0.5, drizzle: 1, storm: 1, heavy: 1, typhoon: 1 };
