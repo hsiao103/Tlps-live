@@ -10448,24 +10448,26 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function mpUI() {
     if (document.getElementById('gNet')) return;
     const css = document.createElement('style'); css.textContent = `
-#gNetBar{position:fixed;left:10px;top:calc(172px + env(safe-area-inset-top,0px));z-index:21;display:flex;gap:6px;align-items:center}
-#gNetBtn{position:relative;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:#2b6fe0;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3)}
-#gNetUn{position:absolute;right:-4px;top:-4px;min-width:18px;height:18px;border-radius:9px;background:#e5484d;color:#fff;font:700 11px/18px var(--font-ui);padding:0 4px;display:none}
-#gNetN{background:rgba(20,28,45,.72);color:#fff;border-radius:99px;padding:4px 9px;font:700 12px var(--font-ui)}
+#gNetBar{position:relative;display:inline-block;flex:none;margin:0 4px 0 2px;z-index:21}
+#gNetBtn{position:relative;width:28px;height:28px;padding:0;line-height:24px;border-radius:50%;border:2px solid #fff;background:#2b6fe0;color:#fff;font-size:13px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.3);display:block}
+#gNetUn{position:absolute;right:-6px;top:-6px;min-width:16px;height:16px;border-radius:8px;background:#e5484d;color:#fff;font:700 10px/16px var(--font-ui);padding:0 3px;display:none}
+#gNetN{position:absolute;right:-9px;bottom:-6px;background:rgba(20,28,45,.82);color:#fff;border-radius:99px;padding:0 4px;font:700 9px/14px var(--font-ui);white-space:nowrap;pointer-events:none}
 #gNetFeed{position:fixed;left:10px;top:calc(220px + env(safe-area-inset-top,0px));z-index:21;width:min(250px,46vw);pointer-events:none;display:flex;flex-direction:column;gap:3px}
 #gNetFeed .ln{background:rgba(20,28,45,.72);color:#fff;border-radius:10px;padding:3px 8px;font:12px/1.4 var(--font-ui);word-break:break-all}#gNetFeed .ln.sys{opacity:.8}
-#gNet{position:fixed;left:8px;top:8px;z-index:48;width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);display:flex;flex-direction:column;background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.4);font-family:var(--font-ui);color:#1b2433;overflow:hidden}
+#gNet{position:fixed;left:8px;top:calc(72px + env(safe-area-inset-top,0px));z-index:48;width:min(300px,calc(100vw - 16px));max-height:min(46vh,340px);max-height:min(46dvh,340px);opacity:.96;display:flex;flex-direction:column;background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.4);font-family:var(--font-ui);color:#1b2433;overflow:hidden}
 #gNet[hidden]{display:none}
 #gNet .h{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#2b6fe0;color:#fff}#gNet .h b{font-size:14px}#gNet .st{flex:1;font-size:11px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#gNet .x{border:0;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer}
 #gNet .tabs{display:flex;border-bottom:1px solid #e3e8f0}#gNet .tabs button{flex:1;border:0;background:#f4f6fa;padding:7px 0;font:700 12px var(--font-ui);cursor:pointer;color:#55627a}#gNet .tabs button.on{background:#fff;color:#2b6fe0;box-shadow:inset 0 -2px #2b6fe0}
 #gNet .pg{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:auto}#gNet .pg[hidden]{display:none}
-#gNet .log{height:min(200px,34vh);overflow:auto;background:#f6f8fc;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:3px}#gNet .ln{font-size:13px;line-height:1.45;word-break:break-all}#gNet .ln b{color:#2b6fe0}#gNet .ln.me b{color:#1c9a4b}#gNet .ln.sys{color:#7a8499;font-size:12px}
+#gNet .log{height:min(120px,20vh);overflow:auto;background:#f6f8fc;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:3px}#gNet .ln{font-size:13px;line-height:1.45;word-break:break-all}#gNet .ln b{color:#2b6fe0}#gNet .ln.me b{color:#1c9a4b}#gNet .ln.sys{color:#7a8499;font-size:12px}
 #gNet .qk{display:flex;flex-wrap:wrap;gap:4px}#gNet .qk button{border:1px solid #cfd8e8;background:#fff;border-radius:99px;padding:3px 8px;font:12px var(--font-ui);cursor:pointer}
 #gNet form.in{display:flex;gap:6px}#gNet input{flex:1;min-width:0;border:1.5px solid #cfd8e8;border-radius:10px;padding:7px 9px;font:14px var(--font-ui)}#gNet form.in button,#gNet .set button{border:0;background:#2b6fe0;color:#fff;border-radius:10px;padding:7px 12px;font:700 13px var(--font-ui);cursor:pointer}
 #gNet .set label{font-size:12px;color:#55627a;display:block;margin-top:2px}#gNet .set .r{display:flex;gap:6px}#gNet .set button.t{background:#e8eefb;color:#2b6fe0}#gNet .set button.t.on{background:#2b6fe0;color:#fff}
 #gNet .tip{font-size:11px;color:#7a8499;line-height:1.5}#gNet .big{font-size:11px;color:#c27a00;background:#fff4dc;border-radius:8px;padding:5px 7px}
 body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
-@media (max-height:500px) and (orientation:landscape){#gNetFeed{top:calc(218px + env(safe-area-inset-top,0px));width:min(210px,40vw)}#gNetFeed .ln:nth-child(n+3){display:none}#gNet .log{height:min(110px,30vh)}#gNetBtn{width:36px;height:36px;font-size:17px}}`;
+#search{display:none!important}
+@media (max-width:700px){#gHud{width:min(292px,calc(100vw - 20px))}}
+@media (max-height:500px) and (orientation:landscape){#gNetFeed{top:calc(218px + env(safe-area-inset-top,0px));width:min(210px,40vw)}#gNetFeed .ln:nth-child(n+3){display:none}#gNet .log{height:min(80px,26vh)}#gNet{top:8px;max-height:calc(100vh - 16px)}}`;
     document.head.appendChild(css);
     const bar = mkEl('div', 'gNetBar'); bar.innerHTML = '<button type="button" id="gNetBtn" aria-label="聊天與線上玩家">💬<i id="gNetUn"></i></button><span id="gNetN">👥 –</span>'; mkEl('div', 'gNetFeed');
     const p = mkEl('div', 'gNet'); p.hidden = true;
@@ -10476,7 +10478,10 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
     const $q = s => p.querySelector(s), qk = $q('.qk'); $q('.relog').onclick = () => { try { window.TLAUTH.signOut(); } catch (e) { /* 忽略 */ } location.href = (window.TLAUTH && window.TLAUTH.cfg.visitorPage) || 'index.html'; };
     ['👋 大家好', '😊 你好呀', '👍 讚', '😂 哈哈', '🙏 謝謝', '🏃 一起去玩', '❓ 這裡怎麼玩', '🎉 恭喜'].forEach(t => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.onclick = () => mpSend1(t.replace(/^\S+\s/, '') || t); qk.appendChild(b); });
     const setOpen = o => { MP.open = o; p.hidden = !o; if (o) { MP.unread = 0; const u = document.getElementById('gNetUn'); u.style.display = 'none'; const fd = document.getElementById('gNetFeed'); fd.textContent = ''; const log = $q('.log'); if (!log.children.length) MP.lines.forEach(l => { const d = document.createElement('div'); d.className = 'ln ' + (l.cls || ''); if (l.who) { const b = document.createElement('b'); b.textContent = l.who + '：'; d.appendChild(b); } d.appendChild(document.createTextNode(l.text)); log.appendChild(d); }); log.scrollTop = log.scrollHeight; mpWho(); mpCount(); } };
-    MP.setOpen = setOpen; document.getElementById('gNetBtn').onclick = () => setOpen(!MP.open); $q('.x').onclick = () => setOpen(false);
+    MP.setOpen = setOpen; document.getElementById('gNetBtn').onclick = e => { e.stopPropagation(); setOpen(!MP.open); };
+    { const hudEl = document.getElementById('gHud'), place = () => { const hd = hudEl && hudEl.querySelector('.hd'); if (!hd || hd.contains(bar)) return; const sp = hd.querySelector('span:not(.gMe)'); if (sp) sp.after(bar); else hd.appendChild(bar); };
+      if (hudEl) { place(); new MutationObserver(place).observe(hudEl, { childList: true }); } }
+    document.addEventListener('pointerdown', e => { if (MP.open && !e.target.closest('#gNet') && !e.target.closest('#gNetBar')) setOpen(false); }, true); $q('.x').onclick = () => setOpen(false);
     p.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { MP.tab = b.dataset.t; p.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b)); p.querySelectorAll('.pg').forEach(g => { g.hidden = g.dataset.p !== MP.tab; }); if (MP.tab === 'who') mpWho(); if (MP.tab === 'set') { $q('.nk').value = mpNick(); $q('.rm').value = mpRoom() === 'lobby' ? '' : mpRoom(); } });
     const inp = $q('form.in input'); $q('form.in').onsubmit = e => { e.preventDefault(); if (mpSend1(inp.value)) inp.value = ''; };
     p.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') setOpen(false); }, true); p.addEventListener('keyup', e => e.stopPropagation(), true);
