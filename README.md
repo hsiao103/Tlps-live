@@ -120,3 +120,7 @@
 - 白名單網域新增 tlps.ilc.edu.tw（stage61）。
 
 - 設定面板：「登出」移到最上方（標題下第一格），手機直式不必捲到底（stage62）。
+
+## 聊天測試頁（stage63）
+- 網址：play-chat.html（正式版 play.html 不受影響）。內含多人同場、聊天、管理後台 admin.html。
+- 需先在 Supabase SQL Editor 執行 supabase-mp.sql，並確認 Realtime 已啟用。
