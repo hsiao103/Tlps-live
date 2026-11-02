@@ -7058,7 +7058,7 @@ const NPC_BOT = [0x26357a, 0x3b4252, 0x6b5a3e, 0x2f5a46];
 const NPC_SAY = { student: ['你好！', '歡迎來同樂！', '嗨～', '今天天氣真好！'], teacher: ['歡迎參觀同樂', '你好，需要幫忙嗎？'], guard: ['歡迎蒞臨同樂國小', '請注意安全'], principal: ['歡迎來校長室！'] };
 const SPEC = [
   ['student', 'boy', 1.26, 0, '阿哲'], ['student', 'girl', 1.22, 1, '米米'], ['student', 'boy', 1.32, 2, '鼓鼓'], ['student', 'boy', 1.30, 3, '小綠'], ['student', 'girl', 1.20, 4, '小戲'], ['student', 'boy', 1.28, 5, '踢踢'],
-  ['teacher', 'girl', 1.60, 1], ['teacher', 'boy', 1.70, 0], ['guard', 'boy', 1.72, 0], ['principal', 'boy', 1.68, 2, '停停校長']
+  ['teacher', 'girl', 1.60, 1], ['teacher', 'boy', 1.70, 0], ['guard', 'boy', 1.72, 0], ['principal', 'boy', 1.68, 2, '停停.鄧不利']
 ];
 const PERSONA = {
   '阿哲': { say: '我查一下！', colors: { hair: 0x1d1a1f } },
@@ -7066,7 +7066,7 @@ const PERSONA = {
   '鼓鼓': { say: '氣勢不能輸！', colors: { hair: 0x221c20 } },
   '小綠': { say: '地球需要你！', colors: { hair: 0x382822 } },
   '小戲': { say: '唱做念打樣樣行！', colors: { hair: 0x1d1a1f, 'school-shirt': 0xf08fb0, 'school-sleeve': 0xf6c2d4, 'school-shorts': 0xd9608a, collar: 0xf2c230, 'hair-band': 0xf2c230, shoes: 0xb8335f } },
-  '停停校長': { say: '歡迎來校長室坐坐！', colors: { hair: 0x9aa0a8, 'school-shirt': 0x2f5d62, 'school-sleeve': 0x2f5d62, 'school-shorts': 0x34383f, collar: 0xffffff, shoes: 0x2a2a2e } },
+  '停停.鄧不利': { say: '歡迎來校長室坐坐！', colors: { hair: 0x9aa0a8, 'school-shirt': 0x2f5d62, 'school-sleeve': 0x2f5d62, 'school-shorts': 0x34383f, collar: 0xffffff, shoes: 0x2a2a2e } },
   '踢踢': { say: '禮義廉恥，一起加油！', colors: { hair: 0x221c20, 'school-shirt': 0xf6f4ee, 'school-sleeve': 0xf6f4ee, 'school-shorts': 0xf6f4ee, collar: 0x1b1b1e, shoes: 0xe0b896, socks: 0xe0b896 } }
 };
 // 道具：先以角色本地座標建立，再 attach 到骨架（保留世界座標），隨動作移動
@@ -7093,7 +7093,7 @@ function decorate(ch, name) {
   } else if (name === '小戲') {
     [-1, 1].forEach(sx => { G.add(M(new T.SphereGeometry(0.28 * r, 8, 6), 0xf6c2d4, sx * 0.72 * r, cy + 0.52 * r, -0.2 * r)); G.add(M(new T.SphereGeometry(0.14 * r, 8, 6), 0xd8322b, sx * 0.72 * r, cy + 0.52 * r, -0.42 * r)); });
     G.add(M(new T.ConeGeometry(0.5 * r, 0.5 * r, 8), 0xf2c230, 0, cy + 1.15 * r, 0));
-  } else if (name === '停停校長') {   // 原創造型：灰色短髮、紅框圓眼鏡、小鬍子、紅色領結
+  } else if (name === '停停.鄧不利') {   // 原創造型：灰色短髮、紅框圓眼鏡、小鬍子、紅色領結
     [-1, 1].forEach(sx => { const t = M(new T.TorusGeometry(0.33 * r, 0.045 * r, 8, 18), 0xc0392b, sx * 0.42 * r, cy - 0.5 * r, -0.97 * r); G.add(t); });
     G.add(M(new T.BoxGeometry(0.2 * r, 0.05 * r, 0.05 * r), 0xc0392b, 0, cy - 0.46 * r, -1.0 * r)); G.add(M(new T.BoxGeometry(0.6 * r, 0.1 * r, 0.1 * r), 0x8a8f96, 0, cy - 0.98 * r, -1.0 * r));
     const bw = new T.Group(); [-1, 1].forEach(sx => { const c2 = M(new T.ConeGeometry(0.1 * h * 0.5, 0.16 * h * 0.5, 4), 0xc0392b, sx * 0.09 * h * 0.5, 0, 0); c2.rotation.z = -sx * Math.PI / 2; bw.add(c2); }); bw.add(M(new T.SphereGeometry(0.035 * h * 0.5, 8, 6), 0x962d22, 0, 0, 0)); bw.position.set(0, ch.head ? ch.head.cy - r * 1.45 : 0.74 * h, -0.12 * h * 0.5); addProp(ch, 'Torso', bw);
@@ -10054,16 +10054,16 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   ia({ id: 'islThrone', x: ISL.thr.x, get y() { return ISY(); }, z: ISL.thr.z, r: 2.2, txt: () => '👑 坐上王座', act: () => say('👑 天之城的王座', '你坐上王座，整個大廳都安靜下來。\n\n牆上的旗幟寫著：「學習、合作、快樂」。\n城堡的四座藍頂塔加上中央的紅頂主塔，剛好是五座——傳說，正是為了等待五位「轉生者」到齊。\n\n遠遠地，你彷彿聽見地面那座同樂校舍傳來的校歌迴音……', [{ label: '起身離開' }], AV(0)) });
   ia({ id: 'islChest', x: ISL.thr.cx, get y() { return ISY(); }, z: ISL.thr.cz, r: 2, txt: () => S.islChest ? '📦 空的寶箱' : '🎁 打開寶箱', act: () => { if (S.islChest) { toast('寶箱空了，下次再來看看吧', 2200); return; } S.islChest = 1; S.coin = (S.coin || 0) + 30; if (S.items) S.items.med = (S.items.med || 0) + 1; save(); refreshAll(); SFX.play('win', 200); toast('🎁 古老寶箱裡留著賢者的補給：金幣 +30、補血包 +1！', 3600); } });
 
-  /* ---------- 校長室的停停校長（原創 NPC，站在辦公桌旁；每天可請校長勉勵一次）---------- */
+  /* ---------- 校長室的停停.鄧不利（原創 NPC，站在辦公桌旁；每天可請校長勉勵一次）---------- */
   if (window.ROOM_POS && window.ROOM_POS['校長室']) { const rp = window.ROOM_POS['校長室'];
     const WORDS = ['遇到困難先停一停、想一想，再決定下一步。慢一點，常常反而比較快。', '今天有沒有幫同學做一件小事？小小的善意，會讓整個校園都變得更溫暖。', '犯錯沒關係，重點是說出來、改過來。誠實的孩子，最讓人放心。', '多讀一本書，就多認識一個世界。圖書館的書都在等你喔！', '運動、睡覺、吃飯，三件事都顧好，才有力氣玩，也才有力氣學。', '同樂的每個角落都有故事，用心看，你會發現更多。'];
-    ia({ id: 'npc-principal', x: rp.x, y: rp.y + 0.1, z: rp.z, r: 2.6, txt: () => '💬 與停停校長說話', act: () => {
+    ia({ id: 'npc-principal', x: rp.x, y: rp.y + 0.1, z: rp.z, r: 2.6, txt: () => '💬 與校長停停.鄧不利說話', act: () => {
       const d = D(), got = d.prinTalk;
-      say('停停校長', got ? '今天我們已經聊過了，明天再來找我吧！校長室的書櫃、會議桌、沙發，你都可以隨意參觀。' : '歡迎來校長室！坐、坐，別拘束。想聽聽校長今天想對你說的話嗎？',
+      say('校長・停停.鄧不利', got ? '今天我們已經聊過了，明天再來找我吧！校長室的書櫃、會議桌、沙發，你都可以隨意參觀。' : '歡迎來校長室！坐、坐，別拘束。想聽聽校長今天想對你說的話嗎？',
         [{ label: got ? '參觀校長室' : '請校長勉勵我', pri: true, fn: () => {
-          if (got) { say('停停校長', '辦公桌後面的獎盃，是同樂的孩子們一路累積的榮譽；旁邊的書櫃藏著許多老書，會議桌是大家討論學校大小事的地方。', [{ label: '謝謝校長', pri: true }]); return; }
-          d.prinTalk = 1; const w = WORDS[Math.floor(Math.random() * WORDS.length)]; addPts(3, '🎓 聽了停停校長的勉勵'); try { addAttr('social', 1); } catch (e) { /* 忽略 */ } save();
-          say('停停校長', w + '\n\n（今天的勉勵已領取，明天再來吧）', [{ label: '謝謝校長', pri: true }]);
+          if (got) { say('校長・停停.鄧不利', '辦公桌後面的獎盃，是同樂的孩子們一路累積的榮譽；旁邊的書櫃藏著許多老書，會議桌是大家討論學校大小事的地方。', [{ label: '謝謝校長', pri: true }]); return; }
+          d.prinTalk = 1; const w = WORDS[Math.floor(Math.random() * WORDS.length)]; addPts(3, '🎓 聽了停停.鄧不利的勉勵'); try { addAttr('social', 1); } catch (e) { /* 忽略 */ } save();
+          say('校長・停停.鄧不利', w + '\n\n（今天的勉勵已領取，明天再來吧）', [{ label: '謝謝校長', pri: true }]);
         } }, { label: '下次再來' }], AV(0)); } }); }
   /* ---------- 遊戲器材區：溜滑梯、蹺蹺板、鞦韆、攀爬架、沙坑、旋轉盤、搖搖馬、單槓（走近按 F 遊玩）---------- */
   { const PG = window.PLAYG; if (PG && PG.items) {
