@@ -5609,12 +5609,6 @@ box(GX0, GZ0, GX1, GZ1, 0.0, 0.11, mat(0x6e7378), { walk: true, noShadow: true }
       const rib = new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 32, 0.13, 5, false), cols[i % 3]); rib.castShadow = true; (CTX ? CTX.group : scene).add(rib);
     }
     [-1, 1].forEach(sg => { const b2 = box(cx + sg * A - 0.18, GZ0, cx + sg * A + 0.18, GZ1, 7.6, 8.1, cols[sg > 0 ? 1 : 2], { noShadow: true }); });
-    [GZ0 + 2.5, GZ1 - 2.5].forEach((hz, n) => {
-      const dir = n ? -1 : 1;
-      box(cx - 0.1, hz - 0.1, cx + 0.1, hz + 0.1, 0, 3.0, M.steel, { wall: true });
-      box(cx - 0.9, hz + dir * 0.15, cx + 0.9, hz + dir * 0.2, 2.4, 3.45, M.white, { noShadow: true });
-      box(cx - 0.2, hz + dir * 0.2, cx + 0.2, hz + dir * 0.7, 2.95, 3.0, M.orange, { noShadow: true });
-    });
   }); }
 // D 棟與風雨球場上層結合：西側低斜屋頂（銀色）、藍色鐵皮雨遮、2F 連通步道
 { // 西側鐵皮低屋頂：依空照為梯形（比拱頂低，與 D 棟側銜接面較窄、球場側較寬）
@@ -5637,7 +5631,45 @@ box(GX0, GZ0, GX1, GZ1, 0.0, 0.11, mat(0x6e7378), { walk: true, noShadow: true }
 { const sl = new T.Mesh(new T.BoxGeometry(GX1 - GX0 - GVW - 2, 0.12, 4.2), mat(0x6f8fa6)); sl.rotation.x = 0.6; sl.position.set((GX0 + GVW + 2 + GX1) / 2, 6.6, GZ1 - 2.0); sl.castShadow = true; (CTX ? CTX.group : scene).add(sl); }
 for (let x = GX0 + 6; x < GX1 - 2; x += 5) box(x, GZ1 + 0.6, x + 0.3, GZ1 + 0.9, 0.1, 0.5, M.orange, { noShadow: true });
 FOOT.push({ x0: GX0, z0: GZ0, x1: GX1, z1: GZ1, c: '#5c88b8', tf: CTX.tf, gym: true });
-[[GX0 + 2, GZ0 + 5.5], [GX1 - 2, GZ0 + 5.5]].forEach(p => { box(p[0] - 0.1, p[1] - 0.1, p[0] + 0.1, p[1] + 0.1, 0.1, 3.05, M.steel, { wall: true }); box(p[0] - 0.9, p[1] - 0.05, p[0] + 0.9, p[1] + 0.05, 2.6, 3.4, M.white, { noShadow: true }); });
+// 場地畫線（地面）與活動籃球架：籃球（白）、排球（黃）、羽球（藍）三種球場線疊畫，兩座活動式籃球架停在籃球場兩端底線外
+{ const LW = 0.05, Y0 = 0.11, Y1 = 0.117, G = CTX.group, lm = c => new T.MeshLambertMaterial({ color: c }), LWH = lm(0xf4f4f4), LYE = lm(0xf2c230), LBL = lm(0x58a6e8), PAINT = lm(0x9b5448);
+  const ln = (x0, z0, x1, z1, m, yy) => box(x0, z0, x1, z1, Y0, yy || Y1, m, { noShadow: true });
+  const rect = (x0, z0, x1, z1, m, yy) => { ln(x0, z0, x1, z0 + LW, m, yy); ln(x0, z1 - LW, x1, z1, m, yy); ln(x0, z0, x0 + LW, z1, m, yy); ln(x1 - LW, z0, x1, z1, m, yy); };
+  const ring = (cx, cz, r, th0, len, m, yy) => { const me = new T.Mesh(new T.RingGeometry(r - LW / 2, r + LW / 2, 48, 1, th0, len), m); me.rotation.x = -Math.PI / 2; me.position.set(cx, yy || Y1 + 0.001, cz); G.add(me); return me; };
+  const B0 = 13.6, B1 = 41.6, Z0 = -17.75, Z1 = -2.75, ZC = (Z0 + Z1) / 2, XC = (B0 + B1) / 2;
+  // 排球場 18×9（黃）：中線、3 m 進攻線
+  { const x0 = XC - 9, x1 = XC + 9, z0 = ZC - 4.5, z1 = ZC + 4.5, y = Y1 - 0.002; rect(x0, z0, x1, z1, LYE, y); ln(XC - LW / 2, z0, XC + LW / 2, z1, LYE, y); [-3, 3].forEach(d => ln(XC + d - LW / 2, z0, XC + d + LW / 2, z1, LYE, y)); }
+  // 羽球場 13.4×6.1（藍），沿球場長軸並排兩面
+  [-5.2, 5.2].forEach(dx => { const cx = XC + dx * 0 , cz = ZC; });
+  [Z0 + 3.2, Z1 - 3.2].forEach(zc => { const x0 = XC - 6.7, x1 = XC + 6.7, z0 = zc - 3.05, z1 = zc + 3.05, y = Y1 - 0.004; rect(x0, z0, x1, z1, LBL, y); ln(XC - LW / 2, z0, XC + LW / 2, z1, LBL, y); [-1.98, 1.98].forEach(d => ln(XC + d - LW / 2, z0, XC + d + LW / 2, z1, LBL, y));
+    ln(x0, zc - LW / 2, XC - 1.98, zc + LW / 2, LBL, y); ln(XC + 1.98, zc - LW / 2, x1, zc + LW / 2, LBL, y); ln(x0, z0 + 0.46, x1, z0 + 0.46 + LW, LBL, y); ln(x0, z1 - 0.46 - LW, x1, z1 - 0.46, LBL, y); });
+  // 籃球場 28×15（白）
+  rect(B0, Z0, B1, Z1, LWH); ln(XC - LW / 2, Z0, XC + LW / 2, Z1, LWH); ring(XC, ZC, 1.8, 0, Math.PI * 2, LWH);
+  [1, -1].forEach(dir => { const xb = dir > 0 ? B0 : B1, hx = xb + dir * 1.6, kx = xb + dir * 5.8;
+    box(Math.min(xb, kx), ZC - 2.45, Math.max(xb, kx), ZC + 2.45, Y0, Y0 + 0.003, PAINT, { noShadow: true });   // 禁區油漆底色
+    ln(Math.min(xb, kx), ZC - 2.45, Math.max(xb, kx), ZC - 2.45 + LW, LWH); ln(Math.min(xb, kx), ZC + 2.45 - LW, Math.max(xb, kx), ZC + 2.45, LWH); ln(kx - LW / 2, ZC - 2.45, kx + LW / 2, ZC + 2.45, LWH);   // 禁區線與罰球線
+    const ft = dir > 0 ? -Math.PI / 2 : Math.PI / 2; ring(kx, ZC, 1.8, ft, Math.PI, LWH);   // 罰球圈（朝場內半圈）
+    ring(hx, ZC, 1.25, dir > 0 ? -Math.PI / 2 : Math.PI / 2, Math.PI, LWH);   // 合理衝撞區
+    const ax = hx + dir * 1.41, ph = Math.atan2(6.6, 1.41);   // 三分線：直線段接圓弧（半徑 6.75 m）
+    [ZC - 6.6, ZC + 6.6].forEach(zz => ln(Math.min(xb, ax), zz - LW / 2, Math.max(xb, ax), zz + LW / 2, LWH));
+    ring(hx, ZC, 6.75, dir > 0 ? -ph : Math.PI - ph, ph * 2, LWH);
+    // 活動籃球架：底座（壓重塊＋輪子）、立柱、前伸橫臂與斜撐、透明籃板、橘色籃框與籃網
+    const g = new T.Group(); g.position.set(xb - dir * 0.7, Y0, ZC); g.rotation.y = dir > 0 ? 0 : Math.PI; G.add(g);
+    const ad = (geo, m, x, y, z) => { const me = new T.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; g.add(me); return me; };
+    const rod = (p, q, r, m) => { const A = new T.Vector3(...p), B = new T.Vector3(...q), L = A.distanceTo(B), me = new T.Mesh(new T.CylinderGeometry(r, r, L, 8), m); me.position.copy(A).add(B).multiplyScalar(0.5); me.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), B.clone().sub(A).normalize()); me.castShadow = true; g.add(me); };
+    const dk = lm(0x30343a), st = lm(0xcfd5dd), bl = lm(0x2f5fb0), og = lm(0xff6a1a);
+    ad(new T.BoxGeometry(1.0, 0.2, 2.0), dk, 0, 0.18, 0); ad(new T.BoxGeometry(1.02, 0.03, 0.14), lm(0xf2c230), 0, 0.29, -0.8); ad(new T.BoxGeometry(1.02, 0.03, 0.14), lm(0xf2c230), 0, 0.29, 0.8);
+    [[-0.38, -0.92], [0.38, -0.92], [-0.38, 0.92], [0.38, 0.92]].forEach(q => { const w = ad(new T.CylinderGeometry(0.08, 0.08, 0.06, 12), lm(0x111111), q[0], 0.08, q[1]); w.rotation.x = Math.PI / 2; });
+    rod([0, 0.28, 0], [0, 3.3, 0], 0.075, st); ad(new T.BoxGeometry(0.3, 1.3, 0.3), bl, 0, 0.95, 0);   // 立柱＋藍色護墊
+    rod([0, 3.3, 0], [1.9, 3.3, 0], 0.06, st); rod([0, 2.3, 0], [1.2, 3.3, 0], 0.04, st);
+    ad(new T.BoxGeometry(0.03, 1.1, 1.85), lm(0x8a939e), 1.9 - 0.02, 3.4, 0);   // 籃板金屬框
+    ad(new T.BoxGeometry(0.04, 1.05, 1.8), new T.MeshLambertMaterial({ color: 0xe6f1fa, transparent: true, opacity: 0.78 }), 1.9, 3.4, 0);
+    [[0, 3.22, 0.59, 0.02], [0, 3.67, 0.59, 0.02]].forEach(q => ad(new T.BoxGeometry(0.045, q[3], q[2]), og, 1.93, q[1], 0));
+    [-0.295, 0.295].forEach(zz => ad(new T.BoxGeometry(0.045, 0.47, 0.02), og, 1.93, 3.445, zz));
+    ad(new T.BoxGeometry(0.17, 0.03, 0.14), st, 1.99, 3.05, 0);
+    const rim = ad(new T.TorusGeometry(0.23, 0.014, 6, 24), og, 2.3, 3.05, 0); rim.rotation.x = Math.PI / 2;
+    ad(new T.CylinderGeometry(0.23, 0.13, 0.42, 14, 1, true), new T.MeshBasicMaterial({ color: 0xffffff, wireframe: true }), 2.3, 2.84, 0);
+    box(xb - dir * 0.7 - 0.5, ZC - 1.0, xb - dir * 0.7 + 0.5, ZC + 1.0, Y0, 1.2, M.steel, { wall: true, noShadow: true }).visible = false; }); }
 });
 PLANMARK(__gym0, scene.children.length);   // 平面模式：風雨操場一併隱藏
 
