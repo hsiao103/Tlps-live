@@ -10,7 +10,8 @@
     async exchange(idToken) {   // Google ID token → Supabase 登入
       if (!B.configured() || !idToken) return null;
       const r = await fetch(base() + '/auth/v1/token?grant_type=id_token', { method: 'POST', headers: { apikey: C.supabaseAnonKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: 'google', id_token: idToken }) });
-      if (!r.ok) throw new Error('exchange ' + r.status); return B._put(await r.json());
+      if (!r.ok) { let t = ''; try { t = (await r.text()).slice(0, 200); } catch (e) { /* 忽略 */ } try { localStorage.setItem('tl_sb_err', r.status + ' ' + t); } catch (e) { /* 忽略 */ } throw new Error('exchange ' + r.status); }
+      try { localStorage.removeItem('tl_sb_err'); } catch (e) { /* 忽略 */ } return B._put(await r.json());
     },
     async token() {   // 取得可用的 access token（必要時用 refresh token 更新）
       let s = B.session(); if (!s) return null;
