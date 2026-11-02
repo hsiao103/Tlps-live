@@ -5799,7 +5799,7 @@ function whereText() {
   if (s === '戶外' && (() => { const dx = PL.x - GOX, dz = PL.z - GOZ, lx = dx * GTF.c - dz * GTF.s, lz = dx * GTF.s + dz * GTF.c; return lx > GX0 && lx < GX1 && lz > GZ0 && lz < GZ1; })()) s = '風雨球場';
   if (s === '戶外' && Math.hypot((PL.x - TX) / TR, (PL.z - TZ) / (TS + TR)) < 1) s = '操場';
   const fl = Math.round(PL.y / H) + 1;
-  $('where').textContent = view.mode === 'bird' ? '鳥瞰模式' : `${s} · ${inB ? fl + ' 樓' : '地面層'} ｜ x ${PL.x.toFixed(0)} z ${PL.z.toFixed(0)}`;
+  $('where').textContent = view.mode === 'bird' ? '鳥瞰模式' : `${s} · ${inB ? fl + ' 樓' : '地面層'}${window.matchMedia && matchMedia('(max-width:700px),(max-height:500px)').matches ? '' : ` ｜ x ${PL.x.toFixed(0)} z ${PL.z.toFixed(0)}`}`;
 }
 
 
@@ -8881,7 +8881,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const d = D(), w = W(), rq = REQ(), lv = level(), next = TITLES[lv + 1];
     const row = (ok, tx, n, nav) => '<div class="t' + (ok ? ' ok' : '') + '"><span class="ck">' + (ok ? '✓' : '') + '</span><span class="tx">' + tx + '</span><span class="n">' + n + '</span>' + (nav && !ok ? '<button type="button" data-nav="' + nav + '">📍</button>' : '') + '</div>';
     const reqTx = d.req === 0 ? '找「' + NPCDEF[rq.npc].name.split(' ')[0] + '」幫忙：' + rq.title : d.req === 1 ? rq.title + '：' + rq.steps[0].name : d.req === 2 ? '回去向「' + NPCDEF[rq.npc].name.split(' ')[0] + '」回報' : rq.title + '（已完成）';
-    hud.innerHTML = '<div class="hd">' + meAv() + '<span>LV.' + lvOf() + ' ' + TITLES[lv][1] + '</span>' + (pastOf() >= 0 ? '<span class="pt" style="margin-left:0" title="前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '">' + PASTS[pastOf()][1] + '</span>' : '<span class="pt" style="margin-left:0;cursor:pointer" onclick="event.stopPropagation();__live.pickPast()">🎲 選身分</span>') + '<span class="pt" style="cursor:pointer" onclick="event.stopPropagation();__live.openBag()" title="背包與角色（B）">🎒</span><span class="pt">' + S.pts + ' 點</span></div><div class="mini"><div class="vb hp"><b>HP</b><div class="tr"><i id="gHpM"></i></div><em id="gHpMT"></em></div><div class="vb mp"><b>MP</b><div class="tr"><i id="gMpM"></i></div><em id="gMpMT"></em></div></div><div class="bd">' +
+    hud.innerHTML = '<div class="hd">' + meAv() + '<span>LV.' + lvOf() + ' ' + TITLES[lv][1] + '</span>' + (pastOf() >= 0 ? '<span class="pt hdx" style="margin-left:0" title="前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '">' + PASTS[pastOf()][1] + '</span>' : '<span class="pt hdx" style="margin-left:0;cursor:pointer" onclick="event.stopPropagation();__live.pickPast()">🎲 選身分</span>') + '<span class="pt hdx" style="cursor:pointer" onclick="event.stopPropagation();__live.openBag()" title="背包與角色（B）">🎒</span><span class="pt">' + S.pts + ' 點</span></div><div class="mini"><div class="vb hp"><b>HP</b><div class="tr"><i id="gHpM"></i></div><em id="gHpMT"></em></div><div class="vb mp"><b>MP</b><div class="tr"><i id="gMpM"></i></div><em id="gMpMT"></em></div></div><div class="bd">' +
+      '<div class="tools">' + (pastOf() >= 0 ? '<span title="前世：' + PASTS[pastOf()][0] + '・' + PASTS[pastOf()][2] + '">' + PASTS[pastOf()][1] + ' ' + PASTS[pastOf()][0] + '</span>' : '<button type="button" onclick="event.stopPropagation();__live.pickPast()">🎲 選身分</button>') + '<button type="button" onclick="event.stopPropagation();__live.openBag()">🎒 背包與角色</button></div>' +
       meLine() + '<div class="vrow">' + avHtml('hv') + '<div class="vit"><div class="vb hp"><b>HP</b><div class="tr"><i id="gHp"></i></div><em id="gHpT"></em></div><div class="vb mp"><b>MP</b><div class="tr"><i id="gMp"></i></div><em id="gMpT"></em></div><div class="vb xp"><b>EXP</b><div class="tr"><i id="gXp"></i></div><em id="gXpT"></em></div></div></div>' +
       (next ? '<div class="st"><span>距進化「' + TIERS[lv + 1][1] + '・' + next[1] + '」(Lv.' + TIERS[lv + 1][0] + ') 還差 ' + (next[0] - S.pts) + ' 點</span></div>' : '<div class="st"><span>🌟 已是最高階級「' + TIERS[lv][3] + '」</span></div>') +
       '<div class="st" id="gClk" style="margin:0 0 2px"></div>' +
@@ -10466,6 +10467,15 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
 #gNet .tip{font-size:11px;color:#7a8499;line-height:1.5}#gNet .big{font-size:11px;color:#c27a00;background:#fff4dc;border-radius:8px;padding:5px 7px}
 body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
 #search{display:none!important}
+#gHud .tools{display:none}
+@media (max-width:700px),(max-height:500px){
+#info h1.tl1{display:none!important}#info #where{font-size:13px;font-weight:700;color:inherit;opacity:1}
+#gHud .hdx{display:none!important}
+#gHud .tools{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}#gHud .tools button,#gHud .tools span{border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:99px;font:700 12px var(--font-ui);padding:3px 11px;cursor:pointer}
+#gHud.min{width:max-content!important;min-width:0!important}#gHud:not(.min){width:min(292px,calc(100vw - 20px))!important}
+#gHud .hd{gap:6px}#gHud .hd .pt:last-child{margin-left:6px}
+#gHud.min .mini{padding:0;gap:0}#gHud.min .mini .vb{grid-template-columns:1fr;gap:0}#gHud.min .mini .vb b,#gHud.min .mini .vb em{display:none}#gHud.min .mini .vb .tr{height:4px;border-radius:0}
+}
 #gGear{right:16px!important;border-radius:0 22px 22px 0}
 #gWxChip{top:calc(12px + env(safe-area-inset-top,0px))!important;right:60px!important;height:44px;box-sizing:border-box;border-radius:22px 0 0 22px;border-right-width:0;padding:0 10px 0 12px;gap:3px;font-size:14px;z-index:31}
 @media (max-width:400px){#gWxChip{padding:0 7px 0 9px}#gWxChip i,#gWxChip em{display:none}}
