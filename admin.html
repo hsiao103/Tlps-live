@@ -31,7 +31,7 @@ const deny=t=>{show();$('#app').innerHTML='<div class="msg">'+t+'</div>'};
 $('#back').onclick=()=>location.href=(A&&A.cfg.fullPage)||'play.html';
 if(!sess){location.replace((A.cfg.visitorPage||'index.html')+'?need=login');return}
 if(admins.indexOf(String(sess.email).toLowerCase())<0){deny('此帳號（'+esc(sess.email)+'）沒有管理權限。');return}
-if(!B||!B.configured()||!B.session()){deny('尚未取得雲端登入。請先回到登入頁以 Google 帳號登入一次，再開啟本頁。');return}
+if(!B||!B.configured()||!B.session()){{let er='';try{er=localStorage.getItem('tl_sb_err')||''}catch(e){}deny('尚未取得雲端登入。請回到登入頁，按「登出」後用 Google 重新登入一次，再開啟本頁。'+(er?'<br><small>上次雲端登入錯誤：'+esc(er.slice(0,200))+'</small>':'<br><small>（沒有記錄到錯誤：多半是登入發生在雲端設定完成之前）</small>')+'<br><br><a href="'+((A.cfg.visitorPage)||'index.html')+'">前往登入頁</a>');return}}
 show();$('#who').textContent=sess.email;
 async function get(path){const s=await B.token();if(!s)throw new Error('session');const r=await fetch(String(C.supabaseUrl).replace(/\/+$/,'')+'/rest/v1/'+path,{headers:{apikey:C.supabaseAnonKey,Authorization:'Bearer '+s.access}});if(!r.ok)throw new Error(path.split('?')[0]+' '+r.status);return r.json()}
 async function call(path,method,body,extra){const s=await B.token();const r=await fetch(String(C.supabaseUrl).replace(/\/+$/,'')+'/rest/v1/'+path,{method,headers:Object.assign({apikey:C.supabaseAnonKey,Authorization:'Bearer '+s.access,'Content-Type':'application/json'},extra||{}),body:body?JSON.stringify(body):undefined});if(!r.ok)throw new Error(method+' '+r.status)}
