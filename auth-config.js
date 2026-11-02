@@ -9,7 +9,7 @@
 window.TL_AUTH_CONFIG = {
   clientId: '496401881030-1qjipaivkr1sivbnakccf017i1v4ia9a.apps.googleusercontent.com',
   allowDomains: ['tmail.ilc.edu.tw', 'smail.ilc.edu.tw'],
-  allowEmails: ['blurwater@gmail.com', 'hsiao103@gmail.com'],   /* 白名單：網域之外的個別信箱 */
+  allowEmails: ['blurwater@gmail.com', 'hsiao103@gmail.com', 'hsiao103@cges.ilc.edu.tw'],   /* 白名單：網域之外的個別信箱 */
   adminEmails: ['hsiao103@gmail.com'],   /* 管理後台（admin.html）可進入的信箱；真正的資料權限請同步修改 supabase-mp.sql 的 tl_is_admin() */
   sessionHours: 12,
   fullPage: 'play.html',        // 遊戲頁面
