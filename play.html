@@ -4796,7 +4796,7 @@ function bld(o) {
     const bsk = (o.boundsK && o.boundsK[k]) || o.bounds, nRk = bsk ? bsk.length - 1 : nR;
     for (let i = 0; i < (o.hall ? 0 : nRk); i++) {
       const a = bsk ? bsk[i] : roomU0 + i * rw, b = bsk ? bsk[i + 1] : a + rw, dm = (a + b) / 2, rwi = b - a, shr = shOn(k) && a >= SH.u0 - 0.01 && b <= SH.u1 + 0.01, Dr = shr ? SH.v : D - dAt(a, b);
-      const wc0 = o.names && o.names[k] && /廁/.test(o.names[k][i]), two = o.twoDoors && !wc0 && rwi >= 6,
+      const wc0 = o.names && o.names[k] && /廁/.test(o.names[k][i]), two = (o.twoDoors || (o.twoDoorRooms && o.twoDoorRooms.indexOf(o.names && o.names[k] && o.names[k][i]) >= 0 && o.twoDoorRoomsK.indexOf(k) >= 0)) && !wc0 && rwi >= 6,
         dcs = two ? [a + 1.5, b - 1.5] : [dm];                                   // twoDoors：前後門各開在走廊側（靠集合場一側）牆的兩端
       { let cur = a; dcs.forEach(dc => { R(cur, CORR, dc - 0.6, CORR + 0.2, y0, y1, M.wallIn, W); cur = dc + 0.6; }); R(cur, CORR, b, CORR + 0.2, y0, y1, M.wallIn, W); }
       if (two) R(dcs[0] + 0.9, CORR - 0.04, dcs[1] - 0.9, CORR, y0 + 1.15, y0 + 2.0, POSTER[(i + k) % 4], { noShadow: true });
@@ -4839,7 +4839,7 @@ function bld(o) {
         const bc = [0xd9534f, 0x5b8dd9, 0xf0b840, 0x58a868, 0x9b6bd0]; for (let lv = 0; lv < 4; lv++) { let t = 9.95; let n2 = 0; while (t < 15.1) { const w2 = 0.18 + ((n2 * 37) % 7) * 0.03; R(b - 0.72, t, b - 0.7, Math.min(t + w2, 15.2), y0 + 0.28 + lv * 0.45, y0 + 0.56 + lv * 0.45, mat(bc[(n2 + lv) % 5]), { noShadow: true }); t += w2 + 0.02; n2++; } }
         R(a + 0.3, 10.4, a + 1.3, 13.0, y0 + 0.08, y0 + 0.5, sofaM, { noShadow: true }); R(a + 0.25, 10.4, a + 0.5, 13.0, y0 + 0.5, y0 + 0.95, sofaM, { noShadow: true });
         R(a + 1.8, 10.8, a + 2.6, 12.6, y0 + 0.08, y0 + 0.45, tblM, { noShadow: true });
-        [[a + 0.5, vF - 0.5], [b - 1.2, vN + 0.4]].forEach(q => { R(q[0], q[1], q[0] + 0.5, q[1] + 0.5, y0 + 0.08, y0 + 0.45, potM, { noShadow: true }); R(q[0] + 0.05, q[1] + 0.05, q[0] + 0.45, q[1] + 0.45, y0 + 0.45, y0 + 1.3, plM, { noShadow: true }); });
+        [[a + 0.5, vF - 0.5], [b - 0.8, vN + 0.3]].forEach(q => { R(q[0], q[1], q[0] + 0.5, q[1] + 0.5, y0 + 0.08, y0 + 0.45, potM, { noShadow: true }); R(q[0] + 0.05, q[1] + 0.05, q[0] + 0.45, q[1] + 0.45, y0 + 0.45, y0 + 1.3, plM, { noShadow: true }); });
         const cI = new T.InstancedMesh(CHAIRG, mat(0x3c3c4c), chairs.length); chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(q[2]); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); }); cI.frustumCulled = false; par.add(cI);
       }
       else if ((o.names && o.names[k] && o.names[k][i]) === '校史室') {   // 校史室：校史文物展示（照片牆、年表、玻璃展示櫃、老校鐘、老課桌椅）
@@ -4851,7 +4851,7 @@ function bld(o) {
         [vN + 1.6, vN + 4.0, vN + 6.4, vN + 8.8].forEach((v, n) => { [[a + 0.2, 1], [b - 0.01, -1]].forEach(q => { const u = q[0], sg = q[1];
           R(Math.min(u, u + 0.06 * sg), v - 0.7, Math.max(u, u + 0.06 * sg), v + 0.7, y0 + 1.0, y0 + 2.0, gold, { noShadow: true });
           R(Math.min(u + 0.06 * sg, u + 0.09 * sg), v - 0.6, Math.max(u + 0.06 * sg, u + 0.09 * sg), v + 0.6, y0 + 1.1, y0 + 1.9, sepia[(n + (sg > 0 ? 0 : 2)) % 4], { noShadow: true }); }); });
-        [[a + 0.4, dm - 1.1], [dm + 1.1, b - 0.4]].forEach(q => { R(q[0], CORR + 0.2, q[1], CORR + 0.26, y0 + 1.0, y0 + 2.0, gold, { noShadow: true }); R(q[0] + 0.08, CORR + 0.26, q[1] - 0.08, CORR + 0.29, y0 + 1.08, y0 + 1.92, paper, { noShadow: true });
+        [[dm - 2.3, dm - 0.1], [dm + 0.1, dm + 2.3]].forEach(q => { R(q[0], CORR + 0.2, q[1], CORR + 0.26, y0 + 1.0, y0 + 2.0, gold, { noShadow: true }); R(q[0] + 0.08, CORR + 0.26, q[1] - 0.08, CORR + 0.29, y0 + 1.08, y0 + 1.92, paper, { noShadow: true });
           for (let t = 0; t < 4; t++) R(q[0] + 0.2, CORR + 0.29, q[1] - 0.2, CORR + 0.31, y0 + 1.25 + t * 0.16, y0 + 1.33 + t * 0.16, t % 2 ? blue : red, { noShadow: true }); });
         // 三座玻璃展示櫃（中央一列）
         const cases = [[dm, 5.2, '📜 古老藍圖'], [dm, 8.4, '🏆 歷屆獎盃'], [dm, 11.6, '📚 老課本與算盤']];
@@ -5200,7 +5200,7 @@ const dW = (x, z) => toWorld(TFD, x, z);        // D 棟局部座標 → 世界�
 // 依「115 學年度校園空間配置第 4 版」：A 棟（含穿堂）、圖書館翼(B 西翼)、中段、親子/課輔翼(C 東翼)、D 棟房名
 const LIFT = 0.35, LIFTR = [];                // A、B、BC、C 棟與通廊整體墊高（地坪抬高 35 cm）
 let __s = scene.children.length, __w = WALLS.length;
-bld({ id: 'A', short: '行政大樓', name: '行政大樓', names: { 0: ['廁所', '行政辦公室', '交誼室'], 1: ['廁所', '校史室', '校長室'], 2: ['廁所', '禮堂'] }, x0: -30.5, z0: -32.5, x1: -6, z1: -16.2, floors: 3, open: 'N', stair: 'none', bounds: [0, 5.7, 15.1, 24.5], boundsK: { 2: [0, 5.7, 24.5] }, railGaps: [{ u0: 3.6, u1: 8.6, floors: [1] }], roof: 'gable', roofU0: 5.7, shrink: { u0: 0, u1: 5.7, v: 10, floors: [1, 2] }, tower: false, mini: '#2f7d63',
+bld({ id: 'A', twoDoorRooms: ['校史室', '校長室'], twoDoorRoomsK: [1], short: '行政大樓', name: '行政大樓', names: { 0: ['廁所', '行政辦公室', '交誼室'], 1: ['廁所', '校史室', '校長室'], 2: ['廁所', '禮堂'] }, x0: -30.5, z0: -32.5, x1: -6, z1: -16.2, floors: 3, open: 'N', stair: 'none', bounds: [0, 5.7, 15.1, 24.5], boundsK: { 2: [0, 5.7, 24.5] }, railGaps: [{ u0: 3.6, u1: 8.6, floors: [1] }], roof: 'gable', roofU0: 5.7, shrink: { u0: 0, u1: 5.7, v: 10, floors: [1, 2] }, tower: false, mini: '#2f7d63',
   endDoors: [{ end: 1, v0: 0.15, v1: 1.8, floors: [0, 1, 2], full: true }, { end: 0, v0: 0.15, v1: 1.8, floors: [0, 1, 2], full: true }] });
 // A 棟西翼（廚房）與西側連接走廊；A 棟北側走廊連往 D 棟南端樓梯
 bld({ id: 'AW', short: '廚房', name: '廚房', names: { 0: ['廚房'] }, x0: -51.1, z0: -22.5, x1: -33.3, z1: -16.2, floors: 1, open: 'S', stair: 'none', rooms: { n: 1, u0: 0.2, w: 17 }, hall: true, endDoors: [{ end: 1, v0: 2.2, v1: 3.9, floors: [0] }], roof: 'flat', parapet: 0, mini: '#c9a96a' });
