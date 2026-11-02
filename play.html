@@ -8220,7 +8220,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     if (stage >= 1) { const sf = K.add(new T.Mesh(new T.TorusGeometry(0.095, 0.03, 6, 16), M(sc)), 0, 0.67, 0, body); sf.rotation.x = Math.PI / 2; const tl = K.bx(0.05, 0.16, 0.02, M(sc), 0.05, 0.58, 0.09, body); tl.rotation.z = 0.15; }
     if (stage >= 2) { const cp = K.add(new T.Mesh(new T.PlaneGeometry(0.3, 0.5), M(sc, { side: T.DoubleSide })), 0, 0.46, -0.1, body); cp.rotation.x = 0.12; }
     const tp = petTop(g, K, stage, 1.18, 0.0, 0.52, 0.66); g.scale.setScalar(0.95 + 0.06 * stage);
-    const P = { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.83, base: 0, hop: 0.025, mode: 'trot' };
+    const P = { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.83, base: 0, hop: 0.025, by: -0.12, mode: 'trot' };
     P.fx = (now, w) => { arms.forEach((a, i) => { const sw = Math.sin(P.ph + (i ? 0 : Math.PI)) * 0.7 * w; a.rotation.x = sw; a.rotation.z = (i ? -1 : 1) * (0.12 + Math.sin(now / 600 + i) * 0.05 * (1 - w)); }); if (w < 0.1 && Math.sin(now / 2300) > 0.97) arms[1].rotation.z = -2.4 + Math.sin(now / 90) * 0.3; };
     return P;
   }
@@ -8250,7 +8250,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     if (o.kind === 'dog' || stage >= 1) { const sf = K.add(new T.Mesh(new T.TorusGeometry(0.095, 0.03, 6, 16), M(o.kind === 'dog' ? (stage >= 1 ? sc : 0xd9534f) : sc)), 0, 0.67, 0, body); sf.rotation.x = Math.PI / 2; const tl = K.bx(0.05, 0.16, 0.02, M(o.kind === 'dog' ? (stage >= 1 ? sc : 0xd9534f) : sc), 0.05, 0.58, 0.09, body); tl.rotation.z = 0.15; }
     if (stage >= 2) { const cp = K.add(new T.Mesh(new T.PlaneGeometry(0.3, 0.5), M(sc, { side: T.DoubleSide })), 0, 0.46, -0.1, body); cp.rotation.x = 0.12; }
     const tp = petTop(g, K, stage, 1.18, 0.0, 0.52, 0.66); g.scale.setScalar(0.95 + 0.06 * stage);
-    const P = { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.83, base: 0, hop: 0.025, mode: 'trot' };
+    const P = { g, body, head, ears, tail, legs, halo: tp.halo, aura: tp.aura, ph: 0, sp: 0, ry: 0, lx: 0, lz: 0, key: '', top: 0.83, base: 0, hop: 0.025, by: -0.12, mode: 'trot' };
     P.fx = (now, w) => { arms.forEach((a, i) => { const sw = Math.sin(P.ph + (i ? 0 : Math.PI)) * 0.7 * w; a.rotation.x = sw; a.rotation.z = (i ? -1 : 1) * (0.12 + Math.sin(now / 600 + i) * 0.05 * (1 - w)); }); if (extra) extra.rotation.y = now / 500; if (w < 0.1 && Math.sin(now / 2300) > 0.97) arms[1].rotation.z = -2.4 + Math.sin(now / 90) * 0.3; };
     return P;
   }
@@ -8305,7 +8305,7 @@ window.__tlLogo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF+CAYAAACcS
     else P.legs.forEach((l, i) => { l.rotation.x = Math.sin(P.ph + (i === 1 || i === 2 ? Math.PI : 0)) * 0.75 * w; });
     const bob = P.mode === 'float' ? Math.sin(now / 500) * 0.05 : Math.abs(Math.sin(P.ph)) * P.hop * w;
     P.g.position.set(px, gy + P.base + bob, pz);
-    P.body.position.y = P.mode === 'float' ? 0 : Math.sin(now / 550) * 0.012 * (1 - w);
+    P.body.position.y = (P.by || 0) + (P.mode === 'float' ? 0 : Math.sin(now / 550) * 0.012 * (1 - w));
     P.head.rotation.x = Math.sin(P.ph * 0.5) * 0.06 * w + Math.sin(now / 900) * 0.04 * (1 - w); P.head.rotation.y = Math.sin(now / 1700) * 0.25 * (1 - w);
     if (P.tail) { P.tail.rotation.y = Math.sin(now / (mv ? 90 : 140)) * (mv ? 0.5 : 0.8); P.tail.rotation.x = -0.3 - w * 0.4; }
     P.ears.forEach((e, i) => { e.rotation.x = -0.1 - w * 0.35 + Math.sin(P.ph * 2 + i) * 0.08 * w; });
