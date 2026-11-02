@@ -9506,6 +9506,44 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       for (const [x, z] of [[-X, Z0], [X, Z0], [-X, Z1], [X, Z1]]) { add(new T.Mesh(new T.CylinderGeometry(2.6, 2.9, 15, 10), stone), x, 11.5, z); add(new T.Mesh(new T.ConeGeometry(3.5, 5.5, 10), roofB), x, 21.7, z); add(new T.Mesh(new T.BoxGeometry(0.9, 1.8, 0.4), arch), x * 0.96, 13, z * 0.96 + (z > 0 ? 2.5 : -2.5)); }
       add(new T.Mesh(new T.BoxGeometry(6, 1, 3), stone2), 0, 8.5, Z0 - 1.6);
       ISL.g.children.slice().forEach(g => { if (g.type === 'Group' && g.position.y === 5) { const x = g.position.x, z = g.position.z; if ((Math.abs(Math.abs(x) - X) < 3.2 && z > Z0 - 3 && z < Z1 + 3) || (Math.abs(z - Z0) < 3.2 && Math.abs(x) < X + 3)) ISL.g.remove(g); } }); }
+    // ===== 城堡內部：把實心主堡挖空，配置大廳與擺設 =====
+    { const P = (g, k) => g.geometry && g.geometry.parameters && g.geometry.parameters[k];
+      ISL.g.remove(keep);
+      ISL.g.children.slice().forEach(m => { if (!m.isMesh) return; const t = m.geometry.type; if ((t === 'BoxGeometry' && P(m, 'width') === 14 && P(m, 'height') === 6 && P(m, 'depth') === 1.4) || (t === 'BoxGeometry' && P(m, 'width') === 8 && P(m, 'height') === 9 && P(m, 'depth') === 1.2) || (t === 'CylinderGeometry' && P(m, 'radiusTop') === 4 && P(m, 'height') === 1.2) || (t === 'CylinderGeometry' && P(m, 'radiusTop') === 4.2 && P(m, 'height') === 34)) ISL.g.remove(m); });
+      add(new T.Mesh(new T.CylinderGeometry(4.2, 4.6, 16, 12), stone), 0, 30, -4);
+      const bx = (w, h, d, c, x, y, z, o) => add(new T.Mesh(new T.BoxGeometry(w, h, d), c instanceof T.Material ? c : M(c, o)), x, y, z);
+      const cy = (r1, r2, h, c, x, y, z, seg) => add(new T.Mesh(new T.CylinderGeometry(r1, r2, h, seg || 10), c instanceof T.Material ? c : M(c)), x, y, z);
+      const gold = M(0xe0b432), red = M(0xb3262e), wd2 = M(0x8a5a30), fireM = new T.MeshBasicMaterial({ color: 0xffa83a });
+      // 主堡外殼（含門洞）
+      bx(1, 18, 14, stone, -7.5, 13, -2); bx(1, 18, 14, stone, 7.5, 13, -2); bx(16, 18, 1, stone, 0, 13, -8.5);
+      bx(6, 18, 1, stone, -5, 13, 4.5); bx(6, 18, 1, stone, 5, 13, 4.5); bx(4, 10, 1, stone, 0, 17, 4.5);
+      bx(0.6, 7, 0.8, wood, -2.1, 8.5, 5); bx(0.6, 7, 0.8, wood, 2.1, 8.5, 5); bx(4.8, 0.7, 0.8, wood, 0, 12.2, 5);
+      bx(16, 1, 14, stone2, 0, 21.5, -2); // 天花板
+      bx(14, 0.3, 12.4, M(0xcfc6b2), 0, 5.05, -2.2); for (let i = 0; i < 6; i++) for (let j = 0; j < 5; j++) if ((i + j) % 2) bx(2.3, 0.05, 2.4, M(0xb8ad96), -5.8 + i * 2.32, 5.22, -7.4 + j * 2.45);
+      // 紅地毯＋金邊
+      bx(3, 0.1, 11.5, red, 0, 5.28, -2.4); bx(0.25, 0.11, 11.5, gold, -1.65, 5.29, -2.4); bx(0.25, 0.11, 11.5, gold, 1.65, 5.29, -2.4);
+      // 王座台階與王座
+      bx(8, 0.5, 3.6, M(0xa89c85), 0, 5.45, -6.5); bx(6, 0.5, 2.6, M(0xb8ad96), 0, 5.95, -6.8); bx(3.4, 0.12, 2.2, red, 0, 6.26, -4.6);
+      bx(1.8, 0.9, 1.5, gold, 0, 6.7, -7); bx(1.8, 3.6, 0.35, gold, 0, 8.5, -7.7); bx(0.35, 0.9, 1.4, gold, -1, 7.1, -7); bx(0.35, 0.9, 1.4, gold, 1, 7.1, -7);
+      add(new T.Mesh(new T.ConeGeometry(0.5, 1, 4), M(0xff5a5a)), 0, 10.8, -7.7); add(new T.Mesh(new T.PlaneGeometry(5, 8), M(0xb3262e, { side: T.DoubleSide })), 0, 14, -7.9);
+      add(new T.Mesh(new T.CircleGeometry(1.3, 18), new T.MeshBasicMaterial({ color: 0xe0b432 })), 0, 15, -7.85); add(new T.Mesh(new T.CircleGeometry(0.8, 18), new T.MeshBasicMaterial({ color: 0x3f6fd8 })), 0, 15, -7.8);
+      // 石柱與壁燈
+      ISL.fl = [];
+      for (const [x, z] of [[-4.6, -5.5], [4.6, -5.5], [-4.6, 0.5], [4.6, 0.5]]) { cy(0.7, 0.8, 16, stone2, x, 13, z, 12); cy(1, 1, 0.5, gold, x, 5.4, z, 12); cy(1, 1, 0.5, gold, x, 20.8, z, 12); const sx = x < 0 ? 1 : -1; cy(0.08, 0.08, 1.2, wood, x + sx * 0.85, 9.5, z); const f = add(new T.Mesh(new T.SphereGeometry(0.28, 8, 6), fireM), x + sx * 0.85, 10.3, z); ISL.fl.push(f); }
+      // 側牆旗幟
+      for (const sx of [-1, 1]) for (const z of [-6, -2, 1.5]) { add(new T.Mesh(new T.PlaneGeometry(1.8, 5), M(sx < 0 ? 0x3f6fd8 : 0xb3262e, { side: T.DoubleSide })), sx * 6.95, 15, z).rotation.y = Math.PI / 2; bx(0.1, 0.3, 2, gold, sx * 6.9, 17.6, z); }
+      // 左側：書架＋圓桌
+      for (const z of [-6.2, -3.4]) { bx(0.9, 6, 2.4, wd2, -6.4, 8, z); for (let k = 0; k < 4; k++) for (let n = 0; n < 4; n++) bx(0.5, 0.9, 0.35, [0xd9534f, 0x3f6fd8, 0x4fa35a, 0xe0b432][(k + n) % 4], -5.9, 6.3 + k * 1.35, z - 0.9 + n * 0.6); }
+      cy(1.5, 1.5, 0.2, wd2, -3.3, 6.6, 2, 18); cy(0.25, 0.3, 1.3, wd2, -3.3, 5.9, 2); for (const a of [0, 2.1, 4.2]) cy(0.45, 0.45, 0.6, wd2, -3.3 + Math.cos(a) * 2.2, 5.6, 2 + Math.sin(a) * 2.2);
+      cy(0.4, 0.3, 0.3, M(0xe8e0d0), -3.3, 6.85, 2); add(new T.Mesh(new T.SphereGeometry(0.22, 8, 6), M(0xd9534f)), -3.1, 7.1, 2.1); add(new T.Mesh(new T.SphereGeometry(0.2, 8, 6), M(0x7bbd57)), -3.5, 7.08, 1.9);
+      // 右側：盔甲架＋寶箱
+      for (const z of [-4.8, -1.8]) { bx(0.9, 0.3, 0.9, wd2, 5.9, 5.3, z); cy(0.3, 0.45, 1.8, M(0xaab4c0), 5.9, 6.4, z); add(new T.Mesh(new T.SphereGeometry(0.38, 10, 8), M(0xaab4c0)), 5.9, 7.7, z); bx(0.12, 2.8, 0.12, M(0x6b4a2b), 6.5, 6.7, z + 0.5); add(new T.Mesh(new T.ConeGeometry(0.2, 0.7, 6), M(0xaab4c0)), 6.5, 8.4, z + 0.5); }
+      const chest = new T.Group(); chest.position.set(5.2, 5.2, -7); ISL.g.add(chest); bx(1.8, 0.9, 1.1, wd2, 0, 0.45, 0, chest); add(new T.Mesh(new T.CylinderGeometry(0.55, 0.55, 1.8, 10, 1, false, 0, Math.PI), wd2), 0, 0.9, 0, chest).rotation.z = Math.PI / 2; bx(1.85, 0.2, 0.2, gold, 0, 0.5, 0.56, chest); bx(0.3, 0.4, 0.2, gold, 0, 0.55, 0.62, chest);
+      // 吊燈
+      cy(0.05, 0.05, 4, M(0x444444), 0, 19.4, -2, 4); add(new T.Mesh(new T.TorusGeometry(1.6, 0.12, 6, 18), gold), 0, 17.2, -2).rotation.x = Math.PI / 2; for (let i = 0; i < 6; i++) { const f = add(new T.Mesh(new T.SphereGeometry(0.22, 8, 6), fireM), Math.cos(i * 1.047) * 1.6, 17.6, -2 + Math.sin(i * 1.047) * 1.6); ISL.fl.push(f); }
+      const pl = new T.PointLight(0xffd9a0, 0.9, 34); pl.position.set(0, 14, -2); ISL.g.add(pl);
+      // 進出互動
+      ISL.thr = { x: ISL.g.position.x, z: ISL.g.position.z - 5.2 * 0.7, cx: ISL.g.position.x + 5.2 * 0.7, cz: ISL.g.position.z - 6.2 * 0.7 }; }
     // 道路：城堡大門 → 外牆門樓 → 蜿蜒到洞口
     { const dirt = M(0xc9ad7a), edge = M(0xa88a5a), mx = ex + ox * 2.5, mz = ez + oz * 2.5, pts = [[0, 6], [0, 21], [1, 27], [7, 29.5], [14, 28], [mx - 2, mz - 4], [mx, mz]];
       for (let i = 0; i < pts.length - 1; i++) { const [x1, z1] = pts[i], [x2, z2] = pts[i + 1], L = Math.hypot(x2 - x1, z2 - z1), a = Math.atan2(x2 - x1, z2 - z1); const m = add(new T.Mesh(new T.BoxGeometry(4.2, 0.2, L + 1.2), dirt), (x1 + x2) / 2, 5.08, (z1 + z2) / 2); m.rotation.y = a; const sd = add(new T.Mesh(new T.BoxGeometry(5, 0.12, L + 1.2), edge), (x1 + x2) / 2, 5.04, (z1 + z2) / 2); sd.rotation.y = a; add(new T.Mesh(new T.CylinderGeometry(2.1, 2.1, 0.2, 10), dirt), x2, 5.08, z2); }
@@ -9519,7 +9557,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const ISK = 0.7, ISY = () => ISL.g.position.y + 5 * ISK;
   ISL.g.updateMatrixWorld(true);
   ISL.g.children.forEach(m => { if (m.isMesh && m.geometry && ((m.geometry.type === 'CylinderGeometry' && m.geometry.parameters.radiusTop === 38.5) || (m.geometry.type === 'SphereGeometry' && m.geometry.parameters.radius >= 5 && m.geometry.parameters.thetaLength < 2))) walk.push(m); });
-  ISL.walls = [[-13.5, 13.5, -12.5, 8.5], [-18, -16, -17, 20], [16, 18, -17, 20], [-18, 18, -18, -16], [-18, -2.5, 19, 21], [2.5, 18, 19, 21]].map(b => { const w = { x0: ISL.g.position.x + b[0] * ISK, x1: ISL.g.position.x + b[1] * ISK, z0: ISL.g.position.z + b[2] * ISK, z1: ISL.g.position.z + b[3] * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(w); return w; });
+  ISL.walls = [[-8, -7, -9, 5], [7, 8, -9, 5], [-8, 8, -9, -8], [-8, -2.3, 4, 5], [2.3, 8, 4, 5], [-13.2, -6.8, -12.2, -5.8], [6.8, 13.2, -12.2, -5.8], [-13.2, -6.8, 1.8, 8.2], [6.8, 13.2, 1.8, 8.2], [-18, -16, -17, 20], [16, 18, -17, 20], [-18, 18, -18, -16], [-18, -2.5, 19, 21], [2.5, 18, 19, 21]].map(b => { const w = { x0: ISL.g.position.x + b[0] * ISK, x1: ISL.g.position.x + b[1] * ISK, z0: ISL.g.position.z + b[2] * ISK, z1: ISL.g.position.z + b[3] * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(w); return w; });
   ISL.syncWalls = () => { const b = ISL.g.position.y; ISL.walls.forEach(w => { w.y0 = b + 4 * ISK; w.y1 = b + 25 * ISK; }); };
   ISL.syncWalls();
   function skyPortal(grp, ring, name, col) {
@@ -9536,6 +9574,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const skyGo = (x, y, z, lx, lz, msg) => { try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) {} SFX.play('win', 200); PL.x = x; PL.y = y + 0.05; PL.z = z; PL.vy = 0; PL.yaw = Math.atan2(-(lx - x), -(lz - z)); toast(msg, 2800); };
   ia({ id: 'skyUp', x: SKY0.x, y: SKY0.y, z: SKY0.z, r: 2.6, txt: () => '☁️ 傳送到浮空島', act: () => skyGo(ISL.g.position.x, ISY(), ISL.g.position.z + 26 * ISK, ISL.g.position.x, ISL.g.position.z, '☁️ 歡迎來到浮空島！走回藍光圈旁的橘色傳送門就能回校園') });
   ia({ id: 'skyDown', x: SKYA.x, get y() { return ISY(); }, z: SKYA.z, r: 2.6, txt: () => '🏫 傳送回校園', act: () => skyGo(SKY0.x, SKY0.y, SKY0.z + 3, SKY0.x, SKY0.z - 20, '🏫 回到校園囉') });
+  ia({ id: 'islThrone', x: ISL.thr.x, get y() { return ISY(); }, z: ISL.thr.z, r: 2.2, txt: () => '👑 坐上王座', act: () => say('👑 同樂王座', '你坐上了城堡的王座，整個大廳都安靜下來。\n牆上的旗幟寫著：「學習、合作、快樂」。\n（也許之後這裡會有任務在等你……）', [{ label: '起身離開' }], AV(0)) });
+  ia({ id: 'islChest', x: ISL.thr.cx, get y() { return ISY(); }, z: ISL.thr.cz, r: 2, txt: () => S.islChest ? '📦 空的寶箱' : '🎁 打開寶箱', act: () => { if (S.islChest) { toast('寶箱空了，下次再來看看吧', 2200); return; } S.islChest = 1; S.coin = (S.coin || 0) + 30; if (S.items) S.items.med = (S.items.med || 0) + 1; save(); refreshAll(); SFX.play('win', 200); toast('🎁 城堡寶箱：金幣 +30、補血包 +1！', 3200); } });
   function islTick(dt, night, c) {
     ISL.t += dt; const t = ISL.t, g = ISL.g;
     if (!g.userData.fix) g.position.y = 92 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
@@ -9546,6 +9586,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (ISL.pens) ISL.pens.forEach((f, i) => { f.rotation.y = Math.sin(t * 3 + i) * 0.35; });
     if (L.skyP) L.skyP.forEach((q, i) => { q.rg.rotation.z = t * 0.6; q.sp.rotation.z = -t * 1.8; q.sp.rotation.x = Math.sin(t) * 0.4; q.dc.material.opacity = 0.38 + Math.sin(t * 2 + i) * 0.1; });
     if (ISL.syncWalls) ISL.syncWalls();
+    if (ISL.fl) ISL.fl.forEach((f, i) => f.scale.setScalar(1 + Math.sin(t * 9 + i * 1.7) * 0.18));
     if (ISL.glow) ISL.glow.scale.setScalar(1 + Math.sin(t * 4) * 0.2);
     if (ISL.fall) ISL.fall.material.opacity = 0.45 + Math.sin(t * 5) * 0.1;
     g.visible = !S.noSky;
