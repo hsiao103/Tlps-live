@@ -9544,6 +9544,14 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const pl = new T.PointLight(0xffd9a0, 0.9, 34); pl.position.set(0, 14, -2); ISL.g.add(pl);
       // 進出互動
       ISL.thr = { x: ISL.g.position.x, z: ISL.g.position.z - 5.2 * 0.7, cx: ISL.g.position.x + 5.2 * 0.7, cz: ISL.g.position.z - 6.2 * 0.7 }; }
+    // ===== 城堡大門（上鎖）與鑰匙 =====
+    { ISL.door = { t: 0, L: null, R: null };
+      const dm = M(0x6b4a2b), ring = M(0xe0b432);
+      [[-1.85, 1, 'L'], [1.85, -1, 'R']].forEach(([px, sg, k]) => { const pv = new T.Group(); pv.position.set(px, 8.5, 5); ISL.g.add(pv); const lf = new T.Mesh(new T.BoxGeometry(1.85, 7, 0.45), dm); lf.position.x = sg * 0.925; pv.add(lf); for (const y of [-2, 0, 2]) { const bd = new T.Mesh(new T.BoxGeometry(1.85, 0.25, 0.55), M(0x3f2a15)); bd.position.set(sg * 0.925, y, 0); pv.add(bd); } const kn = new T.Mesh(new T.TorusGeometry(0.28, 0.06, 6, 12), ring); kn.position.set(sg * 0.4, 0, 0.3); pv.add(kn); pv.frustumCulled = false; ISL.door[k] = pv; });
+      const kg = new T.Group(); kg.position.set(ex + ox * 3.4, 6.4, ez + oz * 3.4); ISL.g.add(kg);
+      add(new T.Mesh(new T.TorusGeometry(0.5, 0.14, 8, 16), new T.MeshBasicMaterial({ color: 0xffd54a })), 0, 0.7, 0, kg); add(new T.Mesh(new T.BoxGeometry(0.2, 1.4, 0.2), new T.MeshBasicMaterial({ color: 0xffd54a })), 0, -0.4, 0, kg); add(new T.Mesh(new T.BoxGeometry(0.6, 0.2, 0.2), new T.MeshBasicMaterial({ color: 0xffd54a })), 0.3, -0.8, 0, kg); add(new T.Mesh(new T.BoxGeometry(0.4, 0.2, 0.2), new T.MeshBasicMaterial({ color: 0xffd54a })), 0.2, -0.45, 0, kg);
+      add(new T.Mesh(new T.SphereGeometry(1.2, 10, 8), new T.MeshBasicMaterial({ color: 0xfff1a0, transparent: true, opacity: 0.25, depthWrite: false })), 0, 0, 0, kg);
+      ISL.key = kg; ISL.keyW = { x: ISL.g.position.x + (ex + ox * 3.4) * 0.7, z: ISL.g.position.z + (ez + oz * 3.4) * 0.7 }; }
     // 道路：城堡大門 → 外牆門樓 → 蜿蜒到洞口
     { const dirt = M(0xc9ad7a), edge = M(0xa88a5a), mx = ex + ox * 2.5, mz = ez + oz * 2.5, pts = [[0, 6], [0, 21], [1, 27], [7, 29.5], [14, 28], [mx - 2, mz - 4], [mx, mz]];
       for (let i = 0; i < pts.length - 1; i++) { const [x1, z1] = pts[i], [x2, z2] = pts[i + 1], L = Math.hypot(x2 - x1, z2 - z1), a = Math.atan2(x2 - x1, z2 - z1); const m = add(new T.Mesh(new T.BoxGeometry(4.2, 0.2, L + 1.2), dirt), (x1 + x2) / 2, 5.08, (z1 + z2) / 2); m.rotation.y = a; const sd = add(new T.Mesh(new T.BoxGeometry(5, 0.12, L + 1.2), edge), (x1 + x2) / 2, 5.04, (z1 + z2) / 2); sd.rotation.y = a; add(new T.Mesh(new T.CylinderGeometry(2.1, 2.1, 0.2, 10), dirt), x2, 5.08, z2); }
@@ -9558,7 +9566,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   ISL.g.updateMatrixWorld(true);
   ISL.g.children.forEach(m => { if (m.isMesh && m.geometry && ((m.geometry.type === 'CylinderGeometry' && m.geometry.parameters.radiusTop === 38.5) || (m.geometry.type === 'SphereGeometry' && m.geometry.parameters.radius >= 5 && m.geometry.parameters.thetaLength < 2))) walk.push(m); });
   ISL.walls = [[-8, -7, -9, 5], [7, 8, -9, 5], [-8, 8, -9, -8], [-8, -2.3, 4, 5], [2.3, 8, 4, 5], [-13.2, -6.8, -12.2, -5.8], [6.8, 13.2, -12.2, -5.8], [-13.2, -6.8, 1.8, 8.2], [6.8, 13.2, 1.8, 8.2], [-18, -16, -17, 20], [16, 18, -17, 20], [-18, 18, -18, -16], [-18, -2.5, 19, 21], [2.5, 18, 19, 21]].map(b => { const w = { x0: ISL.g.position.x + b[0] * ISK, x1: ISL.g.position.x + b[1] * ISK, z0: ISL.g.position.z + b[2] * ISK, z1: ISL.g.position.z + b[3] * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(w); return w; });
-  ISL.syncWalls = () => { const b = ISL.g.position.y; ISL.walls.forEach(w => { w.y0 = b + 4 * ISK; w.y1 = b + 25 * ISK; }); };
+  ISL.doorW = { x0: ISL.g.position.x - 2.3 * ISK, x1: ISL.g.position.x + 2.3 * ISK, z0: ISL.g.position.z + 4 * ISK, z1: ISL.g.position.z + 5 * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(ISL.doorW);
+  ISL.syncWalls = () => { const b = ISL.g.position.y; ISL.walls.forEach(w => { w.y0 = b + 4 * ISK; w.y1 = b + 25 * ISK; }); const d = ISL.doorW; if (S.islDoor) { d.y0 = d.y1 = -999; } else { d.y0 = b + 4 * ISK; d.y1 = b + 14 * ISK; } };
   ISL.syncWalls();
   function skyPortal(grp, ring, name, col) {
     const rg = new T.Mesh(new T.TorusGeometry(1.3, 0.16, 10, 32), new T.MeshStandardMaterial({ color: col[0], emissive: col[1], emissiveIntensity: 0.9 })); rg.position.y = 1.7; grp.add(rg);
@@ -9574,6 +9583,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const skyGo = (x, y, z, lx, lz, msg) => { try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) {} SFX.play('win', 200); PL.x = x; PL.y = y + 0.05; PL.z = z; PL.vy = 0; PL.yaw = Math.atan2(-(lx - x), -(lz - z)); toast(msg, 2800); };
   ia({ id: 'skyUp', x: SKY0.x, y: SKY0.y, z: SKY0.z, r: 2.6, txt: () => '☁️ 傳送到浮空島', act: () => skyGo(ISL.g.position.x, ISY(), ISL.g.position.z + 26 * ISK, ISL.g.position.x, ISL.g.position.z, '☁️ 歡迎來到浮空島！走回藍光圈旁的橘色傳送門就能回校園') });
   ia({ id: 'skyDown', x: SKYA.x, get y() { return ISY(); }, z: SKYA.z, r: 2.6, txt: () => '🏫 傳送回校園', act: () => skyGo(SKY0.x, SKY0.y, SKY0.z + 3, SKY0.x, SKY0.z - 20, '🏫 回到校園囉') });
+  ia({ id: 'islKey', x: ISL.keyW.x, get y() { return ISY(); }, z: ISL.keyW.z, r: 2.4, txt: () => S.islKey ? '' : '🗝️ 撿起金鑰匙', act: () => { S.islKey = 1; save(); SFX.play('win', 200); toast('🗝️ 得到「城堡金鑰匙」！回到城堡大門試試看', 3600); } });
+  ia({ id: 'islDoor', x: ISL.g.position.x, get y() { return ISY(); }, z: ISL.g.position.z + 7.2 * ISK, r: 2.6, txt: () => S.islDoor ? '' : S.islKey ? '🗝️ 用金鑰匙開門' : '🚪 城堡大門（上鎖了）', act: () => { if (!S.islKey) { say('🚪 城堡大門', '大門上了一把金色的大鎖，怎麼推都推不動。\n門縫貼著一張紙條：\n「鑰匙掉在山洞口附近，沿著小路就找得到。」', [{ label: '知道了' }], AV(0)); return; } S.islDoor = 1; save(); SFX.play('win', 300); toast('🚪 喀嚓！大門緩緩打開了——歡迎光臨同樂城堡', 3600); } });
   ia({ id: 'islThrone', x: ISL.thr.x, get y() { return ISY(); }, z: ISL.thr.z, r: 2.2, txt: () => '👑 坐上王座', act: () => say('👑 同樂王座', '你坐上了城堡的王座，整個大廳都安靜下來。\n牆上的旗幟寫著：「學習、合作、快樂」。\n（也許之後這裡會有任務在等你……）', [{ label: '起身離開' }], AV(0)) });
   ia({ id: 'islChest', x: ISL.thr.cx, get y() { return ISY(); }, z: ISL.thr.cz, r: 2, txt: () => S.islChest ? '📦 空的寶箱' : '🎁 打開寶箱', act: () => { if (S.islChest) { toast('寶箱空了，下次再來看看吧', 2200); return; } S.islChest = 1; S.coin = (S.coin || 0) + 30; if (S.items) S.items.med = (S.items.med || 0) + 1; save(); refreshAll(); SFX.play('win', 200); toast('🎁 城堡寶箱：金幣 +30、補血包 +1！', 3200); } });
   function islTick(dt, night, c) {
@@ -9586,6 +9597,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (ISL.pens) ISL.pens.forEach((f, i) => { f.rotation.y = Math.sin(t * 3 + i) * 0.35; });
     if (L.skyP) L.skyP.forEach((q, i) => { q.rg.rotation.z = t * 0.6; q.sp.rotation.z = -t * 1.8; q.sp.rotation.x = Math.sin(t) * 0.4; q.dc.material.opacity = 0.38 + Math.sin(t * 2 + i) * 0.1; });
     if (ISL.syncWalls) ISL.syncWalls();
+    if (ISL.door) { const tg = S.islDoor ? 1 : 0; ISL.door.t += (tg - ISL.door.t) * Math.min(1, dt * 2.2); ISL.door.L.rotation.y = ISL.door.t * 1.75; ISL.door.R.rotation.y = -ISL.door.t * 1.75; }
+    if (ISL.key) { ISL.key.visible = !S.islKey; ISL.key.rotation.y = t * 1.6; ISL.key.position.y = 6.4 + Math.sin(t * 2) * 0.35; }
     if (ISL.fl) ISL.fl.forEach((f, i) => f.scale.setScalar(1 + Math.sin(t * 9 + i * 1.7) * 0.18));
     if (ISL.glow) ISL.glow.scale.setScalar(1 + Math.sin(t * 4) * 0.2);
     if (ISL.fall) ISL.fall.material.opacity = 0.45 + Math.sin(t * 5) * 0.1;
