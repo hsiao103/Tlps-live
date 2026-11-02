@@ -9451,7 +9451,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   /* ---------- 天空浮空島＋城堡：高掛在校園北方天空，緩緩上下飄浮 ---------- */
   const ISL = { g: new T.Group(), flag: null, win: [], sat: [], fall: null, t: 0 };
-  ISL.g.name = 'liveSkyIsland'; ISL.g.position.set(0, 52, -120); scene.add(ISL.g);
+  ISL.g.name = 'liveSkyIsland'; ISL.g.position.set(0, 92, -120); ISL.g.scale.setScalar(0.7); scene.add(ISL.g);
   (() => {
     const M = (c, o) => new T.MeshLambertMaterial(Object.assign({ color: c }, o || {})), add = (m, x, y, z, par) => { m.position.set(x, y, z); m.frustumCulled = false; (par || ISL.g).add(m); return m; }, rr = rng(4242);
     const rock = M(0x7a6a58), rock2 = M(0x62564a), grass = M(0x6fae4e), stone = M(0xe3dccb), stone2 = M(0xcfc6b2), roofB = M(0x3f6fd8), roofR = M(0xc8423b), wood = M(0x6b4a2b);
@@ -9479,7 +9479,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   })();
   function islTick(dt, night, c) {
     ISL.t += dt; const t = ISL.t, g = ISL.g;
-    if (!g.userData.fix) g.position.y = 52 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
+    if (!g.userData.fix) g.position.y = 92 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
     if (ISL.wmat) ISL.wmat.color.setHex(night || c.dark > 0.3 ? 0xffd25a : 0x8a8f9c);
     const fl = ISL.flag; if (fl) { const pa = fl.geometry.attributes.position, b = fl.userData.base; for (let i = 0; i < pa.count; i++) { const x = b[i * 3] + 2.5; pa.array[i * 3 + 2] = Math.sin(t * 4 + x * 1.2) * 0.35 * (x / 5); } pa.needsUpdate = true; }
     ISL.sat.forEach(q => { q.a += q.v * dt; q.m.position.set(Math.cos(q.a) * q.d, q.y + Math.sin(t * 0.6 + q.a * 3) * 1.5, Math.sin(q.a) * q.d); q.m.rotation.y += dt * 0.3; });
