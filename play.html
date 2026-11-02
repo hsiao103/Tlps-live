@@ -5715,7 +5715,21 @@ PLANMARK(__gym0, scene.children.length);   // 平面模式：風雨操場一併�
   { const sg2 = new T.Group(); sg2.position.set(-1.3, 0.05, -64.4); scene.add(sg2); [-0.8, 0.8].forEach(xx => A(Bx(0.1, 1.5, 0.1), wd, xx, 0.75, 0, sg2)); A(Bx(1.9, 0.9, 0.08), L3(0xf3e3b8), 0, 1.3, 0, sg2); A(Bx(2.0, 0.06, 0.1), L3(0x8a5a35), 0, 1.78, 0, sg2); A(Bx(2.0, 0.06, 0.1), L3(0x8a5a35), 0, 0.84, 0, sg2);
     label('🛝 遊樂場・玩法說明', -1.3, 2.7, -64.4, 2.0, '#fff4e0'); PG.sign = { x: -1.3, z: -62.9, r: 2.2 }; }
   PG.items.push({ id: 'bar', kind: 'bar', name: '單槓', ic: '💪', x: 1.0, z: -91.4, r: 1.7, bx: 1.0, bz: -94.4 }); }
-[-96, -94.4, -92.8].forEach(z => box(-1.0, z, 3.0, z + 0.08, 0.05, 1.5, M.steel, { noShadow: true }));   // 單槓
+// 單槓：三組高低不同的槓（低 1.3／高 1.9／中 1.6 m），鋼管立柱＋斜撐＋彩色橫槓＋底座，下方鋪藍色安全軟墊
+{ const g = new T.Group(); g.position.set(0, 0.05, -94.4); scene.add(g); const Lm = c => new T.MeshLambertMaterial({ color: c }), st = new T.MeshLambertMaterial({ color: 0xcfd5dd });
+  const add = (geo, m, x, y, z) => { const me = new T.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; g.add(me); return me; };
+  const pad = add(new T.BoxGeometry(4.6, 0.06, 2.6), Lm(0x3b6fd1), 1.0, 0.03, 0.2); pad.castShadow = false; pad.receiveShadow = true;
+  add(new T.BoxGeometry(4.7, 0.05, 0.08), Lm(0xf5c542), 1.0, 0.07, 1.52).castShadow = false;   // 軟墊前緣黃邊
+  [[-0.2, 1.3, 0xe84a4a], [1.0, 1.9, 0x2f9e5b], [2.2, 1.6, 0xf2a21e]].forEach(q => { const x = q[0], h = q[1], hw = 0.5;
+    [-hw, hw].forEach(dx => { add(new T.CylinderGeometry(0.045, 0.05, h, 10), st, x + dx, h / 2, 0);
+      add(new T.CylinderGeometry(0.12, 0.14, 0.06, 12), Lm(0x555c66), x + dx, 0.03, 0);   // 底座
+      [-1, 1].forEach(sg => { const br = add(new T.CylinderGeometry(0.025, 0.025, h * 0.55, 6), st, x + dx, h * 0.27, sg * 0.28); br.rotation.x = sg * Math.atan2(0.56, h * 0.5) * -1; });   // 前後斜撐
+      add(new T.SphereGeometry(0.06, 10, 8), st, x + dx, h, 0); });
+    const bar = add(new T.CylinderGeometry(0.03, 0.03, hw * 2 + 0.12, 10), Lm(q[2]), x, h, 0); bar.rotation.z = Math.PI / 2;
+    add(new T.CylinderGeometry(0.036, 0.036, 0.5, 10), Lm(0x222222), x, h, 0).rotation.z = Math.PI / 2;   // 中段防滑握把
+    [-hw, hw].forEach(dx => box(x + dx - 0.1, -94.4 - 0.1, x + dx + 0.1, -94.4 + 0.1, 0.05, h, M.steel, { wall: true, noShadow: true }).visible = false); });
+  
+  label('💪 單槓（低・高・中）', 1.0, 2.7, -94.4, 2.0, '#e8f4ff'); }
 const __ps = scene.children.length;
 { const cx = -3.4, cz = -59.3, hs = 1.6, cw = 0.5, ch = 3.8;   // 涼亭：四根方柱（下黃上藍）＋淺藍四角錐屋頂
   box(cx - hs - 0.2, cz - hs - 0.2, cx + hs + 0.2, cz + hs + 0.2, 0, 0.1, M.concrete, { walk: true });
