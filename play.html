@@ -4813,6 +4813,51 @@ function bld(o) {
       if (!isWC) for (let q = 0; q < 2; q++) for (let r2 = 0; r2 < 2; r2++) { const lu = dm + (q ? 1 : -1) * rwi * 0.22, lv = CORR + (Dr - CORR) * (r2 ? 0.7 : 0.32); R(lu - 0.7, lv - 0.12, lu + 0.7, lv + 0.12, y1 - 0.38, y1 - 0.31, M.lampM, { noShadow: true }); }   // 教室天花板燈管（夜間會亮）
       if (isWC) { const ns = rwi > 5 ? 3 : 2; for (let q = 0; q < ns; q++) { const pu2 = a + 0.8 + q * ((rwi - 1.6) / ns); R(pu2, Dr - 2.6, pu2 + 0.06, Dr - 0.3, y0, y0 + 1.9, M.wallIn, { noShadow: true }); } }
       else if (isHall) R(a + 2, Dr - 2.6, b - 2, Dr - 0.3, y0, y0 + 0.9, M.concrete, { noShadow: true });      // 禮堂：只有舞台，不設課桌椅
+      else if ((o.names && o.names[k] && o.names[k][i]) === '教師休息室・辦公區') {   // 教師休息室（辦公區）：六張教師桌、文件櫃、影印機、公佈白板
+        const dk = mat(0xc9a06b), dkL = mat(0x8a6a44), cab = mat(0x9aa4ad), cabD = mat(0x6d7780), pc = mat(0x23303c), wb = mat(0xf4f6f8), potM = mat(0xb8663a), plM = mat(0x3c7a3a), cp = mat(0xcfd6dc), cc = [0xd9534f, 0x5b8dd9, 0xf0b840, 0x58a868, 0x9b6bd0];
+        const vN = CORR + 0.3, vF = Dr - 0.3, par = CTX ? CTX.group : scene, mt = new T.Matrix4(), chairs = [];
+        const yw = Math.atan2(-(P(0, -1)[0] - P(0, 0)[0]), -(P(0, -1)[1] - P(0, 0)[1]));
+        [a + 1.9, dm, b - 1.9].forEach((u, ci) => [6.0, 9.6].forEach((v, ri) => {
+          R(u - 0.75, v - 0.4, u + 0.75, v + 0.4, y0 + 0.72, y0 + 0.77, dk, { noShadow: true });
+          [[-0.72, -0.37], [0.67, -0.37], [-0.72, 0.34], [0.67, 0.34]].forEach(q => R(u + q[0], v + q[1], u + q[0] + 0.05, v + q[1] + 0.05, y0 + 0.08, y0 + 0.72, dkL, { noShadow: true }));
+          R(u - 0.28, v + 0.1, u + 0.28, v + 0.18, y0 + 0.9, y0 + 1.26, pc, { noShadow: true }); R(u - 0.04, v + 0.1, u + 0.04, v + 0.2, y0 + 0.77, y0 + 0.9, pc, { noShadow: true }); R(u - 0.25, v - 0.18, u + 0.25, v - 0.02, y0 + 0.77, y0 + 0.8, cp, { noShadow: true });
+          R(u + 0.45, v + 0.05, u + 0.62, v + 0.22, y0 + 0.77, y0 + 0.9, potM, { noShadow: true }); R(u + 0.47, v + 0.07, u + 0.6, v + 0.2, y0 + 0.9, y0 + 1.05, plM, { noShadow: true });
+          chairs.push([u, v - 0.85]); }));
+        // 西牆高文件櫃（彩色檔案夾）、東牆公佈白板、窗下矮櫃
+        R(a + 0.25, 4.6, a + 0.75, 14.2, y0 + 0.08, y0 + 1.85, cab, W); for (let t = 0, v = 4.7; v < 14.1; t++, v += 0.3) R(a + 0.75, v, a + 0.77, v + 0.26, y0 + 0.4 + (t % 4) * 0.4, y0 + 0.7 + (t % 4) * 0.4, mat(cc[t % 5]), { noShadow: true });
+        R(b - 0.06, 5.0, b, 11.0, y0 + 1.0, y0 + 2.1, wb, { noShadow: true }); R(b - 0.08, 4.95, b, 5.0, y0 + 0.98, y0 + 2.12, cabD, { noShadow: true }); [[5.4, cc[0]], [6.6, cc[1]], [8.0, cc[2]], [9.4, cc[3]]].forEach(q => R(b - 0.08, q[0], b - 0.06, q[0] + 0.8, y0 + 1.4, y0 + 1.9, mat(q[1]), { noShadow: true }));
+        R(a + 1.0, vF - 0.5, b - 1.0, vF, y0 + 0.08, y0 + 0.9, cab, W);
+        // 影印機＋碎紙機（靠門邊）
+        R(b - 2.0, vN + 0.1, b - 1.1, vN + 0.8, y0 + 0.08, y0 + 1.0, cp, W); R(b - 1.95, vN + 0.15, b - 1.15, vN + 0.75, y0 + 1.0, y0 + 1.06, pc, { noShadow: true }); R(b - 0.9, vN + 0.15, b - 0.4, vN + 0.65, y0 + 0.08, y0 + 0.6, cabD, W);
+        const cI = new T.InstancedMesh(CHAIRG, mat(0x3a4a5c), chairs.length); chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(yw); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); }); cI.frustumCulled = false; par.add(cI);
+      }
+      else if ((o.names && o.names[k] && o.names[k][i]) === '教師休息室・交誼區') {   // 教師休息室（交誼區）：沙發組、茶水區、午休躺椅、小圓桌
+        const sofa = mat(0x6a8a7a), sofaD = mat(0x56705f), rug = mat(0xd8c7a8), tb = mat(0x8a5a35), wh = mat(0xf2f4f5), cnt = mat(0xb08a5a), cntT = mat(0x4a4a50), blu = mat(0x59b6d8), blk = mat(0x23303c), red = mat(0xd9534f), plM = mat(0x3c7a3a), potM = mat(0xb8663a), rec = mat(0xa86b4a), pillow = [mat(0xf0c040), mat(0xe0645a)];
+        const vN = CORR + 0.3, vF = Dr - 0.3, par = CTX ? CTX.group : scene, mt = new T.Matrix4(), chairs = [];
+        const yawOf = (bu, bv) => { const p0 = P(0, 0), p1 = P(bu, bv); return Math.atan2(-(p1[0] - p0[0]), -(p1[1] - p0[1])); };
+        // 沙發組：地毯、茶几、兩張長沙發相對、兩張單人沙發
+        R(dm - 3.4, 4.2, dm + 0.9, 9.2, y0 + 0.08, y0 + 0.1, rug, { noShadow: true });
+        R(dm - 1.9, 6.1, dm - 0.5, 7.3, y0 + 0.08, y0 + 0.45, tb, { noShadow: true }); R(dm - 1.95, 6.05, dm - 0.45, 7.35, y0 + 0.45, y0 + 0.5, tb, { noShadow: true });
+        R(dm - 3.0, 4.6, dm + 0.4, 5.5, y0 + 0.08, y0 + 0.48, sofa, { noShadow: true }); R(dm - 3.0, 4.4, dm + 0.4, 4.65, y0 + 0.48, y0 + 0.95, sofaD, { noShadow: true });
+        R(dm - 3.0, 7.9, dm + 0.4, 8.8, y0 + 0.08, y0 + 0.48, sofa, { noShadow: true }); R(dm - 3.0, 8.75, dm + 0.4, 9.0, y0 + 0.48, y0 + 0.95, sofaD, { noShadow: true });
+        R(dm + 0.6, 5.9, dm + 1.4, 6.7, y0 + 0.08, y0 + 0.45, sofa, { noShadow: true }); R(dm + 1.35, 5.9, dm + 1.6, 6.7, y0 + 0.45, y0 + 0.9, sofaD, { noShadow: true });
+        R(dm + 0.6, 6.9, dm + 1.4, 7.7, y0 + 0.08, y0 + 0.45, sofa, { noShadow: true }); R(dm + 1.35, 6.9, dm + 1.6, 7.7, y0 + 0.45, y0 + 0.9, sofaD, { noShadow: true });
+        R(dm - 2.4, 4.8, dm - 2.0, 5.2, y0 + 0.48, y0 + 0.68, pillow[0], { noShadow: true }); R(dm - 1.0, 8.2, dm - 0.6, 8.6, y0 + 0.48, y0 + 0.68, pillow[1], { noShadow: true });
+        // 茶水區（東牆外牆側）：流理台、水槽、微波爐、咖啡機、吊櫃、冰箱、飲水機
+        const E = b - 0.3;
+        R(E - 0.65, 8.0, E, 14.5, y0 + 0.08, y0 + 0.9, cnt, W); R(E - 0.7, 8.0, E + 0.02, 14.5, y0 + 0.9, y0 + 0.95, cntT, { noShadow: true });
+        R(E - 0.55, 9.4, E - 0.15, 10.4, y0 + 0.9, y0 + 0.93, blu, { noShadow: true }); R(E - 0.4, 10.4, E - 0.36, 10.55, y0 + 0.95, y0 + 1.25, cntT, { noShadow: true });
+        R(E - 0.55, 11.4, E - 0.1, 12.2, y0 + 0.95, y0 + 1.3, blk, { noShadow: true }); R(E - 0.55, 12.9, E - 0.15, 13.4, y0 + 0.95, y0 + 1.35, red, { noShadow: true });
+        R(E - 0.4, 8.0, E, 14.5, y0 + 1.5, y0 + 2.2, cnt, { noShadow: true });
+        R(E - 0.75, 5.3, E, 6.1, y0 + 0.08, y0 + 1.85, wh, W); R(E - 0.76, 5.9, E - 0.74, 6.0, y0 + 1.0, y0 + 1.5, cntT, { noShadow: true });
+        R(E - 0.55, 6.6, E - 0.1, 7.2, y0 + 0.08, y0 + 1.15, blu, W); R(E - 0.5, 6.65, E - 0.15, 6.95, y0 + 1.15, y0 + 1.3, wh, { noShadow: true });
+        // 午休躺椅兩張（西牆遠側）、小圓桌與椅（遠側中央）、盆栽
+        [11.6, 13.6].forEach(v => { R(a + 0.4, v, a + 1.9, v + 0.9, y0 + 0.08, y0 + 0.4, rec, { noShadow: true }); const bk = R(a + 0.4, v, a + 0.7, v + 0.9, y0 + 0.4, y0 + 1.0, rec, { noShadow: true }); R(a + 0.8, v + 0.15, a + 1.2, v + 0.75, y0 + 0.4, y0 + 0.55, pillow[1], { noShadow: true }); });
+        R(dm - 0.5, 11.9, dm + 0.5, 12.9, y0 + 0.7, y0 + 0.75, tb, { noShadow: true }); R(dm - 0.05, 12.35, dm + 0.05, 12.45, y0 + 0.08, y0 + 0.7, tb, { noShadow: true }); R(dm - 0.3, 12.1, dm + 0.3, 12.7, y0 + 0.08, y0 + 0.12, tb, { noShadow: true });
+        chairs.push([dm - 0.9, 12.4, -1, 0], [dm + 0.9, 12.4, 1, 0], [dm, 11.3, 0, -1], [dm, 13.5, 0, 1]);
+        [[a + 0.35, vN + 0.1], [E - 0.9, vF - 0.7]].forEach(q => { R(q[0], q[1], q[0] + 0.5, q[1] + 0.5, y0 + 0.08, y0 + 0.45, potM, { noShadow: true }); R(q[0] + 0.05, q[1] + 0.05, q[0] + 0.45, q[1] + 0.45, y0 + 0.45, y0 + 1.4, plM, { noShadow: true }); });
+        const cI = new T.InstancedMesh(CHAIRG, mat(0x9b6a4a), chairs.length); chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(yawOf(q[2], q[3])); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); }); cI.frustumCulled = false; par.add(cI);
+      }
       else if ((o.names && o.names[k] && o.names[k][i]) === '校長室') {   // 校長室：辦公桌區＋會議桌區＋沙發、書櫃、旗幟
         const deskM = mat(0x6b4426), tblM = mat(0x8a5a35), rug = mat(0x8a2b2b), gold = mat(0xe0b432), sofaM = mat(0x5a6b8a), plM = mat(0x3c7a3a), potM = mat(0xb8663a), pcM2 = mat(0x2d3a4a), wbM = mat(0xf4f6f8), flB = mat(0x2a5aa8), flR = mat(0xd9534f), whiteM = mat(0xffffff);
         const vN = CORR + 0.3, vF = Dr - 0.3, par = CTX ? CTX.group : scene, mt = new T.Matrix4(), chairs = [];
@@ -5200,7 +5245,7 @@ const dW = (x, z) => toWorld(TFD, x, z);        // D 棟局部座標 → 世界�
 // 依「115 學年度校園空間配置第 4 版」：A 棟（含穿堂）、圖書館翼(B 西翼)、中段、親子/課輔翼(C 東翼)、D 棟房名
 const LIFT = 0.35, LIFTR = [];                // A、B、BC、C 棟與通廊整體墊高（地坪抬高 35 cm）
 let __s = scene.children.length, __w = WALLS.length;
-bld({ id: 'A', twoDoorRooms: ['校史室', '校長室'], twoDoorRoomsK: [1], short: '行政大樓', name: '行政大樓', names: { 0: ['廁所', '行政辦公室', '交誼室'], 1: ['廁所', '校史室', '校長室'], 2: ['廁所', '禮堂'] }, x0: -30.5, z0: -32.5, x1: -6, z1: -16.2, floors: 3, open: 'N', stair: 'none', bounds: [0, 5.7, 15.1, 24.5], boundsK: { 2: [0, 5.7, 24.5] }, railGaps: [{ u0: 3.6, u1: 8.6, floors: [1] }], roof: 'gable', roofU0: 5.7, shrink: { u0: 0, u1: 5.7, v: 10, floors: [1, 2] }, tower: false, mini: '#2f7d63',
+bld({ id: 'A', twoDoorRooms: ['校史室', '校長室'], twoDoorRoomsK: [1], short: '行政大樓', name: '行政大樓', names: { 0: ['廁所', '教師休息室・辦公區', '教師休息室・交誼區'], 1: ['廁所', '校史室', '校長室'], 2: ['廁所', '禮堂'] }, x0: -30.5, z0: -32.5, x1: -6, z1: -16.2, floors: 3, open: 'N', stair: 'none', bounds: [0, 5.7, 15.1, 24.5], boundsK: { 2: [0, 5.7, 24.5] }, railGaps: [{ u0: 3.6, u1: 8.6, floors: [1] }], roof: 'gable', roofU0: 5.7, shrink: { u0: 0, u1: 5.7, v: 10, floors: [1, 2] }, tower: false, mini: '#2f7d63',
   endDoors: [{ end: 1, v0: 0.15, v1: 1.8, floors: [0, 1, 2], full: true }, { end: 0, v0: 0.15, v1: 1.8, floors: [0, 1, 2], full: true }] });
 // A 棟西翼（廚房）與西側連接走廊；A 棟北側走廊連往 D 棟南端樓梯
 bld({ id: 'AW', short: '廚房', name: '廚房', names: { 0: ['廚房'] }, x0: -51.1, z0: -22.5, x1: -33.3, z1: -16.2, floors: 1, open: 'S', stair: 'none', rooms: { n: 1, u0: 0.2, w: 17 }, hall: true, endDoors: [{ end: 1, v0: 2.2, v1: 3.9, floors: [0] }], roof: 'flat', parapet: 0, mini: '#c9a96a' });
