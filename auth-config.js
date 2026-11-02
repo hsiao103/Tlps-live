@@ -7,7 +7,7 @@
    3. sessionHours：登入後有效時數（逾時需重新登入）。
    注意：這是「前端把關」，足以阻擋一般使用者，但不是強式保護（見 README「安全性說明」）。 */
 window.TL_AUTH_CONFIG = {
-  clientId: '496401881030-1qjipaivkr1sivbnakccf017i1v4ia9a.apps.googleusercontent.com',
+  clientId: '722996358883-9njfo7jq18sbmhcl4g70mulnasgltdnc.apps.googleusercontent.com',
   allowDomains: ['tmail.ilc.edu.tw', 'smail.ilc.edu.tw', 'cges.ilc.edu.tw'],
   allowEmails: ['blurwater@gmail.com', 'hsiao103@gmail.com', 'hsiao103@cges.ilc.edu.tw'],   /* 白名單：網域之外的個別信箱 */
   adminEmails: ['hsiao103@gmail.com'],   /* 管理後台（admin.html）可進入的信箱；真正的資料權限請同步修改 supabase-mp.sql 的 tl_is_admin() */
