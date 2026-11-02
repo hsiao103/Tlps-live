@@ -9,6 +9,7 @@
     const u = (x, y) => { const o = Object.assign({}, y || {}, x || {}); return o; };
     if (Array.isArray(base.badges) || Array.isArray(other.badges)) base.badges = Array.from(new Set([].concat(base.badges || [], other.badges || [])));
     ['days', 'flowers', 'vac'].forEach(k => { if (base[k] || other[k]) base[k] = u(base[k], other[k]); });
+    ['islKey', 'islDoor', 'islChest'].forEach(k => { if (a && a[k] || b && b[k]) base[k] = 1; });
     ['best', 'weeks', 'streak'].forEach(k => { base[k] = Math.max(+base[k] || 0, +other[k] || 0); });
     if (base.wx || other.wx) { const w = base.wx || {}, o = other.wx || {}; ['dq', 'home', 'win'].forEach(k => { if (w[k] || o[k]) w[k] = u(w[k], o[k]); }); if (w.wish || o.wish) w.wish = { days: u((w.wish || {}).days, (o.wish || {}).days) }; base.wx = w; }
     return base;
