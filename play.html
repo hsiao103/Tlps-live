@@ -10477,6 +10477,10 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
 #gNet .zm{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:99px;padding:3px 9px;font:700 12px var(--font-ui);cursor:pointer;white-space:nowrap}
 #gNet .tip{flex:none;font-size:10.5px}
 #gNetFeed{pointer-events:auto!important;cursor:pointer}
+#gNet .adm{font-size:12.5px}#gNet .adm .ac{display:flex;gap:6px;margin-bottom:6px}#gNet .adm .ac div{flex:1;background:#eef3fc;border-radius:10px;padding:5px 4px;text-align:center;font-size:11px;color:#55627a}#gNet .adm .ac b{display:block;font-size:20px;color:#2b6fe0}
+#gNet .adm h4{margin:8px 0 3px;font-size:12px;color:#55627a}#gNet .adm .at{display:flex;justify-content:space-between;align-items:center}#gNet .adm .at a{color:#2b6fe0;font-weight:700;text-decoration:none}
+#gNet .adm .ar{display:flex;gap:6px;align-items:center;justify-content:space-between;border-bottom:1px solid #eef1f6;padding:3px 0;word-break:break-all}#gNet .adm .ar small{color:#7a8499}
+#gNet .adm button{border:1px solid #cfd8e8;background:#fff;color:#2b6fe0;border-radius:8px;padding:2px 7px;font:700 11px var(--font-ui);cursor:pointer;white-space:nowrap;margin-left:3px}#gNet .adm button.d{color:#c0392b;border-color:#f0c4be}
 @media (max-width:700px),(max-height:500px){
 #info h1.tl1{display:none!important}#info #where{font-size:13px;font-weight:700;color:inherit;opacity:1}
 #gHud .hdx{display:none!important}
@@ -10508,7 +10512,35 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
     { const hudEl = document.getElementById('gHud'), place = () => { const hd = hudEl && hudEl.querySelector('.hd'); if (!hd || hd.contains(bar)) return; const sp = hd.querySelector('span:not(.gMe)'); if (sp) sp.after(bar); else hd.appendChild(bar); };
       if (hudEl) { place(); new MutationObserver(place).observe(hudEl, { childList: true }); } }
     document.addEventListener('pointerdown', e => { if (MP.open && !e.target.closest('#gNet') && !e.target.closest('#gNetBar')) setOpen(false); }, true); $q('.x').onclick = () => setOpen(false);
-    p.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { MP.tab = b.dataset.t; p.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b)); p.querySelectorAll('.pg').forEach(g => { g.hidden = g.dataset.p !== MP.tab; }); if (MP.tab === 'who') mpWho(); if (MP.tab === 'set') { $q('.nk').value = mpNick(); $q('.rm').value = mpRoom() === 'lobby' ? '' : mpRoom(); } });
+    const isAdm = (() => { try { const A = window.TLAUTH, q = A && A.session(); return !!(q && (A.cfg.adminEmails || []).map(x => String(x).toLowerCase()).indexOf(String(q.email).toLowerCase()) >= 0); } catch (e) { return false; } })();
+    async function admLoad() {
+      const box = p.querySelector('.adm'); if (!box) return; if (!box.dataset.ok) box.textContent = '載入中…';
+      try {
+        const now = Date.now(), d0 = new Date(); d0.setHours(0, 0, 0, 0); const t0 = +d0, since = new Date(now - 86400000).toISOString();
+        const [ss, cc, mm] = await Promise.all([mpRest('tlps_live_sessions?select=*&last_seen=gte.' + since + '&order=started_at.desc&limit=2000', 'GET'), mpRest('tlps_live_chat?select=*&order=created_at.desc&limit=60', 'GET'), mpRest('tlps_live_mutes?select=*', 'GET')]);
+        const mu = {}; (mm || []).forEach(x => { mu[x.user_id] = x; });
+        const on = new Map(); (ss || []).forEach(x => { if (+new Date(x.last_seen) >= now - 150000 && !on.has(x.user_id)) on.set(x.user_id, x); });
+        const tod = new Set(); (ss || []).forEach(x => { if (+new Date(x.last_seen) >= t0) tod.add(x.user_id); });
+        const ct = (cc || []).filter(c => +new Date(c.created_at) >= t0).length, hm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+        const mb = (uid, em) => mu[uid] ? '<button type="button" data-un="' + escH(uid) + '">解除禁言</button>' : '<button type="button" class="d" data-mu="' + escH(uid) + '" data-em="' + escH(em) + '">禁言</button>';
+        box.dataset.ok = '1';
+        box.innerHTML = '<div class="ac"><div><b>' + on.size + '</b>目前上線</div><div><b>' + tod.size + '</b>今日上線人數</div><div><b>' + ct + '</b>近 60 則中今日聊天</div></div>'
+          + '<div class="at"><button type="button" class="rf">🔄 重新整理</button><a href="admin.html">完整後台 ↗</a></div>'
+          + '<h4>目前在線</h4>' + (on.size ? Array.from(on.values()).map(x => '<div class="ar"><span>' + escH(x.nick) + ' <small>Lv.' + escH(x.lv) + '・' + escH(x.room) + '</small></span>' + mb(x.user_id, x.email) + '</div>').join('') : '<div class="tip">目前沒有人在線。</div>')
+          + '<h4>最新聊天（最近 60 則）</h4>' + ((cc || []).length ? cc.map(c => '<div class="ar"><span><small>' + hm(c.created_at) + '</small> <b>' + escH(c.nick) + '</b>：' + escH(c.msg) + '</span><span>' + mb(c.user_id, c.email) + '<button type="button" class="d" data-del="' + escH(c.id) + '">刪</button></span></div>').join('') : '<div class="tip">還沒有聊天紀錄。</div>');
+        box.querySelector('.rf').onclick = admLoad;
+        const act = async (fn, okMsg) => { try { await fn(); admLoad(); } catch (e) { alert('操作失敗：' + e.message); } };
+        box.querySelectorAll('[data-mu]').forEach(b => b.onclick = () => { if (confirm('確定禁言 ' + b.dataset.em + '？')) act(() => mpRest('tlps_live_mutes?on_conflict=user_id', 'POST', { user_id: b.dataset.mu, email: b.dataset.em }, { Prefer: 'resolution=merge-duplicates,return=minimal' })); });
+        box.querySelectorAll('[data-un]').forEach(b => b.onclick = () => act(() => mpRest('tlps_live_mutes?user_id=eq.' + b.dataset.un, 'DELETE')));
+        box.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('刪除這則聊天紀錄？無法復原。')) act(() => mpRest('tlps_live_chat?id=eq.' + b.dataset.del, 'DELETE')); });
+      } catch (e) { box.dataset.ok = ''; box.textContent = '讀取失敗：' + e.message + '（請確認已執行 supabase-mp.sql，且 tl_is_admin() 含您的信箱）'; }
+    }
+    if (isAdm) {
+      const tb = document.createElement('button'); tb.type = 'button'; tb.dataset.t = 'adm'; tb.textContent = '🛠 管理'; p.querySelector('.tabs').appendChild(tb);
+      const pg = document.createElement('div'); pg.className = 'pg'; pg.dataset.p = 'adm'; pg.hidden = true; pg.innerHTML = '<div class="adm"></div>'; p.appendChild(pg);
+      setInterval(() => { if (MP.open && MP.tab === 'adm' && !document.hidden) admLoad(); }, 30000);
+    }
+    p.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { MP.tab = b.dataset.t; p.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b)); p.querySelectorAll('.pg').forEach(g => { g.hidden = g.dataset.p !== MP.tab; }); if (MP.tab === 'who') mpWho(); if (MP.tab === 'adm') admLoad(); if (MP.tab === 'set') { $q('.nk').value = mpNick(); $q('.rm').value = mpRoom() === 'lobby' ? '' : mpRoom(); } });
     const inp = $q('form.in input'); $q('form.in').onsubmit = e => { e.preventDefault(); if (mpSend1(inp.value)) inp.value = ''; };
     p.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') setOpen(false); }, true); p.addEventListener('keyup', e => e.stopPropagation(), true);
     addEventListener('keydown', e => { if (e.key === 'Enter' && !MP.open && !dlgOpen && !opActive && !/INPUT|TEXTAREA/.test((e.target || {}).tagName || '')) { setOpen(true); MP.tab = 'chat'; setTimeout(() => inp.focus(), 50); } });
