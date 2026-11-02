@@ -4827,8 +4827,8 @@ function bld(o) {
         R(a + 0.25, 4.6, a + 0.75, 14.2, y0 + 0.08, y0 + 1.85, cab, W); for (let t = 0, v = 4.7; v < 14.1; t++, v += 0.3) R(a + 0.75, v, a + 0.77, v + 0.26, y0 + 0.4 + (t % 4) * 0.4, y0 + 0.7 + (t % 4) * 0.4, mat(cc[t % 5]), { noShadow: true });
         R(b - 0.06, 5.0, b, 11.0, y0 + 1.0, y0 + 2.1, wb, { noShadow: true }); R(b - 0.08, 4.95, b, 5.0, y0 + 0.98, y0 + 2.12, cabD, { noShadow: true }); [[5.4, cc[0]], [6.6, cc[1]], [8.0, cc[2]], [9.4, cc[3]]].forEach(q => R(b - 0.08, q[0], b - 0.06, q[0] + 0.8, y0 + 1.4, y0 + 1.9, mat(q[1]), { noShadow: true }));
         R(a + 1.0, vF - 0.5, b - 1.0, vF, y0 + 0.08, y0 + 0.9, cab, W);
-        // 影印機＋碎紙機（靠門邊）
-        R(b - 2.0, vN + 0.1, b - 1.1, vN + 0.8, y0 + 0.08, y0 + 1.0, cp, W); R(b - 1.95, vN + 0.15, b - 1.15, vN + 0.75, y0 + 1.0, y0 + 1.06, pc, { noShadow: true }); R(b - 0.9, vN + 0.15, b - 0.4, vN + 0.65, y0 + 0.08, y0 + 0.6, cabD, W);
+        // 影印機＋碎紙機（兩個門之間）
+        R(dm - 0.45, vN + 0.1, dm + 0.45, vN + 0.8, y0 + 0.08, y0 + 1.0, cp, W); R(dm - 0.4, vN + 0.15, dm + 0.4, vN + 0.75, y0 + 1.0, y0 + 1.06, pc, { noShadow: true }); R(dm + 0.7, vN + 0.15, dm + 1.2, vN + 0.65, y0 + 0.08, y0 + 0.6, cabD, W);
         const cI = new T.InstancedMesh(CHAIRG, mat(0x3a4a5c), chairs.length); chairs.forEach((q, n) => { const p = P(q[0], q[1]); mt.makeRotationY(yw); mt.setPosition(p[0], y0 + 0.08, p[1]); cI.setMatrixAt(n, mt); }); cI.frustumCulled = false; par.add(cI);
       }
       else if ((o.names && o.names[k] && o.names[k][i]) === '教師休息室・交誼區') {   // 教師休息室（交誼區）：沙發組、茶水區、午休躺椅、小圓桌
@@ -5245,7 +5245,7 @@ const dW = (x, z) => toWorld(TFD, x, z);        // D 棟局部座標 → 世界�
 // 依「115 學年度校園空間配置第 4 版」：A 棟（含穿堂）、圖書館翼(B 西翼)、中段、親子/課輔翼(C 東翼)、D 棟房名
 const LIFT = 0.35, LIFTR = [];                // A、B、BC、C 棟與通廊整體墊高（地坪抬高 35 cm）
 let __s = scene.children.length, __w = WALLS.length;
-bld({ id: 'A', twoDoorRooms: ['校史室', '校長室'], twoDoorRoomsK: [1], short: '行政大樓', name: '行政大樓', names: { 0: ['廁所', '教師休息室・辦公區', '教師休息室・交誼區'], 1: ['廁所', '校史室', '校長室'], 2: ['廁所', '禮堂'] }, x0: -30.5, z0: -32.5, x1: -6, z1: -16.2, floors: 3, open: 'N', stair: 'none', bounds: [0, 5.7, 15.1, 24.5], boundsK: { 2: [0, 5.7, 24.5] }, railGaps: [{ u0: 3.6, u1: 8.6, floors: [1] }], roof: 'gable', roofU0: 5.7, shrink: { u0: 0, u1: 5.7, v: 10, floors: [1, 2] }, tower: false, mini: '#2f7d63',
+bld({ id: 'A', twoDoorRooms: ['校史室', '校長室', '教師休息室・辦公區', '教師休息室・交誼區'], twoDoorRoomsK: [0, 1], short: '行政大樓', name: '行政大樓', names: { 0: ['廁所', '教師休息室・辦公區', '教師休息室・交誼區'], 1: ['廁所', '校史室', '校長室'], 2: ['廁所', '禮堂'] }, x0: -30.5, z0: -32.5, x1: -6, z1: -16.2, floors: 3, open: 'N', stair: 'none', bounds: [0, 5.7, 15.1, 24.5], boundsK: { 2: [0, 5.7, 24.5] }, railGaps: [{ u0: 3.6, u1: 8.6, floors: [1] }], roof: 'gable', roofU0: 5.7, shrink: { u0: 0, u1: 5.7, v: 10, floors: [1, 2] }, tower: false, mini: '#2f7d63',
   endDoors: [{ end: 1, v0: 0.15, v1: 1.8, floors: [0, 1, 2], full: true }, { end: 0, v0: 0.15, v1: 1.8, floors: [0, 1, 2], full: true }] });
 // A 棟西翼（廚房）與西側連接走廊；A 棟北側走廊連往 D 棟南端樓梯
 bld({ id: 'AW', short: '廚房', name: '廚房', names: { 0: ['廚房'] }, x0: -51.1, z0: -22.5, x1: -33.3, z1: -16.2, floors: 1, open: 'S', stair: 'none', rooms: { n: 1, u0: 0.2, w: 17 }, hall: true, endDoors: [{ end: 1, v0: 2.2, v1: 3.9, floors: [0] }], roof: 'flat', parapet: 0, mini: '#c9a96a' });
