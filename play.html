@@ -9581,12 +9581,73 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const SKYA = { x: ISL.g.position.x - 6.3, z: ISL.g.position.z + 30 * ISK };
   { const g = new T.Group(); g.position.set(-9, 5, 30); ISL.g.add(g); skyPortal(g, 0, '', [0xffb347, 0xd9731a, 0xffe2a8]); const lb = sprite(nameTex('🏫 回到地之城（同樂校舍）', '#d9731a'), [2.4, 0.55], 0, 0, 0, 30); ISL.g.add(lb); lb.position.set(-9, 8.5, 30); lb.scale.set(4.2, 0.9, 1); }
   const skyGo = (x, y, z, lx, lz, msg) => { try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) {} SFX.play('win', 200); PL.x = x; PL.y = y + 0.05; PL.z = z; PL.vy = 0; PL.yaw = Math.atan2(-(lx - x), -(lz - z)); toast(msg, 2800); };
-  ia({ id: 'skyUp', x: SKY0.x, y: SKY0.y, z: SKY0.z, r: 2.6, txt: () => '✨ 踏進拱門，前往天之城', act: () => { const first = !S.islSeen; S.islSeen = 1; skyGo(ISL.g.position.x, ISY(), ISL.g.position.z + 26 * ISK, ISL.g.position.x, ISL.g.position.z, '☁️ 你來到了「天之城」——同樂校舍失散已久的另一半'); if (first) setTimeout(() => say('☁️ 天之城（天頂城堡）', '傳說很久以前，轉生賢者為了封印失控的宇宙裂隙，把一座巨大的浮空城堡一分為二：\n・「地之城」降落大地，成了今天的同樂校舍\n・「天之城」升上雲端，帶著核心能量沉睡到現在\n\n眼前這座城堡，就是校舍失散百年的另一半。\n沿著石子路走，聽說山洞口遺落了一把星光鑰匙……', [{ label: '出發探索', pri: true }], AV(0)), 1400); } });
+  ia({ id: 'skyUp', x: SKY0.x, y: SKY0.y, z: SKY0.z, r: 2.6, txt: () => spArt() >= 5 || S.sp && S.sp.portal ? '✨ 踏進拱門，前往天之城' : '✨ 鐘樓拱門（有五個圖騰凹槽）', act: () => portalGate(() => { const first = !S.islSeen; S.islSeen = 1; skyGo(ISL.g.position.x, ISY(), ISL.g.position.z + 26 * ISK, ISL.g.position.x, ISL.g.position.z, '☁️ 你來到了「天之城」——同樂校舍失散已久的另一半'); if (first) setTimeout(() => say('☁️ 天之城（天頂城堡）', '傳說很久以前，轉生賢者為了封印失控的宇宙裂隙，把一座巨大的浮空城堡一分為二：\n・「地之城」降落大地，成了今天的同樂校舍\n・「天之城」升上雲端，帶著核心能量沉睡到現在\n\n眼前這座城堡，就是校舍失散百年的另一半。\n沿著石子路走，聽說山洞口遺落了一把星光鑰匙……', [{ label: '出發探索', pri: true }], AV(0)), 1400); }) });
   ia({ id: 'skyDown', x: SKYA.x, get y() { return ISY(); }, z: SKYA.z, r: 2.6, txt: () => '🏫 回到地之城（同樂校舍）', act: () => skyGo(SKY0.x, SKY0.y, SKY0.z + 3, SKY0.x, SKY0.z - 20, '🏫 回到地之城——同樂校舍') });
   ia({ id: 'islKey', x: ISL.keyW.x, get y() { return ISY(); }, z: ISL.keyW.z, r: 3, txt: () => S.islKey ? '' : '🗝️ 撿起星光鑰匙', act: () => { S.islKey = 1; save(); SFX.play('win', 200); toast('🗝️ 得到「星光鑰匙」——天之城封印洞穴旁遺落的鑰匙！走回城堡大門吧', 4200); } });
   ia({ id: 'islDoor', x: ISL.g.position.x, get y() { return ISY(); }, z: ISL.g.position.z + 7.2 * ISK, r: 3.4, txt: () => S.islDoor ? '' : S.islKey ? '🗝️ 用星光鑰匙開門' : '🚪 城堡大門（上鎖了）', act: () => { if (!S.islKey) { say('🚪 城堡大門', '大門上了一把星形的古老大鎖，怎麼推都推不動。\n門縫夾著一張泛黃的紙條：\n「鑰匙遺落在封印洞穴旁——那裡是宇宙裂隙最初被鎖住的地方。沿著石子路走就找得到。」', [{ label: '知道了' }], AV(0)); return; } S.islDoor = 1; save(); SFX.play('win', 300); toast('🚪 喀嚓！星光鑰匙開啟了天之城——歡迎回家', 3600); } });
   ia({ id: 'islThrone', x: ISL.thr.x, get y() { return ISY(); }, z: ISL.thr.z, r: 2.2, txt: () => '👑 坐上王座', act: () => say('👑 天之城的王座', '你坐上王座，整個大廳都安靜下來。\n\n牆上的旗幟寫著：「學習、合作、快樂」。\n城堡的四座藍頂塔加上中央的紅頂主塔，剛好是五座——傳說，正是為了等待五位「轉生者」到齊。\n\n遠遠地，你彷彿聽見地面那座同樂校舍傳來的校歌迴音……', [{ label: '起身離開' }], AV(0)) });
   ia({ id: 'islChest', x: ISL.thr.cx, get y() { return ISY(); }, z: ISL.thr.cz, r: 2, txt: () => S.islChest ? '📦 空的寶箱' : '🎁 打開寶箱', act: () => { if (S.islChest) { toast('寶箱空了，下次再來看看吧', 2200); return; } S.islChest = 1; S.coin = (S.coin || 0) + 30; if (S.items) S.items.med = (S.items.med || 0) + 1; save(); refreshAll(); SFX.play('win', 200); toast('🎁 古老寶箱裡留著賢者的補給：金幣 +30、補血包 +1！', 3600); } });
+
+  /* ---------- 浮空篇・故事線：三大怪談＋五件神器＋啟動傳送陣（目前只做劇情，關卡之後再設計） ---------- */
+  const SPD = () => S.sp || (S.sp = { art: {} }), spArt = () => { const a = (S.sp && S.sp.art) || {}; return Object.keys(a).filter(k => a[k]).length; };
+  const ARTS = { 0: ['小樂', '⚔️', '勇氣之劍', '操場'], 1: ['小同', '🎤', '星光麥克風', '禮堂'], 2: ['小創', '🔧', '機巧扳手', '電腦教室'], 3: ['小味', '🍳', '金牌鍋鏟', '涼亭・遊戲區'], 4: ['小知', '🔮', '星象魔導書', '校史室'] };
+  const spPlace = nm => { try { return NPLACES.find(p => p.name === nm); } catch (e) { return null; } };
+  const isAdm2 = () => { try { const A = window.TLAUTH, q = A && A.session(); return !!(q && (A.cfg.adminEmails || []).map(x => String(x).toLowerCase()).indexOf(String(q.email).toLowerCase()) >= 0); } catch (e) { return false; } };
+  const spH = () => { try { return L.clock.h; } catch (e) { return 12; } };
+  const inAfternoon = () => { const h = spH(); return h >= 15 && h < 18; };
+  const spSay = (who, lines, img, done, label) => { let i = 0; const go = () => { const last = i >= lines.length - 1; say(who, lines[i], [{ label: last ? (label || '好') : '繼續 ▶', pri: true, fn: () => { if (last) { if (done) done(); } else { i++; setTimeout(go, 100); } } }], img); }; go(); };
+  const spQuiz = (who, img, qs, done) => { let i = 0; const ask = () => { const q = qs[i]; say(who.replace('（1/3）', '（' + (i + 1) + '/' + qs.length + '）'), q.q, q.o.map((t, k) => ({ label: t, fn: () => { if (k === q.a) { toast('✅ 吻合！', 1600); i++; if (i >= qs.length) done(); else setTimeout(ask, 150); } else { toast('🤔 仔細對照看看（' + q.h + '）', 3000); setTimeout(ask, 150); } } })), img); }; ask(); };
+  /* 1. 鐘樓的影子（午後）：梅花廣場往北，影子指向浮空島 */
+  { const base = spPlace('梅花廣場') || { x: 0, z: -45 }, y0 = (snap(base.x, base.z - 8, { maxR: 3 }) || { y: 0.03 }).y;
+    const sh = new T.Shape(); sh.moveTo(-1.8, 0); sh.lineTo(1.8, 0); sh.lineTo(0.5, 52); sh.lineTo(-0.5, 52); sh.closePath();
+    const sm = new T.Mesh(new T.ShapeGeometry(sh), new T.MeshBasicMaterial({ color: 0x1a1030, transparent: true, opacity: 0.5, depthWrite: false, side: T.DoubleSide })); sm.rotation.x = -Math.PI / 2; sm.position.set(base.x, y0 + 0.12, base.z - 8); sm.renderOrder = 3; G.add(sm); sm.visible = false;
+    const tip = sprite(nameTex('🕰 鐘樓的影子', '#5b3fa8'), [2.2, 0.52], base.x, y0 + 2.6, base.z - 8, 30); tip.visible = false;
+    L.spShadow = { sm, tip };
+    ia({ id: 'spShadow', x: base.x, y: y0, z: base.z - 12, r: 4.5, txt: () => S.sp && S.sp.shadow ? '🕰 再看一次鐘樓的影子' : inAfternoon() ? '🕰 順著鐘樓的影子望向天空' : '🕰 這裡好像有什麼……（午後 3～6 點再來）',
+      act: () => { if (!inAfternoon()) { say('🕰 梅花廣場', '地上隱約有一道淡淡的痕跡，往北邊天空的方向延伸。\n老校工曾說：「午後夕陽斜照的時候，鐘樓的影子會變得特別長。」\n\n（校園時間 15:00～18:00 再來看看。可以按時間按鈕調整校園時間。）', [{ label: '知道了' }], AV(0)); return; }
+        spSay('🕰 鐘樓的影子', ['夕陽把鐘樓的影子拉得好長好長，一路延伸到北邊的天空，指向一個固定的點。', '抬頭一看——那裡正好是浮空島的位置！\n\n老校工的聲音從身後傳來：「那是影子在思念它在天上的另一半啊。」', '你把這件事記了下來：\n鐘樓（地之城）與浮空島（天之城），果然是一對。'], AV(0), () => { const first = !SPD().shadow; SPD().shadow = 1; save(); if (first) addPts(10, '怪談一：永遠指向天空的鐘樓影子'); }); } }); }
+  /* 2. 會響應天際的校歌（夜晚）：集合場 */
+  { const g = spPlace('集合場') || { x: 27, z: -22 }, y0 = (snap(g.x, g.z, { maxR: 3 }) || { y: 0.03 }).y;
+    ia({ id: 'spSong', x: g.x, y: y0, z: g.z, r: 4, txt: () => S.sp && S.sp.song ? '🎵 再唱一次《同樂之光》' : isNight ? '🎵 對著夜空唱校歌《同樂之光》' : '🎵 集合場（夜晚在這裡唱校歌，會有奇妙的迴音）',
+      act: () => { if (!isNight) { say('🎵 集合場', '白天的集合場很熱鬧，什麼特別的聲音都沒有。\n高年級的學長姐說過：「夜深人靜的時候唱校歌，唱到最後一句，天上會有回音。」\n\n（等校園時間到了晚上再來試試。）', [{ label: '知道了' }], AV(0)); return; }
+        say('🎵 夜晚的集合場', '四周好安靜。你深吸一口氣，輕輕唱起《同樂之光》……', [{ label: '唱到最後一句 ♪', pri: true, fn: () => { [523, 659, 784, 1047].forEach((f, i) => bell(f, i * 0.28)); setTimeout(() => { [1047, 784, 659].forEach((f, i) => { tone(f, 3.2, 0.07 - i * 0.015, 'sine', i * 0.5); tone(f * 2, 2.2, 0.03, 'sine', i * 0.5 + 0.1); }); try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) { /* 忽略 */ } toast('✨ 天空傳來了空靈的迴音……', 3500); }, 1500);
+          setTimeout(() => spSay('🎵 天空的迴音', ['歌聲在夜空裡輕輕迴盪——不是山谷的回音，聲音是從更高、更遠的地方傳來的。', '那是浮空島上「星光音樂盒」的聲音，隔著天空與地面，和同樂的校歌一起共鳴。', '校舍和浮空島，似乎真的是一體的兩半。'], AV(0), () => { const first = !SPD().song; SPD().song = 1; save(); if (first) addPts(10, '怪談三：會響應天際的校歌'); }), 4200); } }], AV(0)); } }); }
+  /* 3. 校史室比對藍圖（小知）＋領取第一件神器 */
+  const spMemberMark = {};
+  function spMark(k, avail) { const a = ARTS[k], pl = spPlace(a[3]); if (!pl) return; const y = (pl.lv || 0) * H; spMemberMark[k] = sprite(nameTex(a[1] + ' ' + a[0] + '在這裡', '#2e9b72'), [2.4, 0.52], pl.x, y + 2.6, pl.z, 30); spMemberMark[k].visible = false; }
+  L.spPlaces = {};
+  Object.keys(ARTS).forEach(k => { const a = ARTS[k], pl = spPlace(a[3]); L.spPlaces[a[3]] = pl ? { x: pl.x, z: pl.z, lv: pl.lv || 0 } : null; if (!pl) return; spMark(k); const y = (pl.lv || 0) * H;
+    const have = () => !!(S.sp && S.sp.art && S.sp.art[k]);
+    ia({ id: 'spArt' + k, pen: -3, x: pl.x, y, z: pl.z, r: 3.6, txt: () => have() ? '' : k === '4' ? (S.sp && S.sp.blue ? '' : '📜 校史室的古老藍圖（找小知）') : S.sp && S.sp.blue ? a[1] + ' 找' + a[0] + '（神器・' + a[2] + '）' : '',
+      act: () => { if (have()) return; if (k === '4') blueScene(); else memberScene(k); } }); });
+  function giveArt(k) { const a = ARTS[k]; SPD().art[k] = 1; save(); SFX.play('win', 300); addPts(10, '取得神器：' + a[2]); const n = spArt(); setTimeout(() => toast(a[1] + ' 神器「' + a[2] + '」到手！（' + n + '/5）' + (n >= 5 ? ' ——回到拱門看看吧' : ''), 4200), 1200); }
+  function blueScene() {
+    const f = AV(4); spSay('🔮 小知', ['啊，你來得正好！我在校史室最裡面的櫃子，找到一卷最古老的建築藍圖。', '上面畫的不是同樂校舍……而是一座「天空中的城堡」。來，我們一起對照浮空島，看看哪裡一樣。'], f, () => {
+      spQuiz('📜 比對藍圖（1/3）', f, [{ q: '藍圖上，主堡共有幾座塔尖？\n（浮空島：四座藍頂塔，加上中央一座紅頂主塔）', o: ['3 座', '5 座', '7 座'], a: 1, h: '數數看：四座藍的、一座紅的' }, { q: '藍圖的地基外圍，畫著什麼？\n（浮空島：城堡外面圍了一圈……）', o: ['一圈圍牆（結界）', '一條河', '一座橋'], a: 0, h: '想想城堡外圈的白色石牆' }, { q: '藍圖上有一處特別標示「封印」，在城堡旁邊的……', o: ['湖泊', '山洞', '森林'], a: 1, h: '浮空島上，石子路通到哪裡？' }], () => {
+        spSay('🔮 小知', ['吻合度……100%！整座城堡的地基，和同樂校舍一模一樣。', '藍圖角落有一行小字：\n「兩城合一時，需集齊五位轉生者的神器，放入鐘樓拱門的五個凹槽，傳送陣才會真正啟動。」', '我的神器是這本《星象魔導書》，給你保管。\n其他四位夥伴也各自守著一件神器：\n⚔️ 小樂（操場）　🎤 小同（禮堂）\n🔧 小創（電腦教室）　🍳 小味（涼亭・遊戲區）', '去找他們吧！集齊五件，我們就能打開通往天空的門。'], f, () => { SPD().blue = 1; save(); addPts(10, '校史室比對藍圖'); giveArt(4); });
+      }); }, '開始比對');
+  }
+  const MEMB = {
+    0: { lines: ['（小樂正在操場練劍，劍光劃過夕陽。）\n「來得正好！我一直覺得這把劍在發熱，好像在等什麼……」', '「聽說要去天上的城堡？有這把「勇氣之劍」在，誰擋路我就替你衝在最前面！」'], ask: '小樂問你：「你覺得，勇氣是什麼？」', opts: ['不怕、什麼都敢做', '明知道會怕，還是往前走', '保護身邊的人'], reply: '「嗯！我也這麼想。」小樂把劍交到你手上，劍身亮了一下。' },
+    1: { lines: ['（禮堂的舞台上，小同正在對著空座位練歌。）\n「欸欸你聽見了嗎？每次唱到校歌最後一句，天花板就會傳來回音耶！」', '「原來那是天上的音樂盒在回應我！這支「星光麥克風」給你，我們一起唱給天空聽！」'], ask: '小同問你：「最適合唱給大家聽的歌，是哪一種？」', opts: ['讓人想一起大聲唱的', '聽了心裡暖暖的', '唱完會想笑的'], reply: '「哈哈，好品味！」小同把麥克風塞進你手裡，閃閃發光。' },
+    2: { lines: ['（電腦教室裡，小創正埋頭拆一個老舊的齒輪鐘。）\n「噓——別碰！這個鐘的零件，居然和鐘樓拱門上的圖案能拼在一起！」', '「這把「機巧扳手」是拼出來的第一件工具，帶著它，再複雜的機關都難不倒你。」'], ask: '小創問你：「遇到一個壞掉的東西，你會先做什麼？」', opts: ['先拆開看看', '先問問別人', '先想想它為什麼壞掉'], reply: '「很好，有耐心的人才修得好東西。」小創爽快地把扳手遞給你。' },
+    3: { lines: ['（涼亭旁，小味正在爐火前翻炒，香氣四溢。）\n「來得剛好，嚐嚐這個！我發現，只要煮到最後一道湯，空氣裡就會飄來星星的味道。」', '「這支「金牌鍋鏟」是我的寶貝，借你！有好吃的，大家就有力氣冒險。」'], ask: '小味問你：「冒險前，最想吃哪一種？」', opts: ['熱呼呼的便當', '甜甜的點心', '清爽的水果'], reply: '「記下了，下次煮給你！」小味笑著把鍋鏟放進你的背包。' }
+  };
+  function memberScene(k) {
+    const a = ARTS[k], m = MEMB[k], f = AV(+k); spSay(a[1] + ' ' + a[0], m.lines, f, () => { say(a[1] + ' ' + a[0], m.ask, m.opts.map(t => ({ label: t, fn: () => { setTimeout(() => say(a[1] + ' ' + a[0], m.reply, [{ label: '收下神器 ✨', pri: true, fn: () => giveArt(k) }], f), 120); } })), f); });
+  }
+  /* 4. 鐘樓拱門：五件神器放入凹槽 */
+  function portalGate(go) {
+    if (S.sp && S.sp.portal) { go(); return; }
+    const A = (S.sp && S.sp.art) || {}, row = Object.keys(ARTS).map(k => ARTS[k][1] + (A[k] ? '✅' : '⬜') + ' ' + ARTS[k][2]).join('\n'), n = spArt();
+    if (n >= 5) { spSay('✨ 鐘樓拱門', ['被蔓藤包住的拱門上，五個圖騰凹槽微微發亮。\n你把五件神器，一件一件放進凹槽——', '勇氣之劍、星光麥克風、機巧扳手、金牌鍋鏟、星象魔導書……', '轟——！蔓藤散開，拱門亮起耀眼的星光！\n鐘樓頂端的星光寶石，與天空的浮空島連成一道巨大的光束。', '「地之城」與「天之城」，終於相連了。'], AV(0), () => { SPD().portal = 1; save(); try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) { /* 忽略 */ } addPts(30, '啟動鐘樓拱門傳送陣'); setTimeout(go, 600); }, '踏進光束'); return; }
+    const hint = !(S.sp && S.sp.blue) ? '提示：先去校史室找小知，她在研究一卷古老的藍圖。' : '提示：還有夥伴守著神器，到各自的地點找找看。';
+    const btn = [{ label: '知道了' }]; if (isAdm2()) btn.unshift({ label: '🛠 管理員：直接啟動', fn: () => { SPD().portal = 1; save(); toast('🛠 已直接啟動拱門', 2400); } });
+    say('✨ 鐘樓拱門', '拱門被蔓藤包住，沒有鎖孔，只有五個圖騰凹槽：\n' + row + '\n\n（已集齊 ' + n + '/5）\n' + hint, btn, AV(0));
+  }
+  L.spTick = () => { const sh = L.spShadow; if (sh) { const on = inAfternoon(); sh.sm.visible = on; sh.tip.visible = on && !(S.sp && S.sp.shadow); }
+    Object.keys(spMemberMark).forEach(k => { spMemberMark[k].visible = !(S.sp && S.sp.art && S.sp.art[k]) && (k === '4' ? !(S.sp && S.sp.blue) : !!(S.sp && S.sp.blue)); }); };
+  L.story = { get sp() { return SPD(); }, art: spArt, set h(v) { L.clock.h = v; } };
   function islTick(dt, night, c) {
     ISL.t += dt; const t = ISL.t, g = ISL.g;
     if (!g.userData.fix) g.position.y = 92 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25;
@@ -9597,6 +9658,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (ISL.pens) ISL.pens.forEach((f, i) => { f.rotation.y = Math.sin(t * 3 + i) * 0.35; });
     if (L.skyP) L.skyP.forEach((q, i) => { q.rg.rotation.z = t * 0.6; q.sp.rotation.z = -t * 1.8; q.sp.rotation.x = Math.sin(t) * 0.4; q.dc.material.opacity = 0.38 + Math.sin(t * 2 + i) * 0.1; });
     if (ISL.syncWalls) ISL.syncWalls();
+    if (L.spTick) L.spTick();
     if (S.islKey && !S.islDoor && Math.hypot(PL.x - ISL.g.position.x, PL.z - (ISL.g.position.z + 6.4 * ISK)) < 2.6 && Math.abs(PL.y - ISY()) < 3.6) { S.islDoor = 1; save(); SFX.play('win', 300); toast('🚪 喀嚓！星光鑰匙開啟了天之城——歡迎回家', 3600); }
     if (ISL.door) { const tg = S.islDoor ? 1 : 0; ISL.door.t += (tg - ISL.door.t) * Math.min(1, dt * 2.2); ISL.door.L.rotation.y = ISL.door.t * 1.75; ISL.door.R.rotation.y = -ISL.door.t * 1.75; }
     if (ISL.key) { ISL.key.visible = !S.islKey; ISL.key.rotation.y = t * 1.6; ISL.key.position.y = 6.4 + Math.sin(t * 2) * 0.35; }
