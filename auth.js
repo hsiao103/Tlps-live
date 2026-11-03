@@ -6,9 +6,10 @@
     cfg: C, lastError: '',
     configured() { return !!C.clientId && !/YOUR_/.test(C.clientId); },
     allowed(email) {
-      email = lc(email); const ds = (C.allowDomains || []).map(lc), es = (C.allowEmails || []).map(lc);
-      if (!ds.length && !es.length) return true;
-      return es.indexOf(email) >= 0 || ds.indexOf(email.split('@')[1]) >= 0;
+      email = lc(email); const ds = (C.allowDomains || []).map(lc), es = (C.allowEmails || []).map(lc), sf = (C.allowSuffixes || []).map(lc).map(x => x.replace(/^\./, ''));
+      if (!ds.length && !es.length && !sf.length) return true;
+      const dom = email.split('@')[1] || '';
+      return es.indexOf(email) >= 0 || ds.indexOf(dom) >= 0 || sf.some(x => dom === x || dom.slice(-(x.length + 1)) === '.' + x);   // 後綴比對：'edu.tw' 允許 edu.tw 與所有 *.edu.tw（例：tlps.ilc.edu.tw、ntu.edu.tw）
     },
     session() {
       try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.until > Date.now() && s.aud === C.clientId && A.allowed(s.email)) return s; } catch (e) { /* 忽略 */ }

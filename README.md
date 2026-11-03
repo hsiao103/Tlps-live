@@ -9,9 +9,9 @@
 ## 網站內容
 | 檔案 | 用途 |
 |---|---|
-| `index.html` | 登入頁：說明遊戲、Google 登入（限 `@tmail.ilc.edu.tw`、`@smail.ilc.edu.tw`，另有白名單 blurwater@gmail.com、hsiao103@gmail.com；白名單在 `auth-config.js` 的 `allowEmails`），登入後按「進入遊戲」 |
+| `index.html` | 登入頁：說明遊戲、Google 登入（所有 `.edu.tw` 結尾的教育單位信箱皆可加入，例如 `@tmail.ilc.edu.tw`、`@smail.ilc.edu.tw`、`@tlps.ilc.edu.tw`、各校與大專院校信箱；另有個別白名單 blurwater@gmail.com、hsiao103@gmail.com；後綴規則在 `auth-config.js` 的 `allowSuffixes`、個別信箱在 `allowEmails`），登入後按「進入遊戲」 |
 | `play.html` | 遊戲本體（未登入會被送回 `index.html`） |
-| `auth-config.js` | Google 登入設定（Client ID、允許網域） |
+| `auth-config.js` | Google 登入設定（Client ID、允許網域後綴 `allowSuffixes`、個別白名單） |
 | `live-config.js` | 雲端存檔設定（Supabase；不填也能玩，進度只存在本機瀏覽器） |
 | `auth.js` `gate.js` `acct.js` `sb.js` `save.js` | 登入、把關、登出鈕、Supabase 連線、存檔同步（不必修改） |
 | `supabase.sql` | 貼到 Supabase「SQL Editor」執行一次，建立存檔資料表並限制每人只能讀寫自己的存檔 |
@@ -185,3 +185,4 @@
 - stage101：風雨球場加上場地畫線與活動籃球架：地面疊畫籃球場（白線，28×15 公尺，含中圈、禁區與罰球圈、三分線，禁區底色）、排球場（黃線，18×9）與兩面羽球場（藍線）；原本固定的四座側邊籃球架與兩座端點籃球架，改為兩座活動籃球架（壓重底座與輪子、藍色護墊立柱、前伸橫臂與斜撐、透明籃板、橘色籃框與籃網），停在籃球場兩端底線外。
 - stage102：校長室（行政大樓 2 樓）加入原創的校長 NPC「停停.鄧不利」：灰色短髮、紅框圓眼鏡、小鬍子、紅色領結、青綠色外套，固定站在辦公桌旁、面向室內，走近會打招呼；按 F 可與他說話，每天可請校長勉勵一次（+3 點、社交 +1），之後可聽他介紹校長室。
 - stage103：校長 NPC 正式命名為「停停.鄧不利」（對話標題「校長・停停.鄧不利」）。
+- stage104：登入網域放寬為所有 `.edu.tw` 教育單位信箱（含 tlps/cges/tmail/smail.ilc.edu.tw、各校與大專院校信箱）：auth.js 新增後綴比對 `allowSuffixes`（嚴格比對網域結尾，xedu.tw、edu.tw.evil.com 等不符），`auth-config.js` 設為 ['edu.tw']，個別白名單 allowEmails 不變；登入頁文案、README、設定檔註解同步更新。
