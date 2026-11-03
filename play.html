@@ -11053,10 +11053,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const MPS = () => (S.mp = S.mp || {});
   const mpG = new T.Group(); mpG.name = 'liveMP'; scene.add(mpG);
   const MPBAD = ['幹你', '幹您', '操你', '靠北', '靠腰', '雞掰', '機掰', '三小', '他媽', '他馬', '白痴', '白癡', '智障', '去死', '死全家', '婊', '屌', '賤人', '王八'];
+  const mpBad = () => MPBAD.concat(((window.TL_LIVE_CONFIG && window.TL_LIVE_CONFIG.chatBannedWords) || []).map(x => String(x || '').trim()).filter(x => x.length > 0));   // 內建禁用語＋live-config.js 的 chatBannedWords（可直接在 GitHub 編輯）
   function mpClean(t) {
     t = String(t == null ? '' : t).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
     t = t.replace(/https?:\/\/\S+|www\.\S+/gi, '（網址）').replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '（信箱）').replace(/\d[\d\s-]{5,}\d/g, '＊＊＊');
-    MPBAD.forEach(w => { t = t.split(w).join('＊'.repeat(w.length)); }); return t;
+    mpBad().forEach(w => { const i = t.toLowerCase().indexOf(w.toLowerCase()); if (i < 0) return; let k; while ((k = t.toLowerCase().indexOf(w.toLowerCase())) >= 0) t = t.slice(0, k) + '＊'.repeat(w.length) + t.slice(k + w.length); }); return t;
   }
   const mpRoom = () => { const r = String(MPS().room || '').replace(/[^\w一-鿿-]/g, '').slice(0, 16); return r || 'lobby'; };
   const mpSlug = r => Array.from(r).map(c => /[\w-]/.test(c) ? c : 'u' + c.codePointAt(0).toString(16)).join('');
