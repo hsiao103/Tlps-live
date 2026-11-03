@@ -11,6 +11,7 @@
 |---|---|
 | `index.html` | 登入頁：說明遊戲、Google 登入（所有 `.edu.tw` 結尾的教育單位信箱皆可加入，例如 `@tmail.ilc.edu.tw`、`@smail.ilc.edu.tw`、`@tlps.ilc.edu.tw`、各校與大專院校信箱；另有個別白名單 blurwater@gmail.com、hsiao103@gmail.com；後綴規則在 `auth-config.js` 的 `allowSuffixes`、個別信箱在 `allowEmails`），登入後按「進入遊戲」 |
 | `play.html` | 遊戲本體（未登入會被送回 `index.html`） |
+| `disclaimer.html`、`免責聲明與使用說明.md` | 使用說明與免責聲明（含個資告知、聊天守則、資料保存與責任範圍、智慧財產與致謝）；登入頁有連結。正式上線前建議送學校個資／法制承辦人員檢視，並補上聯絡窗口與資料保存期限 |
 | `auth-config.js` | Google 登入設定（Client ID、允許網域後綴 `allowSuffixes`、個別白名單） |
 | `live-config.js` | 雲端存檔設定（Supabase；不填也能玩，進度只存在本機瀏覽器） |
 | `auth.js` `gate.js` `acct.js` `sb.js` `save.js` | 登入、把關、登出鈕、Supabase 連線、存檔同步（不必修改） |
@@ -186,3 +187,4 @@
 - stage102：校長室（行政大樓 2 樓）加入原創的校長 NPC「停停.鄧不利」：灰色短髮、紅框圓眼鏡、小鬍子、紅色領結、青綠色外套，固定站在辦公桌旁、面向室內，走近會打招呼；按 F 可與他說話，每天可請校長勉勵一次（+3 點、社交 +1），之後可聽他介紹校長室。
 - stage103：校長 NPC 正式命名為「停停.鄧不利」（對話標題「校長・停停.鄧不利」）。
 - stage104：登入網域放寬為所有 `.edu.tw` 教育單位信箱（含 tlps/cges/tmail/smail.ilc.edu.tw、各校與大專院校信箱）：auth.js 新增後綴比對 `allowSuffixes`（嚴格比對網域結尾，xedu.tw、edu.tw.evil.com 等不符），`auth-config.js` 設為 ['edu.tw']，個別白名單 allowEmails 不變；登入頁文案、README、設定檔註解同步更新。
+- stage105：新增「使用說明與免責聲明」（disclaimer.html、免責聲明與使用說明.md）：說明遊戲性質（教學創作、校園為參考簡化、劇情虛構、點數無實質價值）、使用對象、個人資料告知（蒐集單位、目的、項目、儲存方式、保存期間、當事人權利）、聊天與互動守則、服務與資料保存免責、健康提醒、智慧財產與致謝、聲明修改與適用法律；登入頁於提示與頁尾加入連結。
