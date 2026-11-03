@@ -11057,9 +11057,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     '雞掰', '機掰', '雞巴', '機巴', '雞八', '機八', '幾八', '幾掰', '雞歪', '三小', '啥小', '沙小', '殺小', '蝦小', '他媽', '他馬', '他嗎', '他瑪', '特嬤', '塔嗎', '塔媽', '妳媽', '你媽', '你娘', '妳娘', '嘰掰',
     '白痴', '白癡', '白吃', '柏吃', '智障', '智章', '智商低', '低能', '腦殘', '腦癱', '弱智', '去死', '去屎', '死一死', '死全家', '全家死', '死肥豬', '死胖子', '醜八怪', '肥豬', '賤人', '賤貨', '賤種', '婊', '妓女', '王八', '混蛋', '廢物', '垃圾人', '人渣', '畜生', '禽獸',
     '屌', '屌你', '懶叫', '懶覺', '龜頭', '陰莖', '陰道', '打炮', '約砲', '做愛', '性交', '口交', '強暴', '強姦', '色情', '成人影片', 'a片', '裸照', '裸體', '援交',
+    '娘炮', '娘娘腔', '娘們', '人妖', '死同性戀', '死gay', '死基佬', '死玻璃', '男人婆', '三八婆', '死三八', '八婆', '肥婆', '臭女人', '賤女人', '死女人', '臭男人', '母豬', '查某', '女人就該', '女人就是', '女生就是', '女人只會', '女人不能', '女生不能', '男人都是', '女人都是', '女生都是', '男生都是', '女的都', '女人比不上', '女生比不上', '男尊女卑', '女人活該', '女生活該',
+    '奶子', '咪咪', '巨乳', '大波妹', '乳頭', '小穴', '蜜穴', '淫蕩', '淫穢', '淫', '騷貨', '精液', '射精', '自慰', '手淫', '打手槍', '打飛機', '勃起', '陰蒂', '陰戶', '陰唇', '肉棒', '啪啪啪', '上床', '脫光', '全裸', '露點', '無碼', '女優', '色圖', '黃片', '黃色網站', '色色', '性愛', '性行為', '性騷擾他', '亂倫', '輪姦', '迷姦', '獸交', '人獸',
+    'porn', 'porno', 'sexy', 'nsfw', 'hentai', 'blowjob', 'handjob', 'boobs', 'penis', 'vagina', 'whore', 'dildo', 'masturbat', 'nude', 'faggot', 'tranny', 'rape', 'sex',
     'tmd', 'wtf', 'wdnmd', 'nmsl', 'cnm', 'cnmb', 'mdzz', 'fuck', 'fuk', 'fck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'slut', 'bastard', 'stfu', 'gtfo', 'nigger', 'nigga', 'retard'
   ];
-  const MPOK = ['三小時', '三小朋友', '三小隻', '三小組', '四小時', '兩小時', '幾小時', '半小時', '全家死機'];   // 含上述字詞但屬正常用語者，不遮蔽
+  const MPOK = ['三小時', '三小朋友', '三小隻', '三小組', '四小時', '兩小時', '幾小時', '半小時', '全家死機', 'essex', 'middlesex', 'unisex', 'sussex', 'wessex', '上床鋪', '上床睡', '上床單', '八婆山', '八婆婆'];   // 含上述字詞但屬正常用語者，不遮蔽
   const mpBad = () => MPBAD.concat(MP.badCloud || [], ((window.TL_LIVE_CONFIG && window.TL_LIVE_CONFIG.chatBannedWords) || [])).map(x => String(x || '').trim()).filter(x => x.length > 0);   // 內建＋管理後台新增（雲端）＋live-config.js 的 chatBannedWords
   const MPSEP = /[\s.\-_*·。，,、~!！?？|\/\\'"`^+=:;：；()（）\[\]【】<>＜＞]/;
   function mpNorm(str) { const ns = [], idx = []; for (let i = 0; i < str.length; i++) { for (const c of str[i].normalize('NFKC').toLowerCase()) { if (MPSEP.test(c)) continue; ns.push(c); idx.push(i); } } return { s: ns.join(''), idx }; }
@@ -11073,6 +11076,13 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     t = String(t == null ? '' : t).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
     t = t.replace(/https?:\/\/\S+|www\.\S+/gi, '（網址）').replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '（信箱）').replace(/\d[\d\s-]{5,}\d/g, '＊＊＊');
     return mpMask(t);
+  }
+  /* 跨訊息偵測：同一人 20 秒內最近 6 則合起來若湊成禁用語（例：「幹」「你」「娘」分三則送），把最新這則涉及的字遮掉；傳回遮蔽後文字 */
+  function mpChain(uid, t) {
+    const H = (MP.hist = MP.hist || {}), k = String(uid || '?'), L = H[k] = (H[k] || []), now = Date.now();
+    while (L.length && (now - L[0].t > 20000 || L.length >= 6)) L.shift();
+    const prev = L.map(x => x.s).join(''), m = mpMask(prev + t), out = m.slice(prev.length);
+    L.push({ t: now, s: t }); return out;
   }
   const mpRoom = () => { const r = String(MPS().room || '').replace(/[^\w一-鿿-]/g, '').slice(0, 16); return r || 'lobby'; };
   const mpSlug = r => Array.from(r).map(c => /[\w-]/.test(c) ? c : 'u' + c.codePointAt(0).toString(16)).join('');
@@ -11193,11 +11203,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   requestAnimationFrame(mpFrame);
   /* ---- 聊天 ---- */
   function mpChatIn(d) {
-    const t = mpClean(d.m); if (!t || typeof d.m !== 'string') return; const n = String(d.n || '學員').slice(0, 10), q = MP.peers[d.u];
+    if (typeof d.m !== 'string') return; const t = mpChain(d.u, mpClean(d.m)); if (!t) return; const n = String(d.n || '學員').slice(0, 10), q = MP.peers[d.u];
     mpLine(n, t, ''); if (q) mpBubble(q, t);
   }
   function mpSend1(raw) {
-    const t = mpClean(raw); if (!t) return false; const now = Date.now();
+    const t0 = mpClean(raw); if (!t0) return false; const t = mpChain('me', t0), now = Date.now();
+    if (t !== t0) { mpLine('', '⚠ 這則和你前幾則合起來含有不適當的字詞，沒有送出。', 'sys'); return false; }
     if (MP.muted) { mpLine('', '🔇 你目前被管理者暫停聊天。', 'sys'); return false; }
     if (!MP.joined) { mpLine('', '⚠ 尚未連線，請稍後再試。', 'sys'); return false; }
     if (now - MP.lastSend < 1500) { mpLine('', '⏳ 說話太快囉，慢一點～', 'sys'); return false; }
@@ -11332,7 +11343,7 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
     loadBad(); setInterval(loadBad, 300000);   // 管理後台新增的禁用語：進入時載入，之後每 5 分鐘更新
     mpConnect();
   };
-  L.mp = { state: MP, send: mpSend1, clean: mpClean, open: o => MP.setOpen && MP.setOpen(o), peers: MP.peers };
+  L.mp = { state: MP, send: mpSend1, clean: mpClean, chain: mpChain, open: o => MP.setOpen && MP.setOpen(o), peers: MP.peers };
 /*@@/MP@@*/
   L.ready = true;
 })();
