@@ -191,3 +191,4 @@
 - stage104：登入網域放寬為所有 `.edu.tw` 教育單位信箱（含 tlps/cges/tmail/smail.ilc.edu.tw、各校與大專院校信箱）：auth.js 新增後綴比對 `allowSuffixes`（嚴格比對網域結尾，xedu.tw、edu.tw.evil.com 等不符），`auth-config.js` 設為 ['edu.tw']，個別白名單 allowEmails 不變；登入頁文案、README、設定檔註解同步更新。
 - stage105：新增「使用說明與免責聲明」（disclaimer.html、免責聲明與使用說明.md）：說明遊戲性質（教學創作、校園為參考簡化、劇情虛構、點數無實質價值）、使用對象、個人資料告知（蒐集單位、目的、項目、儲存方式、保存期間、當事人權利）、聊天與互動守則、服務與資料保存免責、健康提醒、智慧財產與致謝、聲明修改與適用法律；登入頁於提示與頁尾加入連結。
 - stage106：免責聲明補上聯絡窗口（遊戲管理員 hsiao103@tmail.ilc.edu.tw）與自動遮蔽說明；聊天新增可直接設定的禁用語（`live-config.js` 的 `chatBannedWords`，不分大小寫、發送與接收兩端皆遮蔽）；新增選用的 `supabase-cleanup.sql` 控制雲端資料量。
+- stage107：修正 `supabase-cleanup.sql`：pg_cron 段改為安全寫法（未啟用 pg_cron 時只顯示提示、不報錯，啟用後重跑即建立每日排程），可整份貼上執行；「依當事人信箱刪除」維持註解。
