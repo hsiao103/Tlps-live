@@ -11052,12 +11052,27 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const MP = { on: false, B: null, ws: null, uid: '', email: '', joined: false, roster: {}, peers: {}, muted: false, lastSend: 0, sid: 0, retry: 0, open: false, unread: 0, lines: [], tab: 'chat' };
   const MPS = () => (S.mp = S.mp || {});
   const mpG = new T.Group(); mpG.name = 'liveMP'; scene.add(mpG);
-  const MPBAD = ['幹你', '幹您', '操你', '靠北', '靠腰', '雞掰', '機掰', '三小', '他媽', '他馬', '白痴', '白癡', '智障', '去死', '死全家', '婊', '屌', '賤人', '王八'];
-  const mpBad = () => MPBAD.concat(((window.TL_LIVE_CONFIG && window.TL_LIVE_CONFIG.chatBannedWords) || []).map(x => String(x || '').trim()).filter(x => x.length > 0));   // 內建禁用語＋live-config.js 的 chatBannedWords（可直接在 GitHub 編輯）
+  const MPBAD = [   // 內建禁用語（含常見諧音、拆字、英文縮寫變體；空白與符號夾在中間也會被抓到）
+    '幹你', '幹您', '幹妳', '幹林', '幹拎', '幹爆', '幹死', '幹譙', '干你', '干您', '肏', '操你', '操他', '操妳', '靠北', '靠杯', '靠邀', '靠腰', '靠夭', '靠爸', '靠悲',
+    '雞掰', '機掰', '雞巴', '機巴', '雞八', '機八', '幾八', '幾掰', '雞歪', '三小', '啥小', '沙小', '殺小', '蝦小', '他媽', '他馬', '他嗎', '他瑪', '特嬤', '塔嗎', '塔媽', '妳媽', '你媽', '你娘', '妳娘', '嘰掰',
+    '白痴', '白癡', '白吃', '柏吃', '智障', '智章', '智商低', '低能', '腦殘', '腦癱', '弱智', '去死', '去屎', '死一死', '死全家', '全家死', '死肥豬', '死胖子', '醜八怪', '肥豬', '賤人', '賤貨', '賤種', '婊', '妓女', '王八', '混蛋', '廢物', '垃圾人', '人渣', '畜生', '禽獸',
+    '屌', '屌你', '懶叫', '懶覺', '龜頭', '陰莖', '陰道', '打炮', '約砲', '做愛', '性交', '口交', '強暴', '強姦', '色情', '成人影片', 'a片', '裸照', '裸體', '援交',
+    'tmd', 'wtf', 'wdnmd', 'nmsl', 'cnm', 'cnmb', 'mdzz', 'fuck', 'fuk', 'fck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'slut', 'bastard', 'stfu', 'gtfo', 'nigger', 'nigga', 'retard'
+  ];
+  const MPOK = ['三小時', '三小朋友', '三小隻', '三小組', '四小時', '兩小時', '幾小時', '半小時', '全家死機'];   // 含上述字詞但屬正常用語者，不遮蔽
+  const mpBad = () => MPBAD.concat(MP.badCloud || [], ((window.TL_LIVE_CONFIG && window.TL_LIVE_CONFIG.chatBannedWords) || [])).map(x => String(x || '').trim()).filter(x => x.length > 0);   // 內建＋管理後台新增（雲端）＋live-config.js 的 chatBannedWords
+  const MPSEP = /[\s.\-_*·。，,、~!！?？|\/\\'"`^+=:;：；()（）\[\]【】<>＜＞]/;
+  function mpNorm(str) { const ns = [], idx = []; for (let i = 0; i < str.length; i++) { for (const c of str[i].normalize('NFKC').toLowerCase()) { if (MPSEP.test(c)) continue; ns.push(c); idx.push(i); } } return { s: ns.join(''), idx }; }
+  function mpMask(t) {   // 忽略大小寫、全半形，並略過夾在字中間的空白／符號（例：「幹 你 娘」「f.u.c.k」）
+    const N = mpNorm(t), m = [], ok = [];
+    MPOK.forEach(w => { const wn = mpNorm(w).s; let p = 0, k; while (wn && (k = N.s.indexOf(wn, p)) >= 0) { for (let j = k; j < k + wn.length; j++) ok[j] = true; p = k + wn.length; } });
+    mpBad().forEach(w => { const wn = mpNorm(w).s; if (!wn) return; let p = 0, k; while ((k = N.s.indexOf(wn, p)) >= 0) { let skip = false; for (let j = k; j < k + wn.length; j++) if (ok[j]) skip = true; if (!skip) for (let j = N.idx[k]; j <= N.idx[k + wn.length - 1]; j++) m[j] = true; p = k + wn.length; } });
+    return t.split('').map((c, i) => m[i] ? '＊' : c).join('');
+  }
   function mpClean(t) {
     t = String(t == null ? '' : t).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
     t = t.replace(/https?:\/\/\S+|www\.\S+/gi, '（網址）').replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '（信箱）').replace(/\d[\d\s-]{5,}\d/g, '＊＊＊');
-    mpBad().forEach(w => { const i = t.toLowerCase().indexOf(w.toLowerCase()); if (i < 0) return; let k; while ((k = t.toLowerCase().indexOf(w.toLowerCase())) >= 0) t = t.slice(0, k) + '＊'.repeat(w.length) + t.slice(k + w.length); }); return t;
+    return mpMask(t);
   }
   const mpRoom = () => { const r = String(MPS().room || '').replace(/[^\w一-鿿-]/g, '').slice(0, 16); return r || 'lobby'; };
   const mpSlug = r => Array.from(r).map(c => /[\w-]/.test(c) ? c : 'u' + c.codePointAt(0).toString(16)).join('');
@@ -11313,6 +11328,8 @@ body.intro #gNetBar,body.intro #gNetFeed{display:none!important}
     const bs = B.session && B.session(); if (!bs || !bs.uid) { let er = ''; try { er = localStorage.getItem('tl_sb_err') || ''; } catch (e) { /* 忽略 */ } mpStatus('尚未登入雲端：請登出後重新用 Google 登入' + (er ? '（上次雲端登入錯誤：' + er.slice(0, 120) + '）' : '')); return; }
     MP.on = true; MP.B = B; MP.uid = bs.uid; MP.email = (sess && sess.email) || bs.email || ''; mpCount();
     try { const a = await mpRest('tlps_live_mutes?select=user_id&user_id=eq.' + MP.uid, 'GET'); MP.muted = !!(a && a.length); } catch (e) { MP.muted = false; }
+    const loadBad = async () => { try { const a = await mpRest('tlps_live_badwords?select=word&limit=2000', 'GET'); if (a) MP.badCloud = a.map(x => x.word); } catch (e) { /* 尚未建立禁用語資料表時略過 */ } };
+    loadBad(); setInterval(loadBad, 300000);   // 管理後台新增的禁用語：進入時載入，之後每 5 分鐘更新
     mpConnect();
   };
   L.mp = { state: MP, send: mpSend1, clean: mpClean, open: o => MP.setOpen && MP.setOpen(o), peers: MP.peers };

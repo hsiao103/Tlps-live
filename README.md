@@ -12,6 +12,7 @@
 | `index.html` | 登入頁：說明遊戲、Google 登入（所有 `.edu.tw` 結尾的教育單位信箱皆可加入，例如 `@tmail.ilc.edu.tw`、`@smail.ilc.edu.tw`、`@tlps.ilc.edu.tw`、各校與大專院校信箱；另有個別白名單 blurwater@gmail.com、hsiao103@gmail.com；後綴規則在 `auth-config.js` 的 `allowSuffixes`、個別信箱在 `allowEmails`），登入後按「進入遊戲」 |
 | `play.html` | 遊戲本體（未登入會被送回 `index.html`） |
 | `live-config.js` 的 `chatBannedWords` | 聊天室額外禁用語（在 GitHub 直接編輯、不必重建；內建常見不當用語＋網址／信箱／電話自動遮蔽，發送與接收兩端都會遮） |
+| `supabase-badwords.sql` | 禁用語雲端資料表（管理後台「🚫 聊天禁用語」用）：在 Supabase SQL Editor 執行一次；所有登入者可讀、只有管理者可新增／刪除 |
 | `supabase-cleanup.sql` | 選用：清除舊聊天／上線紀錄（預設 90／30 天）、查看資料表大小、pg_cron 自動排程、依當事人信箱刪除其全部資料 |
 | `disclaimer.html`、`免責聲明與使用說明.md` | 使用說明與免責聲明（含個資告知、聊天守則、資料保存與責任範圍、智慧財產與致謝）；登入頁有連結。正式上線前建議送學校個資／法制承辦人員檢視，並補上聯絡窗口與資料保存期限 |
 | `auth-config.js` | Google 登入設定（Client ID、允許網域後綴 `allowSuffixes`、個別白名單） |
@@ -192,3 +193,4 @@
 - stage105：新增「使用說明與免責聲明」（disclaimer.html、免責聲明與使用說明.md）：說明遊戲性質（教學創作、校園為參考簡化、劇情虛構、點數無實質價值）、使用對象、個人資料告知（蒐集單位、目的、項目、儲存方式、保存期間、當事人權利）、聊天與互動守則、服務與資料保存免責、健康提醒、智慧財產與致謝、聲明修改與適用法律；登入頁於提示與頁尾加入連結。
 - stage106：免責聲明補上聯絡窗口（遊戲管理員 hsiao103@tmail.ilc.edu.tw）與自動遮蔽說明；聊天新增可直接設定的禁用語（`live-config.js` 的 `chatBannedWords`，不分大小寫、發送與接收兩端皆遮蔽）；新增選用的 `supabase-cleanup.sql` 控制雲端資料量。
 - stage107：修正 `supabase-cleanup.sql`：pg_cron 段改為安全寫法（未啟用 pg_cron 時只顯示提示、不報錯，啟用後重跑即建立每日排程），可整份貼上執行；「依當事人信箱刪除」維持註解。
+- stage108：聊天禁用語升級：內建清單加入常見諧音、拆字與英文縮寫變體（約 130 個），比對時忽略大小寫、全半形，並略過夾在字中間的空白與符號（「幹 你 娘」「F.U.C.K」都會被遮），另設例外詞避免誤遮（三小時、樹幹、幹部等）；管理後台（admin.html）新增「🚫 聊天禁用語」區，可直接新增（一次多個）與刪除，存在雲端 `tlps_live_badwords`（需先執行 `supabase-badwords.sql`），玩家進遊戲時載入、之後每 5 分鐘更新；原有 `live-config.js` 的 `chatBannedWords` 仍可使用。
