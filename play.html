@@ -234,7 +234,7 @@ body.dq #credit{color:#f6ecd2}
 <div class="itabs" role="tablist"><button type="button" class="on" data-t="pc" role="tab">電腦</button><button type="button" data-t="touch" role="tab">手機／平板</button><button type="button" data-t="vr" role="tab">VR 頭盔</button><button type="button" data-t="fn" role="tab">功能</button></div>
 <dl class="ipane" data-t="pc"><dt>W A S D</dt><dd>前後左右移動（鳥瞰時為平移地圖）</dd><dt>Shift</dt><dd>按住跑步</dd><dt>空白鍵</dt><dd>跳躍</dd><dt>滑鼠拖曳</dt><dd>轉動視角（鳥瞰時為旋轉地圖）</dd><dt>滾輪</dt><dd>縮放（鳥瞰、俯視穿透）</dd><dt>E</dt><dd>切換「第一人稱／鳥瞰」</dd><dt>V</dt><dd>切換「第三人稱」</dd><dt>點地面</dt><dd>鳥瞰：傳送到該點；俯視穿透：自動走過去</dd></dl>
 <dl class="ipane" data-t="touch"><dt>左搖桿</dt><dd>前後左右移動</dd><dt>跑／跳鈕</dt><dd>右下角：「跑」點一下開關、「跳」按一下跳（第一、第三人稱與俯視穿透）</dd><dt>單指拖曳</dt><dd>轉動視角；鳥瞰時左右旋轉地圖、上下調整俯仰</dd><dt>雙指捏合</dt><dd>放大縮小（鳥瞰、俯視穿透）</dd><dt>雙指旋轉</dt><dd>旋轉畫面（鳥瞰、俯視穿透）</dd><dt>輕點地面</dt><dd>鳥瞰：傳送到該點；俯視穿透：自動走過去</dd><dt>下方選單</dt><dd>點「視角」「風格」會往上展開，選一項即可</dd><dt>提醒</dt><dd>左搖桿要按「進入世界」後才會出現</dd></dl>
-<dl class="ipane" data-t="vr"><dt>進入</dt><dd>用 Quest 瀏覽器開啟本頁，按右上「進入 VR」</dd><dt>左搖桿</dt><dd>移動；按下搖桿加速</dd><dt>右搖桿 ◀ ▶</dt><dd>轉向（每次 30 度）</dd><dt>右手 A</dt><dd>大步前進 5 公尺（瞬移）</dd><dt>左手 X</dt><dd>開關手持圓形地圖（＋－縮放，板機點地圖可傳送）</dd><dt>左手 Y</dt><dd>開關選單；右搖桿選項目、A 確認</dd><dt>板機</dt><dd>用射線點選單、地圖或縮尺模型</dd></dl>
+<dl class="ipane" data-t="vr"><dt>進入</dt><dd>用 Quest 瀏覽器開啟本頁，先在平面畫面完成「進入世界」與開場，再按右上 ⚙ →「進入 VR」</dd><dt>左搖桿</dt><dd>移動；按下搖桿加速</dd><dt>右搖桿 ◀ ▶</dt><dd>轉向（每次 30 度）</dd><dt>右手 A</dt><dd>大步前進 5 公尺（瞬移）</dd><dt>左手 X</dt><dd>開關手持圓形地圖（＋－縮放，板機點地圖可傳送）</dd><dt>左手 Y</dt><dd>開關選單；右搖桿選項目、A 確認</dd><dt>板機</dt><dd>靠近互動物件（畫面下方會出現提示）按板機互動；也用射線點選單、地圖或縮尺模型</dd><dt>對話面板</dt><dd>射線指向按鈕＋板機選取；A＝確定／下一頁，右手 B＝關閉</dd></dl>
 <dl class="ipane" data-t="fn"><dt>搜尋</dt><dd>右上放大鏡輸入教室名，黃色箭頭帶你走到門口</dd><dt>視角</dt><dd>鳥瞰／俯視穿透／第三人稱／第一人稱</dd><dt>風格</dt><dd>一般／2D／像素</dd><dt>樓層</dt><dd>鳥瞰時，右側選單可一層層揭開屋頂看教室配置</dd><dt>傳送選單</dt><dd>快速傳送到校園各處</dd><dt>日／夜</dt><dd>切換白天與夜晚</dd><dt>角色</dt><dd>在這個說明頁選「角色 A／B／C」；進入遊戲後，可到聊天面板的「設定」隨時更換</dd></dl>
 </div>
 <div class="sub" data-p="faq">
@@ -6402,7 +6402,7 @@ addEventListener('resize', resize); resize();
 let last = performance.now(), mAcc = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (typeof XRM !== 'undefined' && XRM.active) { XRM.update(dt); if (window.themeTick) window.themeTick(dt, now); renderer.render(scene, camera); return; }
+  if (typeof XRM !== 'undefined' && XRM.active) { XRM.update(dt); if (window.liveTick) window.liveTick(dt, now); if (window.themeTick) window.themeTick(dt, now); renderer.render(scene, camera); return; }
   const f0 = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) - joy.ly;
   const s0 = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0) + joy.lx;
   const AU = view.mode === 'walk' ? autoStep(dt, f0, s0) : null;     // 自動前往（part7）：沒有手動輸入時由路線決定方向
@@ -6917,6 +6917,8 @@ XRM.update = function (dt) {
   const inp = xrInputs(), L = inp.left, R = inp.right;
   const yawR = rig.rotation.y, k = rig.scale.x;
   if (!XRM.placed) { xrPlaceAt(PL.x, PL.y, PL.z); XRM.placed = true; }
+  // 遊戲邏輯（傳送門、傳送選單、劇情）直接改了 PL → 把頭盔座標跟著搬過去
+  if (!XRM.mini && XRM.lx !== undefined && (Math.hypot(PL.x - XRM.lx, PL.z - XRM.lz) > 0.3 || Math.abs(PL.y - XRM.ly) > 0.5)) { xrPlaceAt(PL.x, PL.y, PL.z); if (window.__xrWarp) window.__xrWarp(); }
   // 頭部世界位置（物理位置也會被追蹤）
   const c0 = Math.cos(yawR), s0 = Math.sin(yawR), lx = camera.position.x, lz = camera.position.z;
   const hx = rig.position.x + k * (c0 * lx + s0 * lz), hz = rig.position.z + k * (-s0 * lx + c0 * lz);
@@ -6929,7 +6931,7 @@ XRM.update = function (dt) {
 
   if (!XRM.mini) {
     // ---- 步行 ----
-    if (aP && !XRM.menuOn) {   // 大步前進（瞬移）：朝頭部方向一次前進最多 XRM.blink 公尺，遇到障礙就停在前方
+    if (aP && !XRM.menuOn && !XRM.uiOpen) {   // 大步前進（瞬移）：朝頭部方向一次前進最多 XRM.blink 公尺，遇到障礙就停在前方
       const fx0 = -Math.sin(headYaw), fz0 = -Math.cos(headYaw); let ok = 0;
       for (let d = 0.5; d <= XRM.blink + 1e-6; d += 0.5) { if (blocked(hx + fx0 * d, hz + fz0 * d, PL.y)) break; ok = d; }
       if (ok > 0) { rig.position.x += fx0 * ok; rig.position.z += fz0 * ok; }
@@ -6954,7 +6956,7 @@ XRM.update = function (dt) {
     const nhx = rig.position.x + (Math.cos(rig.rotation.y) * lx + Math.sin(rig.rotation.y) * lz), nhz = rig.position.z + (-Math.sin(rig.rotation.y) * lx + Math.cos(rig.rotation.y) * lz);
     const g = groundAt(nhx, PL.y, nhz);
     XRM.vy -= 18 * dt; PL.y += XRM.vy * dt; if (PL.y <= g) { PL.y = g; XRM.vy = 0; } else if (PL.y < -20) { PL.y = 0.1; XRM.vy = 0; }
-    rig.position.y = PL.y; PL.x = nhx; PL.z = nhz; PL.yaw = headYaw;
+    rig.position.y = PL.y; PL.x = nhx; PL.z = nhz; PL.yaw = headYaw; XRM.lx = PL.x; XRM.lz = PL.z; XRM.ly = PL.y;
     xrNF(0.15, 520);
   } else {
     // ---- 桌上縮尺模型：右搖桿左右＝轉動，左搖桿前後＝放大縮小 ----
@@ -7007,12 +7009,13 @@ XRM.update = function (dt) {
     }
   });
   xrCtrl.forEach(c => { const v = XRM.menuOn || XRM.mini || XRM.mapOn; c.userData.line.visible = v; c.userData.tip.visible = v; c.userData.tip.position.z = -c.userData.line.scale.z; });
+  if (XRM.live) XRM.live(inp, dt);
   drawWrist();
 };
 
 // ---------- 進入／離開 ----------
 function xrStart() {
-  XRM.active = true; XRM.placed = false; XRM.mini = false; XRM.prev = {}; XRM.vy = 0; whereKey = ''; whereT = 0;
+  XRM.active = true; XRM.placed = false; XRM.lx = undefined; XRM.mini = false; XRM.prev = {}; XRM.vy = 0; whereKey = ''; whereT = 0;
   if (document.body.classList.contains('intro')) $('iBird').click();
   view.auto = false; view.third = false; setMode('walk'); avatar.visible = false; rig.rotation.y = PL.yaw || 0; rig.scale.setScalar(1);
   renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
@@ -7025,6 +7028,7 @@ function xrEnd() {
   rig.position.set(0, 0, 0); rig.rotation.set(0, 0, 0); rig.scale.setScalar(1);
   camera.position.set(PL.x, PL.y + 1.55, PL.z); camera.quaternion.identity(); camera.near = 0.1; camera.far = 520; camera.updateProjectionMatrix();
   applyTime(); renderer.shadowMap.autoUpdate = true; setMode('walk'); $('bVR').classList.remove('on');
+  if (window.liveVrEnd) window.liveVrEnd();
 }
 renderer.xr.addEventListener('sessionstart', xrStart);
 renderer.xr.addEventListener('sessionend', xrEnd);
@@ -8924,7 +8928,7 @@ window.__tlLogo='data:image/webp;base64,UklGRh6vAABXRUJQVlA4WAoAAAAQAAAALwIAfQEA
   /* ---------- 介面 ---------- */
   const css = document.createElement('style');
   css.textContent = `
-body.live #bVR,body.live #bIso,body.live #bChar,body.live #bDQ,body.live #bBird,body.live #iBird{display:none!important}
+body.live #bIso,body.live #bChar,body.live #bDQ,body.live #bBird,body.live #iBird{display:none!important}
 body.live #modes{display:none!important}
 body.live.gearopen #modes{display:flex!important;flex-direction:column;align-items:stretch;gap:8px;position:fixed;top:calc(64px + env(safe-area-inset-top,0px));right:16px;left:auto;bottom:auto;width:min(300px,calc(100vw - 32px));max-width:none;max-height:calc(100vh - 90px);overflow-y:auto;padding:12px 14px;border-radius:16px;z-index:30}
 body.live.gearopen #modes .grp{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-right:0;padding-right:0;margin:0}
@@ -9049,7 +9053,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   addEventListener('resize', place); setInterval(place, 700); setTimeout(place, 200);
   let toastT = 0;
-  function toast(msg, ms) { try { SFX.toast(msg); } catch (e) { /* 忽略 */ } toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), ms || 3200); }
+  function toast(msg, ms) { try { SFX.toast(msg); } catch (e) { /* 忽略 */ } if (L.vrToast) L.vrToast(msg, ms); toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), ms || 3200); }
   L.toast = toast;
   let dlgOpen = false, bagOpen = false;
   function say(who, text, btns, img) {
@@ -9595,6 +9599,82 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   function doAct() { if (dlgOpen || bagOpen || roomOpen) return; if (cur) cur.act(); }
   act.onclick = doAct;
+  /* ---------- VR（Quest）：互動提示、對話面板、提示訊息 ----------
+     平面畫面的 HTML 對話框在頭盔裡看不到，這裡把它同步畫成 3D 面板，用手把射線指向＋板機選取。 */
+  document.addEventListener('click', e => {
+    const b = e.target && e.target.closest && e.target.closest('#bVR'); if (!b) return;
+    if (document.body.classList.contains('intro') || opActive || pastOf() < 0) { e.preventDefault(); e.stopImmediatePropagation(); toast('請先在平面畫面按「進入世界」並完成開場，再進入 VR', 4200); }
+  }, true);
+  window.liveVrEnd = () => { view.third = true; };
+  if (window.__xr) {
+    const X = window.__xr, qv = new T.Vector3(), qq = new T.Quaternion(), qe = new T.Euler(), rc = new T.Raycaster(), mt = new T.Matrix4(), o3 = new T.Vector3(), d3 = new T.Vector3();
+    const mkP = (w, h, pw, ph) => { const cv = document.createElement('canvas'); cv.width = pw; cv.height = ph; const tx = new T.CanvasTexture(cv); const m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ map: tx, transparent: true, depthTest: false, fog: false })); m.renderOrder = 45; m.visible = false; scene.add(m); return { cv, tx, m, g: cv.getContext('2d') }; };
+    const DP = mkP(1.0, 0.625, 1024, 640), PR = mkP(0.4, 0.09, 640, 144), TS = mkP(0.62, 0.1, 992, 160);
+    const FN = '"Noto Sans TC","Microsoft JhengHei",sans-serif';
+    const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+    const wrap = (g, s, maxW) => { const out = []; String(s).split('\n').forEach(p => { let line = ''; for (const ch of p) { if (g.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch; } out.push(line); }); return out; };
+    const headPose = () => { camera.getWorldPosition(qv); camera.getWorldQuaternion(qq); qe.setFromQuaternion(qq, 'YXZ'); return { x: qv.x, y: qv.y, z: qv.z, yaw: qe.y }; };
+    const stick = (m, d, y, ox, oy) => { m.position.set(ox, oy, -d).applyQuaternion(qq).add(qv); m.quaternion.copy(qq); };
+    let dSig = '', dPage = 0, dRects = [], dHover = -1, dWasOpen = false, dLines = [], dPer = 6, dWho = '', dBtns = [], vtMsg = '', vtUntil = 0, prSig = '';
+    const pv = {}, edge = (hand, i, inp) => { const k = hand + i, now = !!(inp[hand] && inp[hand].b[i]), was = !!pv[k]; pv[k] = now; return now && !was; };
+    function drawDlg() {
+      const g = DP.g, W = 1024, H = 640; g.clearRect(0, 0, W, H);
+      g.fillStyle = 'rgba(16,30,24,.94)'; rr(g, 4, 4, W - 8, H - 8, 30); g.fill(); g.strokeStyle = '#ff9d57'; g.lineWidth = 5; g.stroke();
+      g.textAlign = 'left'; g.fillStyle = '#ff9d57'; g.font = '800 34px ' + FN; g.fillText(dWho, 40, 66);
+      const more = (dPage + 1) * dPer < dLines.length, show = more ? [{ label: '繼續 ▶', page: true }] : dBtns.map(b => ({ label: b.textContent.trim(), el: b, pri: b.classList.contains('pri') }));
+      const bh = 70, gap = 12, vert = show.length > 2, rows = vert ? show.length : 1, areaB = H - 30 - rows * (bh + gap);
+      dPer = Math.max(3, Math.floor((areaB - 90) / 46));
+      g.fillStyle = '#ffffff'; g.font = '600 32px ' + FN;
+      dLines.slice(dPage * dPer, (dPage + 1) * dPer).forEach((ln, i) => g.fillText(ln, 40, 120 + i * 46));
+      if (dLines.length > dPer) { g.fillStyle = '#9fd8b4'; g.font = '500 24px ' + FN; g.textAlign = 'right'; g.fillText((dPage + 1) + ' / ' + Math.ceil(dLines.length / dPer), W - 40, 66); g.textAlign = 'left'; }
+      dRects = []; const y0 = H - 24 - rows * (bh + gap) + gap;
+      show.forEach((b, i) => {
+        const w = vert ? W - 80 : Math.min(420, (W - 80 - gap * (show.length - 1)) / show.length), x = vert ? 40 : 40 + i * (w + gap), y = vert ? y0 + i * (bh + gap) : y0;
+        const hv = dHover === i; g.fillStyle = hv ? '#ff9d57' : (b.pri || b.page ? '#2f7d4f' : '#2b3d35'); rr(g, x, y, w, bh, 18); g.fill(); g.strokeStyle = hv ? '#ffffff' : '#5fae82'; g.lineWidth = hv ? 5 : 2; g.stroke();
+        g.fillStyle = hv ? '#1a1a1a' : '#ffffff'; g.font = '700 30px ' + FN; g.textAlign = 'center'; g.fillText(b.label.length > 22 ? b.label.slice(0, 21) + '…' : b.label, x + w / 2, y + bh / 2 + 11); g.textAlign = 'left';
+        dRects.push({ x, y, w, h: bh, b });
+      });
+      DP.tx.needsUpdate = true;
+    }
+    function loadDlg() {
+      const t = dlg.querySelector('.tx'), w = dlg.querySelector('.who'); DP.g.font = '600 32px ' + FN;
+      dWho = w ? w.textContent : ''; dLines = wrap(DP.g, t ? t.textContent : '', 1024 - 80); dBtns = Array.from(dlg.querySelectorAll('.bt button, button')); dBtns = dBtns.filter((b, i, a) => a.indexOf(b) === i); dPage = 0; dHover = -1;
+    }
+    function drawPlate(P, t1, t2) { const g = P.g, w = P.cv.width, h = P.cv.height; g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(16,30,24,.9)'; rr(g, 3, 3, w - 6, h - 6, 28); g.fill(); g.strokeStyle = '#ff9d57'; g.lineWidth = 4; g.stroke(); g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = '800 46px ' + FN; g.fillText(t1, w / 2, t2 ? h * 0.46 : h * 0.62); if (t2) { g.fillStyle = '#9fd8b4'; g.font = '500 28px ' + FN; g.fillText(t2, w / 2, h * 0.82); } g.textAlign = 'left'; P.tx.needsUpdate = true; }
+    L.vrToast = (msg, ms) => { if (!X.active) return; vtMsg = String(msg).replace(/\n/g, ' '); vtUntil = performance.now() + (ms || 3200); drawPlate(TS, vtMsg.length > 30 ? vtMsg.slice(0, 29) + '…' : vtMsg, ''); };
+    X.vrp = { DP, PR, TS, get rects() { return dRects; } };
+    X.live = function (inp, dt) {
+      const R = inp.right, Lf = inp.left, now = performance.now();
+      X.uiOpen = !!dlgOpen;
+      const trig = edge('right', 0, inp) | edge('left', 0, inp) << 1, aP = edge('right', 4, inp), bP = edge('right', 5, inp);
+      // 提示訊息
+      if (now < vtUntil) { TS.m.visible = true; stick(TS.m, 0.7, 0, 0, -0.16); } else TS.m.visible = false;
+      if (dlgOpen) {
+        PR.m.visible = false;
+        const sig = dlg.innerText; if (!dWasOpen) { const hp = headPose(); DP.m.position.set(hp.x - Math.sin(hp.yaw) * 0.85, hp.y - 0.05, hp.z - Math.cos(hp.yaw) * 0.85); DP.m.rotation.set(0, hp.yaw, 0); DP.m.visible = true; dSig = ''; }
+        if (sig !== dSig) { dSig = sig; loadDlg(); drawDlg(); }
+        // 射線
+        let hov = -1, hit = null;
+        [R, Lf].forEach(h => { if (!h || !h.ctrl) return; h.ctrl.updateMatrixWorld(true); mt.identity().extractRotation(h.ctrl.matrixWorld); o3.setFromMatrixPosition(h.ctrl.matrixWorld); d3.set(0, 0, -1).applyMatrix4(mt).normalize(); rc.set(o3, d3);
+          const ht = rc.intersectObject(DP.m, false)[0]; h.ctrl.userData.line.visible = true; h.ctrl.userData.tip.visible = true;
+          if (ht && ht.uv) { const px = ht.uv.x * 1024, py = (1 - ht.uv.y) * 640; const i = dRects.findIndex(r => px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h); h.ctrl.userData.line.scale.z = Math.max(0.05, ht.distance - 0.01); h.ctrl.userData.tip.position.z = -h.ctrl.userData.line.scale.z; if (i >= 0 && hov < 0) { hov = i; hit = h; } } else h.ctrl.userData.line.scale.z = 2; });
+        if (hov !== dHover) { dHover = hov; drawDlg(); }
+        const pick = b => { if (!b) return; if (b.page) { dPage++; drawDlg(); } else if (b.el) b.el.click(); };
+        if (trig && dHover >= 0 && dRects[dHover]) pick(dRects[dHover].b);
+        else if (aP) { const r = dRects.find(q => q.b.page || q.b.pri) || dRects[0]; if (r) pick(r.b); }
+        else if (bP) dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape' }));
+        if (!dlgOpen) { DP.m.visible = false; dWasOpen = false; return; }
+        dWasOpen = true;
+      } else {
+        if (dWasOpen) { DP.m.visible = false; dWasOpen = false; dSig = ''; }
+        if (cur && !X.menuOn && !X.mapOn && !X.mini) {
+          const t = cur._t + ' ・ 板機鍵'; if (t !== prSig) { prSig = t; drawPlate(PR, cur._t, '按手把板機鍵'); }
+          PR.m.visible = true; headPose(); stick(PR.m, 0.7, 0, 0, -0.3);
+          if (trig) doAct();
+        } else { PR.m.visible = false; prSig = ''; }
+      }
+    };
+  }
   addEventListener('keydown', e => { if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.code === 'KeyF' || e.code === 'Enter') { if (dlgOpen) { const p = dlg.querySelector('button.pri') || dlg.querySelector('button'); if (p && e.code === 'Enter') p.click(); } else doAct(); } });
   let acc = 0;
   window.liveTick = function (dt, now) {
