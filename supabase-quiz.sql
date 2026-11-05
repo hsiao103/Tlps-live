@@ -4,7 +4,7 @@
 -- 2) tlps_live_weekly：全校週排行（只存暱稱與分數，不存信箱）。
 create table if not exists public.tlps_live_quiz (
   id         text primary key check (char_length(id) between 1 and 40),
-  bank       text not null check (bank in ('greet','bike','ped','gen')),
+  bank       text not null check (bank in ('greet','bike','ped','gen','pe')),
   cat        text not null default '' check (char_length(cat) <= 20),
   kind       text not null check (kind in ('tf','mc')),
   q          text not null check (char_length(q) between 1 and 200),
@@ -15,6 +15,9 @@ create table if not exists public.tlps_live_quiz (
   updated_by text,
   updated_at timestamptz not null default now()
 );
+-- 若先前已建立過資料表（舊版只有 greet/bike/ped/gen），這段會把允許的題庫加上 pe（體育與健康）
+alter table public.tlps_live_quiz drop constraint if exists tlps_live_quiz_bank_check;
+alter table public.tlps_live_quiz add constraint tlps_live_quiz_bank_check check (bank in ('greet','bike','ped','gen','pe'));
 create index if not exists tlps_live_quiz_bank on public.tlps_live_quiz (bank);
 alter table public.tlps_live_quiz enable row level security;
 drop policy if exists "quiz read all"    on public.tlps_live_quiz;
