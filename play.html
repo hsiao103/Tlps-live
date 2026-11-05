@@ -9569,13 +9569,31 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   /* ---------- 健康中心通廊旁：AED（自動體外心臟電擊去顫器）紅色小櫃 ---------- */
   { const q = (() => { try { return NPLACES.find(x => x.name === '健康中心'); } catch (e) { return null; } })();
     if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x + 1.8, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 1.6 }) || snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
-      const red = new T.Mesh(new T.BoxGeometry(0.42, 0.5, 0.22), gm(0xd62828)); red.position.set(p.x, p.y + 1.25, p.z); red.castShadow = true; G.add(red);
-      const crs = new T.MeshBasicMaterial({ color: 0xffffff }), c1 = new T.Mesh(new T.BoxGeometry(0.22, 0.06, 0.02), crs), c2 = new T.Mesh(new T.BoxGeometry(0.06, 0.22, 0.02), crs);
-      [c1, c2].forEach(m => { m.position.set(p.x, p.y + 1.27, p.z + 0.12); G.add(m); });
-      const leg = new T.Mesh(new T.BoxGeometry(0.08, 1.0, 0.08), gm(0x777c82)); leg.position.set(p.x, p.y + 0.5, p.z - 0.02); G.add(leg);
-      sprite(nameTex('❤️ AED', '#d62828'), [1.1, 0.42], p.x, p.y + 1.85, p.z, 30);
+      // 找最近的牆面（高度至少 2 公尺），把 AED 貼在牆上、朝向通廊；建築可能稍後才建好，所以每個畫面嘗試到找到牆為止
+      const AY = p.y + 1.3, grp = new T.Group(); grp.position.set(p.x, AY, p.z); G.add(grp);
+      const red = new T.Mesh(new T.BoxGeometry(0.46, 0.56, 0.22), gm(0xd62828)); red.castShadow = true; grp.add(red);
+      const crs = new T.MeshBasicMaterial({ color: 0xffffff }), c1 = new T.Mesh(new T.BoxGeometry(0.24, 0.07, 0.02), crs), c2 = new T.Mesh(new T.BoxGeometry(0.07, 0.24, 0.02), crs);
+      [c1, c2].forEach(m => { m.position.set(0, 0.03, 0.115); grp.add(m); });
+      const bar = new T.Mesh(new T.BoxGeometry(0.34, 0.06, 0.02), crs); bar.position.set(0, -0.2, 0.115); grp.add(bar);
+      const lab = sprite(nameTex('❤️ AED', '#d62828'), [1.1, 0.42], p.x, AY + 0.6, p.z, 30);
+      const AEDI = { wall: false, tries: 0 };
+      const attach = () => {
+        let wx = p.x, wz = p.z, nx = 0, nz = 1, best = 1e9;
+        (window.__school && window.__school.WALLS || []).forEach(w => { if (w.y1 - w.y0 < 2 || w.y0 > AY || w.y1 < AY + 0.3) return;
+          let px = p.x, pz = p.z, c = 1, sn = 0; if (w.tf) { const dx = p.x - w.tf.x, dz = p.z - w.tf.z; c = w.tf.c; sn = w.tf.s; px = dx * c - dz * sn; pz = dx * sn + dz * c; }
+          const cx = Math.max(w.x0, Math.min(px, w.x1)), cz = Math.max(w.z0, Math.min(pz, w.z1)), d = Math.hypot(px - cx, pz - cz);
+          if (d < best && d < 3.2) { best = d; let lx = px - cx, lz = pz - cz; if (d < 1e-6) { lx = 0; lz = 1; }
+            if (Math.abs(lx) >= Math.abs(lz)) { lx = Math.sign(lx) || 1; lz = 0; } else { lz = Math.sign(lz) || 1; lx = 0; }
+            wx = w.tf ? w.tf.x + (cx * c + cz * sn) : cx; wz = w.tf ? w.tf.z + (-cx * sn + cz * c) : cz;
+            nx = lx * c + lz * sn; nz = -lx * sn + lz * c; } });
+        if (best >= 1e9) return false;
+        grp.position.set(wx + nx * 0.11, AY, wz + nz * 0.11); grp.rotation.y = Math.atan2(nx, nz); lab.position.set(wx + nx * 0.2, AY + 0.6, wz + nz * 0.2);
+        AEDI.wall = true; AEDI.ax = grp.position.x; AEDI.az = grp.position.z; AEDI.nx = nx; AEDI.nz = nz; return true;
+      };
+      FXQ.push({ tick: () => { if (!AEDI.wall && AEDI.tries < 1200) { AEDI.tries++; attach(); } } });
+      AEDI.pos = p; AEDI.attach = attach; L.aed = AEDI;
       ia({ id: 'aed', x: p.x, y: p.y, z: p.z, r: 2.2, txt: () => '❤️ AED（自動體外心臟電擊去顫器）', act: () => say('❤️ AED 自動體外心臟電擊去顫器', '這是校園的急救設備，放在健康中心通廊旁，遇到有人突然昏倒、沒有呼吸時使用。\n\n【口訣：叫、叫、CPR、AED】\n1. 叫：拍肩膀大聲呼叫，確認有沒有反應與呼吸。\n2. 叫：大聲請人撥 119，並請人去拿 AED（自己也可以派人去）。\n3. CPR：用手掌在胸口正中間快速用力按壓，速度約每分鐘 100 到 120 下。\n4. AED：打開 AED，依照語音指示貼上電擊貼片，機器會自己判斷是否需要電擊。\n\n💡 小朋友發現時：第一時間「大聲求救、找大人、撥 119」，不要自己硬撐。這只是簡單介紹，正式的急救課程請聽老師與校護的指導。', [{ label: '我記住了', pri: true, fn: () => { const d = D(); if (!d.aed) { d.aed = 1; addPts(3, '認識 AED'); addAttr('body', 1); save(); refreshAll(); } } }, { label: '關閉' }]) });
-      L.aed = { pos: p }; } }
+      } }
   { const q = (() => { try { return NPLACES.find(x => x.name === '英語教室'); } catch (e) { return null; } })();
     if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x + 3, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 1.6 }) || snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
       beacon({ x: p.x, y: p.y, z: p.z, col: 0x7a4fd1, hex: '#7a4fd1', icon: '🔤', name: '單字挑戰', r: 1.2, h: 1.2, lw: 2.2, active: () => V().n < VMAX });
