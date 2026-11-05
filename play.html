@@ -9306,6 +9306,37 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     L.legend = { LEGENDS, objs: () => legendObjs, book: legendBook, act: legendAct, count: legendCount };
   L.fest = { festNow, festSync, get cur() { return festCur; }, objs: () => festObjs, FESTS };
 
+  /* ---------- 測驗地點標示：光柱＋地面光圈＋上升粒子＋浮動圖示（取代舊的立牌；已完成時變暗）---------- */
+  const FXQ = [];
+  const DOTTEX = (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d'), r = g.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.45, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 32, 32); return new T.CanvasTexture(c); })();
+  function beacon(o) {
+    const col = o.col, grp = new T.Group(); grp.position.set(o.x, o.y, o.z); G.add(grp);
+    const R = o.r || 1.5, Hh = o.h || 3.8, N = 40;
+    const ringM = new T.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending });
+    const ring = new T.Mesh(new T.RingGeometry(R * 0.82, R, 40), ringM); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.07; grp.add(ring);
+    const discM = new T.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.22, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending });
+    const disc = new T.Mesh(new T.CircleGeometry(R * 0.82, 32), discM); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.065; grp.add(disc);
+    const pilM = new T.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.12, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending });
+    const pil = new T.Mesh(new T.CylinderGeometry(R * 0.6, R * 0.6, Hh, 20, 1, true), pilM); pil.position.y = Hh / 2; grp.add(pil);
+    const pos = new Float32Array(N * 3), geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3));
+    const ptM = new T.PointsMaterial({ color: col, map: DOTTEX, size: 0.34, transparent: true, opacity: 0.95, depthWrite: false, blending: T.AdditiveBlending, sizeAttenuation: true });
+    const pts = new T.Points(geo, ptM); pts.frustumCulled = false; grp.add(pts);
+    const mk = sprite(emojiTex(o.icon, '#ffffff', o.hex || '#7a4fd1'), [0.8, 0.8], o.x, o.y + Hh + 0.55, o.z, 30); bob.push({ s: mk, y: o.y + Hh + 0.55 });
+    const lb = sprite(nameTex(o.icon + ' ' + o.name, o.hex || '#7a4fd1'), [o.lw || 2.6, 0.62], o.x, o.y + Hh + 1.45, o.z, 30);
+    const grey = new T.Color(0x9aa0a6), base = new T.Color(col), cc = new T.Color();
+    const f = { tick: t => {
+      const dx = PL.x - o.x, dz = PL.z - o.z, dy = Math.abs(PL.y - o.y), near = dx * dx + dz * dz < 90 * 90 && dy < 40;
+      grp.visible = near; mk.visible = near; lb.visible = near; if (!near) return;
+      const on = o.active ? !!o.active() : true; cc.copy(on ? base : grey);
+      ringM.color.copy(cc); discM.color.copy(cc); pilM.color.copy(cc); ptM.color.copy(cc);
+      const pu = 0.85 + Math.sin(t * 3) * 0.15; ringM.opacity = on ? 0.8 * pu : 0.3; discM.opacity = on ? 0.2 + Math.sin(t * 3) * 0.06 : 0.07; pilM.opacity = on ? 0.12 : 0.04; ptM.opacity = on ? 0.95 : 0.35;
+      ring.scale.setScalar(1 + (on ? Math.sin(t * 3) * 0.04 : 0));
+      for (let i = 0; i < N; i++) { const ph = i / N, u = (t * (on ? 0.32 : 0.12) + ph) % 1, ang = ph * 37 + t * (on ? 1.3 : 0.4), rad = R * 0.78 * (1 - 0.55 * u);
+        pos[i * 3] = Math.cos(ang) * rad; pos[i * 3 + 1] = 0.12 + u * Hh; pos[i * 3 + 2] = Math.sin(ang) * rad; }
+      geo.attributes.position.needsUpdate = true;
+    } };
+    FXQ.push(f); return f;
+  }
   /* ---------- 週活動：交通安全小站（停車場）──腳踏車／行人／通識，每類每週測驗 1 次，過關有獎勵 ---------- */
   const TFQ = {
     bike: [
@@ -9385,10 +9416,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   Object.keys(TFST).forEach(k => {
     const s = TFST[k], g0 = snap(s.x, s.z, { maxR: 1.5, maxY: 0.9 }) || { y: 0.04 }; s.y = g0.y;
-    const post = new T.Mesh(new T.BoxGeometry(0.14, 2.0, 0.14), gm(0x777c82)); post.position.set(s.x, s.y + 1.0, s.z); post.castShadow = true; G.add(post);
-    const board = new T.Mesh(new T.BoxGeometry(1.3, 0.8, 0.08), gm(s.c3)); board.position.set(s.x, s.y + 2.05, s.z); board.castShadow = true; G.add(board);
-    sprite(nameTex(s.ic + ' ' + s.name, s.col), [2.6, 0.68], s.x, s.y + 3.0, s.z, 30);
-    const mark = sprite(emojiTex(s.ic, '#ffffff', s.col), [0.7, 0.7], s.x, s.y + 3.7, s.z, 28); bob.push({ s: mark, y: s.y + 3.7 });
+    beacon({ x: s.x, y: s.y, z: s.z, col: s.c3, hex: s.col, icon: s.ic, name: s.name, r: 1.5, h: 3.6, lw: 2.6, active: () => TF()[k] === null });
     s.ia = ia({ id: 'traf' + k, x: s.x, y: s.y, z: s.z, r: 3.0, txt: () => { const tf = TF(); return tf[k] !== null ? s.ic + ' ' + s.name + '（本週已完成 ' + tf[k] + '/4）' : tf.run[k] ? s.ic + ' 繼續挑戰：' + s.name : s.ic + ' ' + s.name + '（本週可測驗 1 次）'; }, act: () => tfStation(k) });
   });
   { // 行人穿越道（斑馬線）與交通錐：停車場車道（停車場在 withTf(5,-19.5) 區塊內，世界座標 x＝本地 x＋5、z＝本地 z－19.5）
@@ -9535,18 +9563,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   { const q = (() => { try { return NPLACES.find(x => x.name === '風雨球場'); } catch (e) { return null; } })();
     if (q) { const p = snap(q.x + 2.5, q.z + 2.5, { maxR: 6 }) || snap(q.x, q.z, { maxR: 8 }) || { x: q.x, y: 0.03, z: q.z };
-      const bd = new T.Mesh(new T.BoxGeometry(1.3, 0.8, 0.08), gm(0xe0861a)); bd.position.set(p.x, p.y + 1.05, p.z); G.add(bd);
-      const lg = new T.Mesh(new T.BoxGeometry(0.1, 1.0, 0.1), gm(0x777c82)); lg.position.set(p.x, p.y + 0.5, p.z); G.add(lg);
-      const mk = sprite(emojiTex('🏅', '#ffffff', '#e0861a'), [0.8, 0.8], p.x, p.y + 1.95, p.z, 30); bob.push({ s: mk, y: p.y + 1.95 });
-      sprite(nameTex('🏅 體育與健康小教室', '#e0861a'), [2.8, 0.6], p.x, p.y + 2.7, p.z, 30);
+      beacon({ x: p.x, y: p.y, z: p.z, col: 0xe0861a, hex: '#e0861a', icon: '🏅', name: '體育與健康小教室', r: 1.6, h: 3.4, lw: 3.0, active: () => PE().n < PEMAX });
       ia({ id: 'peQuiz', x: p.x, y: p.y, z: p.z, r: 2.8, txt: () => { const d = PE(); return d.n >= PEMAX ? '🏅 體育小教室（今天已完成）' : '🏅 體育與健康小教室（今天剩 ' + (PEMAX - d.n) + ' 回）'; }, act: peStation });
       L.pe = { PE, pePick, peStation, pos: p }; } }
   { const q = (() => { try { return NPLACES.find(x => x.name === '英語教室'); } catch (e) { return null; } })();
-    if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
-      const bd = new T.Mesh(new T.BoxGeometry(1.1, 0.7, 0.08), gm(0x7a4fd1)); bd.position.set(p.x, p.y + 1.0, p.z); G.add(bd);
-      const lg = new T.Mesh(new T.BoxGeometry(0.1, 0.9, 0.1), gm(0x777c82)); lg.position.set(p.x, p.y + 0.45, p.z); G.add(lg);
-      const mk = sprite(emojiTex('🔤', '#ffffff', '#7a4fd1'), [0.8, 0.8], p.x, p.y + 1.9, p.z, 30); bob.push({ s: mk, y: p.y + 1.9 });
-      sprite(nameTex('🔤 單字挑戰', '#7a4fd1'), [2.0, 0.52], p.x, p.y + 2.6, p.z, 30);
+    if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x + 3, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 1.6 }) || snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
+      beacon({ x: p.x, y: p.y, z: p.z, col: 0x7a4fd1, hex: '#7a4fd1', icon: '🔤', name: '單字挑戰', r: 1.2, h: 1.2, lw: 2.2, active: () => V().n < VMAX });
       ia({ id: 'vocab', x: p.x, y: p.y, z: p.z, r: 2.6, txt: () => { const v = V(); return v.n >= VMAX ? '🔤 單字挑戰（本週已用完）' : '🔤 單字挑戰（本週剩 ' + (VMAX - v.n) + ' 次，加乘 ×' + vmult(v) + '）'; }, act: vocabStation });
       L.vocab = { V, vocabMake, vocabStation, pos: p }; } }
   /* ---------- 週活動：資源回收 ---------- */
@@ -10049,6 +10071,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   window.liveTick = function (dt, now) {
     const t = now / 1000;
     bob.forEach((b, i) => { b.s.position.y = b.y + Math.sin(t * 2.4 + i) * 0.12; });
+    FXQ.forEach(f => f.tick(t));
     if (L.portal) L.portal.rotation.y += dt * 0.6;
     for (const k in NP) { const n = NP[k]; n.ch.mixer.update(dt); const dx = PL.x - n.x, dz = PL.z - n.z, d = Math.hypot(dx, dz); if (d < 7) { const ty = Math.atan2(-dx, -dz); n.yaw += angd(ty, n.yaw) * (1 - Math.exp(-dt * 6)); } n.ch.node.rotation.y = n.yaw; }
     acc += dt; if (acc < 0.12) return; acc = 0;
