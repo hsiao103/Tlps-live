@@ -234,7 +234,7 @@ body.dq #credit{color:#f6ecd2}
 <div class="itabs" role="tablist"><button type="button" class="on" data-t="pc" role="tab">電腦</button><button type="button" data-t="touch" role="tab">手機／平板</button><button type="button" data-t="vr" role="tab">VR 頭盔</button><button type="button" data-t="fn" role="tab">功能</button></div>
 <dl class="ipane" data-t="pc"><dt>W A S D</dt><dd>前後左右移動（鳥瞰時為平移地圖）</dd><dt>Shift</dt><dd>按住跑步</dd><dt>空白鍵</dt><dd>跳躍</dd><dt>滑鼠拖曳</dt><dd>轉動視角（鳥瞰時為旋轉地圖）</dd><dt>滾輪</dt><dd>縮放（鳥瞰、俯視穿透）</dd><dt>E</dt><dd>切換「第一人稱／鳥瞰」</dd><dt>V</dt><dd>切換「第三人稱」</dd><dt>點地面</dt><dd>鳥瞰：傳送到該點；俯視穿透：自動走過去</dd></dl>
 <dl class="ipane" data-t="touch"><dt>左搖桿</dt><dd>前後左右移動</dd><dt>跑／跳鈕</dt><dd>右下角：「跑」點一下開關、「跳」按一下跳（第一、第三人稱與俯視穿透）</dd><dt>單指拖曳</dt><dd>轉動視角；鳥瞰時左右旋轉地圖、上下調整俯仰</dd><dt>雙指捏合</dt><dd>放大縮小（鳥瞰、俯視穿透）</dd><dt>雙指旋轉</dt><dd>旋轉畫面（鳥瞰、俯視穿透）</dd><dt>輕點地面</dt><dd>鳥瞰：傳送到該點；俯視穿透：自動走過去</dd><dt>下方選單</dt><dd>點「視角」「風格」會往上展開，選一項即可</dd><dt>提醒</dt><dd>左搖桿要按「進入世界」後才會出現</dd></dl>
-<dl class="ipane" data-t="vr"><dt>進入</dt><dd>用 Quest 瀏覽器開啟本頁，先在平面畫面完成「進入世界」與開場，再按右上 ⚙ →「進入 VR」</dd><dt>左搖桿</dt><dd>移動；按下搖桿加速</dd><dt>右搖桿 ◀ ▶</dt><dd>轉向（每次 30 度）</dd><dt>右手 A</dt><dd>大步前進 5 公尺（瞬移）</dd><dt>左手 X</dt><dd>開關手持圓形地圖（＋－縮放，板機點地圖可傳送）</dd><dt>左手 Y</dt><dd>開關選單；右搖桿選項目、A 確認</dd><dt>板機</dt><dd>靠近互動物件（畫面下方會出現提示）按板機互動；也用射線點選單、地圖或縮尺模型</dd><dt>對話面板</dt><dd>射線指向按鈕＋板機選取；A＝確定／下一頁，右手 B＝關閉</dd></dl>
+<dl class="ipane" data-t="vr"><dt>進入</dt><dd>用 Quest 瀏覽器開啟本頁，先在平面畫面完成「進入世界」與開場，再按右上 ⚙ →「進入 VR」</dd><dt>左搖桿</dt><dd>移動；按下搖桿加速</dd><dt>右搖桿 ◀ ▶</dt><dd>轉向（每次 30 度）</dd><dt>右手 A</dt><dd>大步前進 5 公尺（瞬移）</dd><dt>左手 X</dt><dd>開關手持圓形地圖（＋－縮放，板機點地圖可傳送）</dd><dt>左手 Y</dt><dd>開關選單；右搖桿選項目、A 確認</dd><dt>板機</dt><dd>靠近互動物件（畫面下方會出現提示）按板機互動；也用射線點選單、地圖或縮尺模型</dd><dt>左手握把</dt><dd>開「VR 選單」：任務清單、背包與角色、環境設定、聊天；再按一次關閉。面板內右搖桿上下捲動、板機點選、右手 B 關閉</dd><dt>對話面板</dt><dd>射線指向按鈕＋板機選取；A＝確定／下一頁，右手 B＝關閉</dd></dl>
 <dl class="ipane" data-t="fn"><dt>搜尋</dt><dd>右上放大鏡輸入教室名，黃色箭頭帶你走到門口</dd><dt>視角</dt><dd>鳥瞰／俯視穿透／第三人稱／第一人稱</dd><dt>風格</dt><dd>一般／2D／像素</dd><dt>樓層</dt><dd>鳥瞰時，右側選單可一層層揭開屋頂看教室配置</dd><dt>傳送選單</dt><dd>快速傳送到校園各處</dd><dt>日／夜</dt><dd>切換白天與夜晚</dd><dt>角色</dt><dd>在這個說明頁選「角色 A／B／C」；進入遊戲後，可到聊天面板的「設定」隨時更換</dd></dl>
 </div>
 <div class="sub" data-p="faq">
@@ -6946,7 +6946,7 @@ XRM.update = function (dt) {
     }
     // 快速轉向（繞頭部）
     XRM.snapT -= dt; const tx = R ? xrDz(R.x) : 0;
-    if (Math.abs(tx) > 0.6 && XRM.snapT <= 0 && !XRM.menuOn) {
+    if (Math.abs(tx) > 0.6 && XRM.snapT <= 0 && !XRM.menuOn && !XRM.uiOpen) {
       XRM.snapT = 0.28;
       rig.rotation.y += tx > 0 ? -Math.PI / 6 : Math.PI / 6;
       const c1 = Math.cos(rig.rotation.y), s1 = Math.sin(rig.rotation.y);
@@ -9642,7 +9642,93 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     }
     function drawPlate(P, t1, t2) { const g = P.g, w = P.cv.width, h = P.cv.height; g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(16,30,24,.9)'; rr(g, 3, 3, w - 6, h - 6, 28); g.fill(); g.strokeStyle = '#ff9d57'; g.lineWidth = 4; g.stroke(); g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = '800 46px ' + FN; g.fillText(t1, w / 2, t2 ? h * 0.46 : h * 0.62); if (t2) { g.fillStyle = '#9fd8b4'; g.font = '500 28px ' + FN; g.fillText(t2, w / 2, h * 0.82); } g.textAlign = 'left'; P.tx.needsUpdate = true; }
     L.vrToast = (msg, ms) => { if (!X.active) return; vtMsg = String(msg).replace(/\n/g, ' '); vtUntil = performance.now() + (ms || 3200); drawPlate(TS, vtMsg.length > 30 ? vtMsg.slice(0, 29) + '…' : vtMsg, ''); };
-    X.vrp = { DP, PR, TS, get rects() { return dRects; } };
+    // ---- 把 HTML 面板（背包、任務清單、設定、聊天、社辦、打工）鏡射成 3D 面板 ----
+    const MW = 1024, MH = 768, PM = mkP(1.2, 0.9, MW, MH);
+    const M = { el: null, key: '', base: null, k: 1, W: 0, H: 0, sy: 0, hits: [], sig: '', t: 0, hover: -1, dirty: true };
+    const SRC = [
+      ['bag', () => document.getElementById('gBag')], ['room', () => document.getElementById('gRoom')], ['job', () => document.getElementById('gJob')],
+      ['set', () => document.body.classList.contains('gearopen') ? document.getElementById('modes') : null], ['chat', () => { const e = document.getElementById('gNet'); return e && !e.hidden ? e : null; }],
+      ['hud', () => X.hudOn ? document.getElementById('gHud') : null]];
+    const vis = e => { if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
+    const rgba = c => { const m = /rgba?\(([^)]+)\)/.exec(c); if (!m) return null; const v = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number); return { r: v[0], g: v[1], b: v[2], a: v.length > 3 ? v[3] : 1, s: c }; };
+    const clickable = e => e.matches && (e.matches('button,summary,a[href],input,select,label,[data-use],[data-q],[data-c],[data-nav],[role=button]') || typeof e.onclick === 'function');
+    const sigOf = root => { const t = root.innerText || ''; return t.length + '|' + t.slice(0, 200) + '|' + root.querySelectorAll('[open]').length; };
+    const SVGC = {};
+    const closedIn = e => { const d = e.closest && e.closest('details'); return !!(d && !d.open && !e.closest('summary')); };
+    function buildBase() {
+      const src = M.el, root = src.querySelector('.pn') || src; try { root.scrollTop = 0; src.scrollTop = 0; } catch (e) { /* 忽略 */ }
+      const rr0 = root.getBoundingClientRect(), all = [root].concat(Array.from(root.querySelectorAll('*')));
+      let H = rr0.height, W = Math.max(200, rr0.width); all.forEach(e => { if (closedIn(e)) return; const r = e.getBoundingClientRect(); if (r.width > 0 && r.height > 0) { H = Math.max(H, r.bottom - rr0.top); W = Math.max(W, Math.min(r.right - rr0.left, rr0.width * 1.8)); } });
+      const k = Math.min(2.2, 900 / W); M.k = k; M.W = W; M.H = Math.min(H, 7000 / k);
+      const cv = M.base || document.createElement('canvas'); cv.width = Math.ceil(W * k); cv.height = Math.ceil(M.H * k); M.base = cv;
+      const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = 'rgba(16,30,24,.96)'; rr(g, 0, 0, cv.width, cv.height, 22); g.fill();
+      M.hits = [];
+      const cs00 = getComputedStyle(root), bg0 = rgba(cs00.backgroundColor), tc = rgba(cs00.color); if (!(bg0 && bg0.a > 0.1) && tc && (tc.r + tc.g + tc.b) / 3 < 120) { g.fillStyle = 'rgb(244,247,245)'; rr(g, 0, 0, cv.width, cv.height, 22); g.fill(); } else if (bg0 && bg0.a > 0.1) { g.fillStyle = 'rgb(' + bg0.r + ',' + bg0.g + ',' + bg0.b + ')'; rr(g, 0, 0, cv.width, cv.height, 22); g.fill(); }
+      all.forEach(e => {
+        const r = e.getBoundingClientRect(); if (r.width <= 0 || r.height <= 0) return; if (closedIn(e)) return; const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none') return;
+        const x = (r.left - rr0.left) * k, y = (r.top - rr0.top) * k, w = r.width * k, h = r.height * k, br = Math.min(Math.min(w, h) / 2, (parseFloat(cs.borderTopLeftRadius) || 0) * k);
+        if (e !== root) {
+          let bg = rgba(cs.backgroundColor); if ((!bg || bg.a < 0.05) && /gradient/.test(cs.backgroundImage)) { const m = /rgba?\([^)]+\)/.exec(cs.backgroundImage); if (m) bg = rgba(m[0]); }
+          if (bg && bg.a > 0.02) { g.fillStyle = bg.s; rr(g, x, y, w, h, br); g.fill(); }
+          const bw = parseFloat(cs.borderTopWidth) || 0, bc = rgba(cs.borderTopColor); if (bw > 0 && bc && bc.a > 0.05 && cs.borderTopStyle !== 'none') { g.strokeStyle = bc.s; g.lineWidth = Math.max(1, bw * k); rr(g, x, y, w, h, br); g.stroke(); }
+        }
+        if (e.namespaceURI === 'http://www.w3.org/2000/svg' && e.tagName.toLowerCase() === 'svg') {
+          try { const cl = e.cloneNode(true); cl.querySelectorAll('text').forEach(t => t.remove()); cl.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); cl.setAttribute('width', r.width); cl.setAttribute('height', r.height); cl.setAttribute('style', 'color:' + cs.color);
+            const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(cl)); let im = SVGC[url];
+            if (!im) { im = SVGC[url] = new Image(); im.onload = () => { M.dirty = true; }; im.src = url; } else if (im.complete && im.naturalWidth) g.drawImage(im, x, y, w, h); } catch (er) { /* 忽略 */ }
+        }
+        if (e.tagName === 'IMG' && e.complete && e.naturalWidth && (/^data:/.test(e.src) || new URL(e.src, location.href).origin === location.origin)) { try { g.drawImage(e, x, y, w, h); } catch (er) { /* 忽略 */ } }
+        if (clickable(e) && !e.disabled) M.hits.push({ x: r.left - rr0.left, y: r.top - rr0.top, w: r.width, h: r.height, el: e });
+      });
+      const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), rg = document.createRange(); let n;
+      while ((n = tw.nextNode())) {
+        const s = n.nodeValue; if (!s || !s.trim()) continue; const pe = n.parentElement; if (!pe || closedIn(pe)) continue; const cs = getComputedStyle(pe); if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+        rg.selectNodeContents(n); const rs = Array.from(rg.getClientRects()).filter(r => r.width > 0); if (!rs.length) continue;
+        g.font = (cs.fontWeight || 400) + ' ' + (parseFloat(cs.fontSize) * k) + 'px ' + FN; g.fillStyle = cs.color; g.textBaseline = 'middle'; g.textAlign = 'left';
+        const put = (t, r) => g.fillText(t.replace(/\s+/g, ' ').trim(), (r.left - rr0.left) * k, (r.top - rr0.top + r.height / 2) * k);
+        if (rs.length === 1) put(s, rs[0]);
+        else { const lines = []; for (let i = 0; i < s.length; i++) { rg.setStart(n, i); rg.setEnd(n, i + 1); const cr = rg.getClientRects()[0]; if (!cr || cr.width === 0) { if (lines.length) lines[lines.length - 1].t += s[i]; continue; } const ln = lines[lines.length - 1]; if (ln && Math.abs(cr.top - ln.r.top) < cr.height * 0.5) ln.t += s[i]; else lines.push({ t: s[i], r: cr }); } lines.forEach(l => put(l.t, l.r)); }
+        g.textBaseline = 'alphabetic';
+      }
+      M.sig = sigOf(root); M.dirty = false;
+    }
+    function drawMirror() {
+      const g = PM.g; g.clearRect(0, 0, MW, MH); g.fillStyle = 'rgba(16,30,24,.9)'; rr(g, 4, 4, MW - 8, MH - 8, 28); g.fill();
+      const bw = M.base.width, bh = M.base.height, view = MH - 40, maxS = Math.max(0, bh - view); M.sy = Math.max(0, Math.min(maxS, M.sy));
+      const x0 = (MW - bw) / 2, hh = Math.min(view, bh - M.sy); g.save(); rr(g, 6, 6, MW - 12, MH - 12, 24); g.clip(); g.drawImage(M.base, 0, M.sy, bw, hh, x0, 12, bw, hh);
+      if (M.hover >= 0 && M.hits[M.hover]) { const h = M.hits[M.hover]; g.strokeStyle = '#ff9d57'; g.lineWidth = 4; g.fillStyle = 'rgba(255,157,87,.22)'; rr(g, x0 + h.x * M.k - 2, 12 + h.y * M.k - M.sy - 2, h.w * M.k + 4, h.h * M.k + 4, 10); g.fill(); g.stroke(); }
+      g.restore();
+      if (maxS > 0) { const th = Math.max(40, view * view / bh); g.fillStyle = 'rgba(255,157,87,.8)'; rr(g, MW - 14, 14 + (view - th) * (M.sy / maxS), 6, th, 3); g.fill(); }
+      g.fillStyle = '#9fd8b4'; g.font = '500 20px ' + FN; g.textAlign = 'right'; g.fillText('右搖桿上下：捲動　板機：點選　B 或左握把：關閉', MW - 20, MH - 12); g.textAlign = 'left'; PM.tx.needsUpdate = true;
+    }
+    function mirrorClose() {
+      const k = M.key, src = M.el;
+      if (k === 'hud') X.hudOn = false; else if (k === 'set') { document.body.classList.remove('gearopen'); } else if (k === 'chat') { const x = document.getElementById('gNetBtn'); if (x) x.click(); }
+      else { const x = src.querySelector('button.x,button.cl'); if (x) x.click(); else dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape' })); }
+    }
+    function mirrorTick(inp, dt, trig, bP) {
+      const R = inp.right, Lf = inp.left; M.t -= dt;
+      let found = null, fe = null; for (const s of SRC) { const e = s[1](); if (e && vis(e)) { found = s; fe = e; break; } }
+      if (!found) { if (M.el) { M.el = null; M.key = ''; PM.m.visible = false; } return false; }
+      if (M.key !== found[0] || M.el !== fe) { M.key = found[0]; M.el = fe; M.sy = 0; M.dirty = true; M.t = 0; M.again = 1.4; const hp = headPose(); PM.m.position.set(hp.x - Math.sin(hp.yaw) * 0.95, hp.y - 0.05, hp.z - Math.cos(hp.yaw) * 0.95); PM.m.rotation.set(0, hp.yaw, 0); PM.m.visible = true; }
+      if (M.t <= 0) { M.t = 0.4; if (sigOf(M.el.querySelector('.pn') || M.el) !== M.sig) M.dirty = true; }
+      if (M.again > 0) { M.again -= dt; if (M.again <= 0) M.dirty = true; }
+      if (M.dirty) { buildBase(); drawMirror(); }
+      const sv = R ? R.y : 0; if (Math.abs(sv) > 0.2) { M.sy += sv * 700 * dt; drawMirror(); }
+      let hv = -1; const bw = M.base.width, x0 = (MW - bw) / 2;
+      [R, Lf].forEach(h => { if (!h || !h.ctrl) return; h.ctrl.updateMatrixWorld(true); mt.identity().extractRotation(h.ctrl.matrixWorld); o3.setFromMatrixPosition(h.ctrl.matrixWorld); d3.set(0, 0, -1).applyMatrix4(mt).normalize(); rc.set(o3, d3);
+        const ht = rc.intersectObject(PM.m, false)[0]; h.ctrl.userData.line.visible = true; h.ctrl.userData.tip.visible = true;
+        if (ht && ht.uv) { const px = ht.uv.x * MW, py = (1 - ht.uv.y) * MH, cx = (px - x0) / M.k, cy = (py - 12 + M.sy) / M.k; let bi = -1; M.hits.forEach((q, i) => { if (cx >= q.x && cx <= q.x + q.w && cy >= q.y && cy <= q.y + q.h) bi = i; }); h.ctrl.userData.line.scale.z = Math.max(0.05, ht.distance - 0.01); h.ctrl.userData.tip.position.z = -h.ctrl.userData.line.scale.z; if (bi >= 0 && hv < 0) hv = bi; } else h.ctrl.userData.line.scale.z = 2; });
+      if (hv !== M.hover) { M.hover = hv; drawMirror(); }
+      if (trig && M.hover >= 0 && M.hits[M.hover]) { try { M.hits[M.hover].el.click(); } catch (e) { /* 忽略 */ } M.dirty = true; M.t = 0.15; }
+      else if (bP) mirrorClose();
+      return true;
+    }
+    L.vrLauncher = () => say('🥽 VR 選單', '選一個要打開的面板（隨時按左手握把鍵再開）。', [
+      { label: '📋 任務清單', pri: true, fn: () => { X.hudOn = true; } }, { label: '🎒 背包與角色', fn: () => { openBag(); } },
+      { label: '⚙ 環境設定（含角色外觀）', fn: () => { const gb = document.getElementById('gGear'); if (gb) gb.click(); else document.body.classList.add('gearopen'); } },
+      { label: '💬 聊天與線上玩家', fn: () => { const b = document.getElementById('gNetBtn'); if (b) b.click(); } }, { label: '關閉' }]);
+    X.vrp = { DP, PR, TS, PM, M, get rects() { return dRects; } };
     X.live = function (inp, dt) {
       const R = inp.right, Lf = inp.left, now = performance.now();
       X.uiOpen = !!dlgOpen;
@@ -9667,6 +9753,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         dWasOpen = true;
       } else {
         if (dWasOpen) { DP.m.visible = false; dWasOpen = false; dSig = ''; }
+        if (edge('left', 1, inp) && !X.menuOn) { if (M.el) mirrorClose(); else L.vrLauncher(); }
+        const mo = !X.menuOn && mirrorTick(inp, dt, trig, bP);
+        X.uiOpen = !!(dlgOpen || mo);
+        if (mo) { PR.m.visible = false; prSig = ''; return; }
         if (cur && !X.menuOn && !X.mapOn && !X.mini) {
           const t = cur._t + ' ・ 板機鍵'; if (t !== prSig) { prSig = t; drawPlate(PR, cur._t, '按手把板機鍵'); }
           PR.m.visible = true; headPose(); stick(PR.m, 0.7, 0, 0, -0.3);
