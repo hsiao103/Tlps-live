@@ -6063,6 +6063,45 @@ const onRoad = (x, z) => ROADS.some(r => { for (let i = 0; i < r.pts.length - 1;
 // 同新路南側的林帶
 for (let i = 0; i < 70; i++) tree(-150 + rnd() * 140, 24 + rnd() * 50, 1.1 + rnd() * 0.6);
 
+// ===== 西北小森林：校地西北方的空地，避開台7丁線與校園設施；中央空地放「森林拱門」（地面→天之城傳送點） =====
+const FOREST = { cx: -70, cz: -98, clr: { x: -70, z: -98, r: 5.5 }, path: [[-70, -98], [-66, -88], [-58, -79], [-49, -70], [-42, -62]], n: 0 };
+window.FOREST = FOREST;
+{
+  let sd = 20261105; const fr = () => { sd = (sd * 1664525 + 1013904223) >>> 0; return sd / 4294967296; };   // 自己的亂數：不影響其他樹木的配置
+  const roadGap = (x, z) => Math.min(...ROADS.map(r => { let m = 1e9; for (let i = 0; i < r.pts.length - 1; i++) { const a = r.pts[i], b = r.pts[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz))); m = Math.min(m, Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz)); } return m - r.w / 2; }));   // 到路緣的距離
+  const pathGap = (x, z) => { let m = 1e9; const P = FOREST.path; for (let i = 0; i < P.length - 1; i++) { const a = P[i], b = P[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz))); m = Math.min(m, Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz)); } return m; };
+  // 步道（泥土色）與中央空地
+  const DIRT = mat(0x9c7d55);
+  for (let i = 0; i < FOREST.path.length - 1; i++) { const a = FOREST.path[i], b = FOREST.path[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
+    withTf(a[0], a[1], Math.atan2(-dz, dx), () => box(-1.1, -1.1, L + 1.1, 1.1, -0.02, 0.035, DIRT, { walk: true, noShadow: true })); }
+  { const c = new T.Mesh(new T.CylinderGeometry(FOREST.clr.r, FOREST.clr.r, 0.07, 28), mat(0xb39a6b)); c.position.set(FOREST.clr.x, 0.0, FOREST.clr.z); c.receiveShadow = true; scene.add(c); walk.push(c); }
+  // 樹：闊葉樹與松樹（各部位用 InstancedMesh，繪製次數很少）；樹幹留碰撞
+  const ts = [];
+  for (let k = 0; k < 4000 && ts.length < 96; k++) {
+    const x = -98 + fr() * 54, z = -134 + fr() * 70, ex = (x - FOREST.cx) / 27, ez = (z - FOREST.cz) / 33;
+    if (ex * ex + ez * ez > 1 - 0.22 * fr()) continue;                          // 橢圓外形、邊緣參差
+    if (roadGap(x, z) < 6) continue;                                            // 遠離道路
+    if (Math.hypot(x - FOREST.clr.x, z - FOREST.clr.z) < FOREST.clr.r + 1.6) continue;   // 中央空地
+    if (pathGap(x, z) < 2.6) continue;                                          // 步道兩側
+    if (ROADBLK.some(b => x > b[0] - 2 && x < b[2] + 2 && z > b[1] - 2 && z < b[3] + 2)) continue;
+    if (ts.some(q => Math.hypot(q.x - x, q.z - z) < 3.1)) continue;
+    ts.push({ x, z, s: 0.9 + fr() * 0.55, pine: fr() < 0.45, c: fr(), r: fr() * 6.28 });
+  }
+  FOREST.n = ts.length; FOREST.trees = ts;
+  const broad = ts.filter(t => !t.pine), pine = ts.filter(t => t.pine), mt = new T.Matrix4(), qt = new T.Quaternion(), sv = new T.Vector3(), pv = new T.Vector3(), col = new T.Color();
+  const inst = (geo, list, mkM, colorOf) => { if (!list.length) return; const im = new T.InstancedMesh(geo, new T.MeshLambertMaterial({ color: 0xffffff }), list.length); list.forEach((t, i) => { mkM(t, mt); im.setMatrixAt(i, mt); im.setColorAt(i, col.setHex(colorOf(t))); }); im.castShadow = true; im.frustumCulled = false; scene.add(im); };
+  const G1 = [0x3f8f3a, 0x4fa043, 0x5fb04a, 0x2f7d3a], G2 = [0x1f6b3a, 0x2a7a42, 0x1b5e34];
+  inst(new T.CylinderGeometry(0.17, 0.24, 2.6, 6), ts, (t, m) => m.compose(pv.set(t.x, 1.3 * t.s, t.z), qt.identity(), sv.set(t.s, t.s, t.s)), () => 0x6b4a2b);
+  inst(new T.SphereGeometry(1, 9, 7), broad, (t, m) => m.compose(pv.set(t.x, 3.5 * t.s, t.z), qt.setFromAxisAngle(new T.Vector3(0, 1, 0), t.r), sv.set(1.7 * t.s, 1.5 * t.s, 1.7 * t.s)), t => G1[Math.floor(t.c * G1.length)]);
+  [[2.1, 2.5, 2.7], [1.55, 2.3, 4.1], [1.05, 2.1, 5.4]].forEach(([rd, h, y]) => inst(new T.ConeGeometry(1, 1, 8), pine, (t, m) => m.compose(pv.set(t.x, y * t.s, t.z), qt.identity(), sv.set(rd * t.s, h * t.s, rd * t.s)), t => G2[Math.floor(t.c * G2.length)]));
+  ts.forEach(t => WALLS.push({ x0: t.x - 0.25 * t.s, z0: t.z - 0.25 * t.s, x1: t.x + 0.25 * t.s, z1: t.z + 0.25 * t.s, y0: 0, y1: 2.6 * t.s, tf: null }));
+  // 灌木與石頭（裝飾，不擋路）
+  const bush = []; for (let k = 0; k < 600 && bush.length < 45; k++) { const x = -98 + fr() * 54, z = -134 + fr() * 70, ex = (x - FOREST.cx) / 28, ez = (z - FOREST.cz) / 34; if (ex * ex + ez * ez > 1 || roadGap(x, z) < 5 || pathGap(x, z) < 1.8 || Math.hypot(x - FOREST.clr.x, z - FOREST.clr.z) < FOREST.clr.r + 0.5) continue; bush.push({ x, z, s: 0.45 + fr() * 0.5, c: fr(), r: 0 }); }
+  inst(new T.SphereGeometry(1, 7, 5), bush, (t, m) => m.compose(pv.set(t.x, 0.35 * t.s, t.z), qt.identity(), sv.set(t.s * 1.2, t.s * 0.8, t.s * 1.2)), t => [0x4a9a3a, 0x3c8a3c, 0x6aa84a][Math.floor(t.c * 3)]);
+  const rock = []; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.28 + 0.3, d = FOREST.clr.r + 0.9; rock.push({ x: FOREST.clr.x + Math.cos(a) * d, z: FOREST.clr.z + Math.sin(a) * d, s: 0.35 + fr() * 0.3, c: fr(), r: a }); }
+  inst(new T.DodecahedronGeometry(1, 0), rock, (t, m) => m.compose(pv.set(t.x, 0.25 * t.s, t.z), qt.setFromAxisAngle(new T.Vector3(0, 1, 0), t.r), sv.set(t.s * 1.3, t.s * 0.8, t.s)), t => [0x9aa0a6, 0x8a9096, 0xa9aeb3][Math.floor(t.c * 3)]);
+}
+
 /* ===== 玩家、控制、迴圈 ===== */
 const $ = id => document.getElementById(id);
 const BNAME = { A: '行政大樓', AW: '廚房', B: '教學區西樓', BC: '教學區南樓', C: '教學區東樓', D: '科任及幼兒園區' };   // 介面顯示名稱（程式代碼 id 不變）
@@ -9070,6 +9109,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const G = new T.Group(); G.name = 'liveGame'; scene.add(G);
   const mats = {}; const gm = (c) => mats[c] || (mats[c] = new T.MeshStandardMaterial({ color: c, roughness: 0.8 }));
   const IA = [];
+  L.iaList = IA;
   function ia(o) { IA.push(o); return o; }
   const bob = [];   // 會上下浮動的標記
 
@@ -10268,12 +10308,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const base = new T.Mesh(new T.CylinderGeometry(1.6, 1.8, 0.2, 20), gm(0xbfb6a6)); base.position.y = 0.1; grp.add(base);
     (L.skyP = L.skyP || []).push({ rg, dc, sp, grp }); return grp;
   }
-  const SKY0 = snap(5, -2, { maxR: 6 }) || { x: 5, y: 0.03, z: -2 };
-  { const g = new T.Group(); g.position.set(SKY0.x, SKY0.y, SKY0.z); G.add(g); skyPortal(g, 0, '', [0x39b9ff, 0x1976d2, 0x9fe0ff]); sprite(nameTex('✨ 鐘樓拱門・通往天之城', '#1f8fd6'), [3.2, 0.6], SKY0.x, SKY0.y + 3.7, SKY0.z, 30); }
+  const SKY0 = snap(window.FOREST.clr.x, window.FOREST.clr.z, { maxR: 3 }) || { x: window.FOREST.clr.x, y: 0.03, z: window.FOREST.clr.z };   // 傳送點在西北小森林的中央空地
+  { const g = new T.Group(); g.position.set(SKY0.x, SKY0.y, SKY0.z); G.add(g); skyPortal(g, 0, '', [0x39b9ff, 0x1976d2, 0x9fe0ff]); sprite(nameTex('✨ 森林拱門・通往天之城', '#1f8fd6'), [3.2, 0.6], SKY0.x, SKY0.y + 3.7, SKY0.z, 30); }
   const SKYA = { x: ISL.g.position.x - 6.3, z: ISL.g.position.z + 30 * ISK };
   { const g = new T.Group(); g.position.set(-9, 5, 30); ISL.g.add(g); skyPortal(g, 0, '', [0xffb347, 0xd9731a, 0xffe2a8]); const lb = sprite(nameTex('🏫 回到地之城（同樂校舍）', '#d9731a'), [2.4, 0.55], 0, 0, 0, 30); ISL.g.add(lb); lb.position.set(-9, 8.5, 30); lb.scale.set(4.2, 0.9, 1); }
   const skyGo = (x, y, z, lx, lz, msg) => { try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) {} SFX.play('win', 200); PL.x = x; PL.y = y + 0.05; PL.z = z; PL.vy = 0; PL.yaw = Math.atan2(-(lx - x), -(lz - z)); toast(msg, 2800); };
-  ia({ id: 'skyUp', x: SKY0.x, y: SKY0.y, z: SKY0.z, r: 2.6, txt: () => spArt() >= 5 || S.sp && S.sp.portal ? '✨ 踏進拱門，前往天之城' : '✨ 鐘樓拱門（有五個圖騰凹槽）', act: () => portalGate(() => { const first = !S.islSeen; S.islSeen = 1; skyGo(ISL.g.position.x, ISY(), ISL.g.position.z + 26 * ISK, ISL.g.position.x, ISL.g.position.z, '☁️ 你來到了「天之城」——同樂校舍失散已久的另一半'); if (first) setTimeout(() => say('☁️ 天之城（天頂城堡）', '傳說很久以前，轉生賢者為了封印失控的宇宙裂隙，把一座巨大的浮空城堡一分為二：\n・「地之城」降落大地，成了今天的同樂校舍\n・「天之城」升上雲端，帶著核心能量沉睡到現在\n\n眼前這座城堡，就是校舍失散百年的另一半。\n沿著石子路走，聽說山洞口遺落了一把星光鑰匙……', [{ label: '出發探索', pri: true }], AV(0)), 1400); }) });
+  ia({ id: 'skyUp', x: SKY0.x, y: SKY0.y, z: SKY0.z, r: 2.6, txt: () => spArt() >= 5 || S.sp && S.sp.portal ? '✨ 踏進拱門，前往天之城' : '✨ 森林拱門（有五個圖騰凹槽）', act: () => portalGate(() => { const first = !S.islSeen; S.islSeen = 1; skyGo(ISL.g.position.x, ISY(), ISL.g.position.z + 26 * ISK, ISL.g.position.x, ISL.g.position.z, '☁️ 你來到了「天之城」——同樂校舍失散已久的另一半'); if (first) setTimeout(() => say('☁️ 天之城（天頂城堡）', '傳說很久以前，轉生賢者為了封印失控的宇宙裂隙，把一座巨大的浮空城堡一分為二：\n・「地之城」降落大地，成了今天的同樂校舍\n・「天之城」升上雲端，帶著核心能量沉睡到現在\n\n眼前這座城堡，就是校舍失散百年的另一半。\n沿著石子路走，聽說山洞口遺落了一把星光鑰匙……', [{ label: '出發探索', pri: true }], AV(0)), 1400); }) });
   ia({ id: 'skyDown', x: SKYA.x, get y() { return ISY(); }, z: SKYA.z, r: 2.6, txt: () => '🏫 回到地之城（同樂校舍）', act: () => skyGo(SKY0.x, SKY0.y, SKY0.z + 3, SKY0.x, SKY0.z - 20, '🏫 回到地之城——同樂校舍') });
   ia({ id: 'islKey', x: ISL.keyW.x, get y() { return ISY(); }, z: ISL.keyW.z, r: 3, txt: () => S.islKey ? '' : '🗝️ 撿起星光鑰匙', act: () => { S.islKey = 1; save(); SFX.play('win', 200); toast('🗝️ 得到「星光鑰匙」——天之城封印洞穴旁遺落的鑰匙！走回城堡大門吧', 4200); } });
   ia({ id: 'islDoor', x: ISL.g.position.x, get y() { return ISY(); }, z: ISL.g.position.z + 7.2 * ISK, r: 3.4, txt: () => S.islDoor ? '' : S.islKey ? '🗝️ 用星光鑰匙開門' : '🚪 城堡大門（上鎖了）', act: () => { if (!S.islKey) { say('🚪 城堡大門', '大門上了一把星形的古老大鎖，怎麼推都推不動。\n門縫夾著一張泛黃的紙條：\n「鑰匙遺落在封印洞穴旁——那裡是宇宙裂隙最初被鎖住的地方。沿著石子路走就找得到。」', [{ label: '知道了' }], AV(0)); return; } S.islDoor = 1; save(); SFX.play('win', 300); toast('🚪 喀嚓！星光鑰匙開啟了天之城——歡迎回家', 3600); } });
@@ -10421,26 +10461,26 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function blueScene() {
     const f = AV(4); spSay('🔮 小知', ['啊，你來得正好！我在校史室最裡面的櫃子，找到一卷最古老的建築藍圖。', '上面畫的不是同樂校舍……而是一座「天空中的城堡」。來，我們一起對照浮空島，看看哪裡一樣。'], f, () => {
       spQuiz('📜 比對藍圖（1/3）', f, [{ q: '藍圖上，主堡共有幾座塔尖？\n（浮空島：四座藍頂塔，加上中央一座紅頂主塔）', o: ['3 座', '5 座', '7 座'], a: 1, h: '數數看：四座藍的、一座紅的' }, { q: '藍圖的地基外圍，畫著什麼？\n（浮空島：城堡外面圍了一圈……）', o: ['一圈圍牆（結界）', '一條河', '一座橋'], a: 0, h: '想想城堡外圈的白色石牆' }, { q: '藍圖上有一處特別標示「封印」，在城堡旁邊的……', o: ['湖泊', '山洞', '森林'], a: 1, h: '浮空島上，石子路通到哪裡？' }], () => {
-        spSay('🔮 小知', ['吻合度……100%！整座城堡的地基，和同樂校舍一模一樣。', '藍圖角落有一行小字：\n「兩城合一時，需集齊五位轉生者的神器，放入鐘樓拱門的五個凹槽，傳送陣才會真正啟動。」', '我的神器是這本《星象魔導書》，給你保管。\n其他四位夥伴也各自守著一件神器：\n⚔️ 小樂（操場）　🎤 小同（禮堂）\n🔧 小創（電腦教室）　🍳 小味（涼亭・遊戲區）', '去找他們吧！集齊五件，我們就能打開通往天空的門。'], f, () => { SPD().blue = 1; save(); addPts(10, '校史室比對藍圖'); giveArt(4); });
+        spSay('🔮 小知', ['吻合度……100%！整座城堡的地基，和同樂校舍一模一樣。', '藍圖角落有一行小字：\n「兩城合一時，需集齊五位轉生者的神器，放入森林拱門的五個凹槽，傳送陣才會真正啟動。」', '我的神器是這本《星象魔導書》，給你保管。\n其他四位夥伴也各自守著一件神器：\n⚔️ 小樂（操場）　🎤 小同（禮堂）\n🔧 小創（電腦教室）　🍳 小味（涼亭・遊戲區）', '去找他們吧！集齊五件，我們就能打開通往天空的門。'], f, () => { SPD().blue = 1; save(); addPts(10, '校史室比對藍圖'); giveArt(4); });
       }); }, '開始比對');
   }
   const MEMB = {
     0: { lines: ['（小樂正在操場練劍，劍光劃過夕陽。）\n「來得正好！我一直覺得這把劍在發熱，好像在等什麼……」', '「聽說要去天上的城堡？有這把「勇氣之劍」在，誰擋路我就替你衝在最前面！」'], ask: '小樂問你：「你覺得，勇氣是什麼？」', opts: ['不怕、什麼都敢做', '明知道會怕，還是往前走', '保護身邊的人'], reply: '「嗯！我也這麼想。」小樂把劍交到你手上，劍身亮了一下。' },
     1: { lines: ['（禮堂的舞台上，小同正在對著空座位練歌。）\n「欸欸你聽見了嗎？每次唱到校歌最後一句，天花板就會傳來回音耶！」', '「原來那是天上的音樂盒在回應我！這支「星光麥克風」給你，我們一起唱給天空聽！」'], ask: '小同問你：「最適合唱給大家聽的歌，是哪一種？」', opts: ['讓人想一起大聲唱的', '聽了心裡暖暖的', '唱完會想笑的'], reply: '「哈哈，好品味！」小同把麥克風塞進你手裡，閃閃發光。' },
-    2: { lines: ['（電腦教室裡，小創正埋頭拆一個老舊的齒輪鐘。）\n「噓——別碰！這個鐘的零件，居然和鐘樓拱門上的圖案能拼在一起！」', '「這把「機巧扳手」是拼出來的第一件工具，帶著它，再複雜的機關都難不倒你。」'], ask: '小創問你：「遇到一個壞掉的東西，你會先做什麼？」', opts: ['先拆開看看', '先問問別人', '先想想它為什麼壞掉'], reply: '「很好，有耐心的人才修得好東西。」小創爽快地把扳手遞給你。' },
+    2: { lines: ['（電腦教室裡，小創正埋頭拆一個老舊的齒輪鐘。）\n「噓——別碰！這個鐘的零件，居然和森林拱門上的圖案能拼在一起！」', '「這把「機巧扳手」是拼出來的第一件工具，帶著它，再複雜的機關都難不倒你。」'], ask: '小創問你：「遇到一個壞掉的東西，你會先做什麼？」', opts: ['先拆開看看', '先問問別人', '先想想它為什麼壞掉'], reply: '「很好，有耐心的人才修得好東西。」小創爽快地把扳手遞給你。' },
     3: { lines: ['（涼亭旁，小味正在爐火前翻炒，香氣四溢。）\n「來得剛好，嚐嚐這個！我發現，只要煮到最後一道湯，空氣裡就會飄來星星的味道。」', '「這支「金牌鍋鏟」是我的寶貝，借你！有好吃的，大家就有力氣冒險。」'], ask: '小味問你：「冒險前，最想吃哪一種？」', opts: ['熱呼呼的便當', '甜甜的點心', '清爽的水果'], reply: '「記下了，下次煮給你！」小味笑著把鍋鏟放進你的背包。' }
   };
   function memberScene(k) {
     const a = ARTS[k], m = MEMB[k], f = AV(+k); spSay(a[1] + ' ' + a[0], m.lines, f, () => { say(a[1] + ' ' + a[0], m.ask, m.opts.map(t => ({ label: t, fn: () => { setTimeout(() => say(a[1] + ' ' + a[0], m.reply, [{ label: '收下神器 ✨', pri: true, fn: () => giveArt(k) }], f), 120); } })), f); });
   }
-  /* 4. 鐘樓拱門：五件神器放入凹槽 */
+  /* 4. 森林拱門：五件神器放入凹槽 */
   function portalGate(go) {
     if (S.sp && S.sp.portal) { go(); return; }
     const A = (S.sp && S.sp.art) || {}, row = Object.keys(ARTS).map(k => ARTS[k][1] + (A[k] ? '✅' : '⬜') + ' ' + ARTS[k][2]).join('\n'), n = spArt();
-    if (n >= 5) { spSay('✨ 鐘樓拱門', ['被蔓藤包住的拱門上，五個圖騰凹槽微微發亮。\n你把五件神器，一件一件放進凹槽——', '勇氣之劍、星光麥克風、機巧扳手、金牌鍋鏟、星象魔導書……', '轟——！蔓藤散開，拱門亮起耀眼的星光！\n鐘樓頂端的星光寶石，與天空的浮空島連成一道巨大的光束。', '「地之城」與「天之城」，終於相連了。'], AV(0), () => { SPD().portal = 1; save(); try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) { /* 忽略 */ } addPts(30, '啟動鐘樓拱門傳送陣'); setTimeout(go, 600); }, '踏進光束'); return; }
+    if (n >= 5) { spSay('✨ 森林拱門', ['被蔓藤包住的拱門上，五個圖騰凹槽微微發亮。\n你把五件神器，一件一件放進凹槽——', '勇氣之劍、星光麥克風、機巧扳手、金牌鍋鏟、星象魔導書……', '轟——！蔓藤散開，拱門亮起耀眼的星光！\n鐘樓頂端的星光寶石，與天空的浮空島連成一道巨大的光束。', '「地之城」與「天之城」，終於相連了。'], AV(0), () => { SPD().portal = 1; save(); try { riftEl.classList.remove('flash'); void riftEl.offsetWidth; riftEl.classList.add('flash'); } catch (e) { /* 忽略 */ } addPts(30, '啟動森林拱門傳送陣'); setTimeout(go, 600); }, '踏進光束'); return; }
     const hint = !(S.sp && S.sp.blue) ? '提示：先去校史室找小知，她在研究一卷古老的藍圖。' : '提示：還有夥伴守著神器，到各自的地點找找看。';
     const btn = [{ label: '知道了' }]; if (isAdm2()) btn.unshift({ label: '🛠 管理員：直接啟動', fn: () => { SPD().portal = 1; save(); toast('🛠 已直接啟動拱門', 2400); } });
-    say('✨ 鐘樓拱門', '拱門被蔓藤包住，沒有鎖孔，只有五個圖騰凹槽：\n' + row + '\n\n（已集齊 ' + n + '/5）\n' + hint, btn, AV(0));
+    say('✨ 森林拱門', '拱門被蔓藤包住，沒有鎖孔，只有五個圖騰凹槽：\n' + row + '\n\n（已集齊 ' + n + '/5）\n' + hint, btn, AV(0));
   }
   L.spTick = () => { const sh = L.spShadow; if (sh) { const on = inAfternoon(); sh.sm.visible = on; sh.tip.visible = on && !(S.sp && S.sp.shadow); }
     Object.keys(spMemberMark).forEach(k => { spMemberMark[k].visible = !(S.sp && S.sp.art && S.sp.art[k]) && (k === '4' ? !(S.sp && S.sp.blue) : !!(S.sp && S.sp.blue)); }); };
