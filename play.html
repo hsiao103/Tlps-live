@@ -9566,6 +9566,16 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       beacon({ x: p.x, y: p.y, z: p.z, col: 0xe0861a, hex: '#e0861a', icon: '🏅', name: '體育與健康小教室', r: 1.6, h: 3.4, lw: 3.0, active: () => PE().n < PEMAX });
       ia({ id: 'peQuiz', x: p.x, y: p.y, z: p.z, r: 2.8, txt: () => { const d = PE(); return d.n >= PEMAX ? '🏅 體育小教室（今天已完成）' : '🏅 體育與健康小教室（今天剩 ' + (PEMAX - d.n) + ' 回）'; }, act: peStation });
       L.pe = { PE, pePick, peStation, pos: p }; } }
+  /* ---------- 健康中心通廊旁：AED（自動體外心臟電擊去顫器）紅色小櫃 ---------- */
+  { const q = (() => { try { return NPLACES.find(x => x.name === '健康中心'); } catch (e) { return null; } })();
+    if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x + 1.8, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 1.6 }) || snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
+      const red = new T.Mesh(new T.BoxGeometry(0.42, 0.5, 0.22), gm(0xd62828)); red.position.set(p.x, p.y + 1.25, p.z); red.castShadow = true; G.add(red);
+      const crs = new T.MeshBasicMaterial({ color: 0xffffff }), c1 = new T.Mesh(new T.BoxGeometry(0.22, 0.06, 0.02), crs), c2 = new T.Mesh(new T.BoxGeometry(0.06, 0.22, 0.02), crs);
+      [c1, c2].forEach(m => { m.position.set(p.x, p.y + 1.27, p.z + 0.12); G.add(m); });
+      const leg = new T.Mesh(new T.BoxGeometry(0.08, 1.0, 0.08), gm(0x777c82)); leg.position.set(p.x, p.y + 0.5, p.z - 0.02); G.add(leg);
+      sprite(nameTex('❤️ AED', '#d62828'), [1.1, 0.42], p.x, p.y + 1.85, p.z, 30);
+      ia({ id: 'aed', x: p.x, y: p.y, z: p.z, r: 2.2, txt: () => '❤️ AED（自動體外心臟電擊去顫器）', act: () => say('❤️ AED 自動體外心臟電擊去顫器', '這是校園的急救設備，放在健康中心通廊旁，遇到有人突然昏倒、沒有呼吸時使用。\n\n【口訣：叫、叫、CPR、AED】\n1. 叫：拍肩膀大聲呼叫，確認有沒有反應與呼吸。\n2. 叫：大聲請人撥 119，並請人去拿 AED（自己也可以派人去）。\n3. CPR：用手掌在胸口正中間快速用力按壓，速度約每分鐘 100 到 120 下。\n4. AED：打開 AED，依照語音指示貼上電擊貼片，機器會自己判斷是否需要電擊。\n\n💡 小朋友發現時：第一時間「大聲求救、找大人、撥 119」，不要自己硬撐。這只是簡單介紹，正式的急救課程請聽老師與校護的指導。', [{ label: '我記住了', pri: true, fn: () => { const d = D(); if (!d.aed) { d.aed = 1; addPts(3, '認識 AED'); addAttr('body', 1); save(); refreshAll(); } } }, { label: '關閉' }]) });
+      L.aed = { pos: p }; } }
   { const q = (() => { try { return NPLACES.find(x => x.name === '英語教室'); } catch (e) { return null; } })();
     if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x + 3, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 1.6 }) || snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
       beacon({ x: p.x, y: p.y, z: p.z, col: 0x7a4fd1, hex: '#7a4fd1', icon: '🔤', name: '單字挑戰', r: 1.2, h: 1.2, lw: 2.2, active: () => V().n < VMAX });
