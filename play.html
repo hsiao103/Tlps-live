@@ -4994,26 +4994,59 @@ function bld(o) {
       const pc = P(u + 0.15, 0.15), par = CTX ? CTX.group : scene;
       const cyl = new T.Mesh(new T.CylinderGeometry(0.2, 0.2, H, 14), COLW); cyl.position.set(pc[0], y0 + H / 2, pc[1]); cyl.castShadow = true; par.add(cyl);
       const bnd = new T.Mesh(new T.CylinderGeometry(0.215, 0.215, 0.45, 14), BAND); bnd.position.set(pc[0], y0 + 1.25, pc[1]); par.add(bnd); }
+    // 廁所內部配置：磁磚地、隔間（馬桶）、男廁小便斗、洗手台＋鏡子；門口上方有男（藍）女（粉紅）標示
+    const WCM = o._wcm || (o._wcm = { porc: mat(0xf4f6f8), tileM: mat(0xcfe3f2), tileF: mat(0xf8dde6), partM: mat(0x6f8fae), partF: mat(0xd987a3), doorM: mat(0x5b84b0), doorF: mat(0xe59ab5), cab: mat(0x9aa4ad), sgM: mat(0x2f6fd0), sgF: mat(0xd8456f), chrome: mat(0xc9d0d6), seat: mat(0xe9edf0) });
+    const wcRoom = (ua, ub, g, dc, y0, y1, v0, v1, dh) => {
+      const M2 = WCM, male = g === 'M', w = ub - ua, dep = v1 - v0, sd = dep > 5.2 ? 1.75 : 1.5, sw = 0.95, ns = Math.max(2, Math.min(male ? 2 : 4, Math.floor((w - 0.3) / sw)));
+      R(ua, v0, ub, v1, y0 + 0.08, y0 + 0.095, male ? M2.tileM : M2.tileF, { noShadow: true });                                  // 磁磚地
+      const x0 = male ? ub - 0.15 - ns * sw : ua + 0.15;                                                                          // 隔間靠 u 小（女）或 u 大（男）側，另一側留給洗手台與小便斗
+      for (let q = 0; q <= ns; q++) R(x0 + q * sw, v1 - sd, x0 + q * sw + 0.04, v1, y0 + 0.25, y0 + 1.95, male ? M2.partM : M2.partF, { noShadow: true });
+      for (let q = 0; q < ns; q++) {
+        const xc = x0 + q * sw + sw / 2, op = q === 0;                                                                              // 第一間門開著，看得到馬桶
+        if (!op) R(x0 + q * sw + 0.04, v1 - sd, x0 + (q + 1) * sw, v1 - sd + 0.04, y0 + 0.25, y0 + 1.85, male ? M2.doorM : M2.doorF, { noShadow: true });
+        else R(x0 + (q + 1) * sw - 0.04, v1 - sd, x0 + (q + 1) * sw, v1 - sd + 0.7, y0 + 0.25, y0 + 1.85, male ? M2.doorM : M2.doorF, { noShadow: true });
+        R(xc - 0.19, v1 - 0.75, xc + 0.19, v1 - 0.22, y0 + 0.08, y0 + 0.42, M2.porc, { noShadow: true });                           // 馬桶座
+        R(xc - 0.17, v1 - 0.2, xc + 0.17, v1 - 0.04, y0 + 0.08, y0 + 0.82, M2.porc, { noShadow: true });                            // 水箱
+        R(xc - 0.2, v1 - 0.78, xc + 0.2, v1 - 0.72, y0 + 0.42, y0 + 0.46, M2.seat, { noShadow: true });
+      }
+      const sx = male ? ua : ub;                                                                                                   // 洗手台靠另一側牆（男：u 小側，女：u 大側）
+      const sg = male ? 1 : -1, nb = w > 3 ? 3 : 2, vs = v0 + 0.45;
+      R(Math.min(sx, sx + sg * 0.55), vs, Math.max(sx, sx + sg * 0.55), vs + nb * 0.62, y0 + 0.08, y0 + 0.78, M2.cab, { noShadow: true });
+      R(Math.min(sx, sx + sg * 0.6), vs - 0.02, Math.max(sx, sx + sg * 0.6), vs + nb * 0.62 + 0.02, y0 + 0.78, y0 + 0.83, M2.porc, { noShadow: true });
+      for (let q = 0; q < nb; q++) { const vc = vs + 0.31 + q * 0.62; R(Math.min(sx + sg * 0.1, sx + sg * 0.45), vc - 0.2, Math.max(sx + sg * 0.1, sx + sg * 0.45), vc + 0.2, y0 + 0.83, y0 + 0.88, M2.chrome, { noShadow: true }); R(Math.min(sx + sg * 0.04, sx + sg * 0.1), vc - 0.03, Math.max(sx + sg * 0.04, sx + sg * 0.1), vc + 0.03, y0 + 0.88, y0 + 1.08, M2.chrome, { noShadow: true }); }
+      R(Math.min(sx, sx + sg * 0.03), vs, Math.max(sx, sx + sg * 0.03), vs + nb * 0.62, y0 + 1.15, y0 + 2.0, M.glass, { noShadow: true });   // 鏡子
+      if (male) for (let q = 0; q < 2; q++) { const vu = Math.max(v0 + 3.0, v1 - sd - 1.6) + q * 0.62, ux = ub - 0.05; R(ux - 0.3, vu, ux, vu + 0.34, y0 + 0.55, y0 + 1.05, M2.porc, { noShadow: true }); if (q === 0) R(ux - 0.45, vu + 0.38, ux, vu + 0.42, y0 + 0.5, y0 + 1.2, M2.partM, { noShadow: true }); }   // 小便斗＋隔板
+      const dgl = male ? M2.sgM : M2.sgF;                                                                                           // 門上標示牌
+      R(dc - 0.55, CORR - 0.06, dc + 0.55, CORR, y0 + 2.4, y0 + 2.95, dgl, { noShadow: true });
+      const lp = P(dc, CORR - 0.3); label(male ? '♂ 男' : '♀ 女', lp[0], y0 + 2.68, lp[1], 0.9, male ? '#d6e8ff' : '#ffe0ea', male ? '#17479a' : '#a3274c');
+    };
     // 走廊牆（含門洞）與隔間牆
     const bsk = (o.boundsK && o.boundsK[k]) || o.bounds, nRk = bsk ? bsk.length - 1 : nR;
     for (let i = 0; i < (o.hall ? 0 : nRk); i++) {
       const a = bsk ? bsk[i] : roomU0 + i * rw, b = bsk ? bsk[i + 1] : a + rw, dm = (a + b) / 2, rwi = b - a, shr = shOn(k) && a >= SH.u0 - 0.01 && b <= SH.u1 + 0.01, Dr = shr ? SH.v : D - dAt(a, b);
       const wc0 = o.names && o.names[k] && /廁/.test(o.names[k][i]), two = (o.twoDoors || (o.twoDoorRooms && o.twoDoorRooms.indexOf(o.names && o.names[k] && o.names[k][i]) >= 0 && o.twoDoorRoomsK.indexOf(k) >= 0)) && !wc0 && rwi >= 6,
-        dcs = two ? [a + 1.5, b - 1.5] : [dm];                                   // twoDoors：前後門各開在走廊側（靠集合場一側）牆的兩端
-      { let cur = a; dcs.forEach(dc => { R(cur, CORR, dc - 0.6, CORR + 0.2, y0, y1, M.wallIn, W); cur = dc + 0.6; }); R(cur, CORR, b, CORR + 0.2, y0, y1, M.wallIn, W); }
+        gen = wc0 && o.names[k][i] === '廁所',                                     // 單一「廁所」：分成男（u 較小側）、女（u 較大側）兩邊，各有自己的門
+        dh = wc0 ? (gen ? Math.min(0.9, (rwi / 2 - 0.5) / 2) : Math.min(1.0, (rwi - 0.8) / 2)) : 0.6,   // 廁所門口加寬（原本半寬 0.6）
+        dcs = two ? [a + 1.5, b - 1.5] : gen ? [a + rwi * 0.25, a + rwi * 0.75] : [dm];                                   // twoDoors：前後門各開在走廊側（靠集合場一側）牆的兩端
+      { let cur = a; dcs.forEach(dc => { R(cur, CORR, dc - dh, CORR + 0.2, y0, y1, M.wallIn, W); cur = dc + dh; }); R(cur, CORR, b, CORR + 0.2, y0, y1, M.wallIn, W); }
       if (two) R(dcs[0] + 0.9, CORR - 0.04, dcs[1] - 0.9, CORR, y0 + 1.15, y0 + 2.0, POSTER[(i + k) % 4], { noShadow: true });
-      else [[a + 0.4, dm - 0.9], [dm + 0.9, b - 0.4]].forEach((s, q) => R(s[0], CORR - 0.04, s[1], CORR, y0 + 1.15, y0 + 2.0, POSTER[(q + i + k) % 4], { noShadow: true }));
+      else if (!wc0) [[a + 0.4, dm - 0.9], [dm + 0.9, b - 0.4]].forEach((s, q) => R(s[0], CORR - 0.04, s[1], CORR, y0 + 1.15, y0 + 2.0, POSTER[(q + i + k) % 4], { noShadow: true }));
       dcs.forEach(dc => {
-        R(dc - 0.6, CORR, dc + 0.6, CORR + 0.2, y0 + 2.3, y1, M.wallIn, { noShadow: true });
-        R(dc - 0.65, CORR - 0.02, dc - 0.6, CORR + 0.22, y0, y0 + 2.3, M.orange, { noShadow: true });
-        R(dc + 0.6, CORR - 0.02, dc + 0.65, CORR + 0.22, y0, y0 + 2.3, M.orange, { noShadow: true });
+        R(dc - dh, CORR, dc + dh, CORR + 0.2, y0 + 2.3, y1, M.wallIn, { noShadow: true });
+        R(dc - dh - 0.05, CORR - 0.02, dc - dh, CORR + 0.22, y0, y0 + 2.3, M.orange, { noShadow: true });
+        R(dc + dh, CORR - 0.02, dc + dh + 0.05, CORR + 0.22, y0, y0 + 2.3, M.orange, { noShadow: true });
       });
       R(a, CORR + 0.2, a + 0.2, Dr, y0, y1, M.wallIn, W);
       if (shr) R(a, Dr - WT, b, Dr, y0, y1, M.wall, W);                         // 內縮後的南外牆
       for (let w = 0; w < (Dr < D ? 1 : 3); w++) { const wu = Dr < D ? dm - 0.6 : a + rwi * (0.2 + 0.3 * w), wu1 = Dr < D ? dm + 0.6 : Math.min(wu + 1.8, b - 0.02); if ((o.backDoors || []).some(bd => bd.floors.indexOf(k) >= 0 && wu < bd.u1 + 0.2 && wu + 1.8 > bd.u0 - 0.2)) continue; R(wu, Dr - 0.3, wu1, Dr + 0.05, y0 + 1.0, y0 + 2.5, M.glassLit, { noShadow: true }); }
       const isWC = o.names && o.names[k] && /廁/.test(o.names[k][i]), isHall = o.names && o.names[k] && o.names[k][i] === '禮堂' && rwi > 14;
       if (!isWC) for (let q = 0; q < 2; q++) for (let r2 = 0; r2 < 2; r2++) { const lu = dm + (q ? 1 : -1) * rwi * 0.22, lv = CORR + (Dr - CORR) * (r2 ? 0.7 : 0.32); R(lu - 0.7, lv - 0.12, lu + 0.7, lv + 0.12, y1 - 0.38, y1 - 0.31, M.lampM, { noShadow: true }); }   // 教室天花板燈管（夜間會亮）
-      if (isWC) { const ns = rwi > 5 ? 3 : 2; for (let q = 0; q < ns; q++) { const pu2 = a + 0.8 + q * ((rwi - 1.6) / ns); R(pu2, Dr - 2.6, pu2 + 0.06, Dr - 0.3, y0, y0 + 1.9, M.wallIn, { noShadow: true }); } }
+      if (isWC) {
+        const nmk = o.names[k][i];
+        if (gen) { R(dm - 0.1, CORR + 0.2, dm + 0.1, Dr, y0, y1, M.wallIn, W); }   // 男女之間的隔牆
+        const halves = gen ? [[a, dm - 0.1, 'M', dcs[0]], [dm + 0.1, b, 'F', dcs[1]]] : [[a + 0.1, b - 0.1, /女/.test(nmk) ? 'F' : 'M', dcs[0]]];
+        halves.forEach(h => wcRoom(h[0], h[1], h[2], h[3], y0, y1, CORR + 0.2, Dr - 0.3, dh));
+      }
       else if (isHall) R(a + 2, Dr - 2.6, b - 2, Dr - 0.3, y0, y0 + 0.9, M.concrete, { noShadow: true });      // 禮堂：只有舞台，不設課桌椅
       else if ((o.names && o.names[k] && o.names[k][i]) === '教師休息室・辦公區') {   // 教師休息室（辦公區）：六張教師桌、文件櫃、影印機、公佈白板
         const dk = mat(0xc9a06b), dkL = mat(0x8a6a44), cab = mat(0x9aa4ad), cabD = mat(0x6d7780), pc = mat(0x23303c), wb = mat(0xf4f6f8), potM = mat(0xb8663a), plM = mat(0x3c7a3a), cp = mat(0xcfd6dc), cc = [0xd9534f, 0x5b8dd9, 0xf0b840, 0x58a868, 0x9b6bd0];
@@ -5205,7 +5238,7 @@ function bld(o) {
       }
       const lp = P(dm, CORR - 0.3), nm = o.names && o.names[k] && o.names[k][i];
       { const nm2 = nm || (o.id + '-' + (k + 1) + '0' + (i + 1)), key = o.id + '-' + (k + 1) + '-' + (i + 1); (info.rooms = info.rooms || []).push({ key, k: k + 1, i: i + 1, name: nm2 });
-        label(nm2, lp[0], y0 + 2.75, lp[1], 1.5, nm === '（待補）' ? '#f3efe2' : (nm ? '#fff4e0' : null), null, key); }
+        label(nm2, lp[0], y0 + (nm === '廁所' ? 3.15 : 2.75), lp[1], 1.5, nm === '（待補）' ? '#f3efe2' : (nm ? '#fff4e0' : null), null, key); }
     }
     if (o.hall) {                                                      // 廚房：一大間，內牆全無；灶台、備餐檯、冰箱、吊燈
       const st = M.steel, HW = L - 2;
