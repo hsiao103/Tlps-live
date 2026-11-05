@@ -4997,7 +4997,7 @@ function bld(o) {
     // 廁所內部配置：磁磚地、隔間（馬桶）、男廁小便斗、洗手台＋鏡子；門口上方有男（藍）女（粉紅）標示
     const WCM = o._wcm || (o._wcm = { porc: mat(0xf4f6f8), tileM: mat(0xcfe3f2), tileF: mat(0xf8dde6), partM: mat(0x6f8fae), partF: mat(0xd987a3), doorM: mat(0x5b84b0), doorF: mat(0xe59ab5), cab: mat(0x9aa4ad), sgM: mat(0x2f6fd0), sgF: mat(0xd8456f), chrome: mat(0xc9d0d6), seat: mat(0xe9edf0) });
     const wcRoom = (ua, ub, g, dc, y0, y1, v0, v1, dh) => {
-      const M2 = WCM, male = g === 'M', w = ub - ua, dep = v1 - v0, sd = dep > 5.2 ? 1.75 : 1.5, sw = 0.95, ns = Math.max(2, Math.min(male ? 2 : 4, Math.floor((w - 0.3) / sw)));
+      const M2 = WCM, male = g === 'M', w = ub - ua, dep = v1 - v0, sd = dep > 5.2 ? 1.75 : 1.5, ns = 3, sw = Math.min(0.95, (w - 0.3) / 3);   // 男、女各 3 間便器
       R(ua, v0, ub, v1, y0 + 0.08, y0 + 0.095, male ? M2.tileM : M2.tileF, { noShadow: true });                                  // 磁磚地
       const x0 = male ? ub - 0.15 - ns * sw : ua + 0.15;                                                                          // 隔間靠 u 小（女）或 u 大（男）側，另一側留給洗手台與小便斗
       for (let q = 0; q <= ns; q++) R(x0 + q * sw, v1 - sd, x0 + q * sw + 0.04, v1, y0 + 0.25, y0 + 1.95, male ? M2.partM : M2.partF, { noShadow: true });
