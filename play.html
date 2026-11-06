@@ -11314,17 +11314,20 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const out = []; for (let i = 0; i < 70; i++) out.push(pts[Math.floor(i * pts.length / 70)] || [0, 0]); return (FIN.form = out); };
   function finMake(fx, fz) { const f = finForm(); FIN.cx = fx; FIN.cz = fz;
     if (!FIN.st.length) for (let i = 0; i < 70; i++) { const s = sprite(emojiTex('⭐'), [3.2, 3.2], 0, -999, 0, 31); s.visible = false; FIN.st.push(s); }
-    FIN.st.forEach((s, i) => { s.userData.f = [fx + f[i][0] * 60, 40 + f[i][1] * 28, fz - 36]; }); }
+    FIN.st.forEach((s, i) => { s.userData.f = [fx + f[i][0] * 60, 40 + f[i][1] * 28, fz - 36]; });
+    if (!FIN.slogan) { const sp = new T.Sprite(new T.SpriteMaterial({ map: txtTex('同心七十　樂而自信', '#ffe28a', 1024, 160, 104), transparent: true, depthTest: false })); sp.scale.set(64, 10, 1); sp.renderOrder = 31; sp.visible = false; sp.frustumCulled = false; G.add(sp); FIN.slogan = sp; }
+    FIN.slogan.position.set(fx, 16, fz - 36); }
   function finStart(pl, fin) { const w = ISW(MB.x, MB.z); finMake(pl.x, pl.z); FIN.pl = pl; FIN.st0 = { x: w.x, y: ISY() + 2, z: w.z }; FIN.tg = FIN.st.map((s, i) => { const a = i / 70 * Math.PI * 2 * 3.1 + 0.4, r = 5 + (i * 7 % 23); return [pl.x + Math.cos(a) * r, (pl.y || 0) + 2 + (i % 5) * 1.4, pl.z + Math.sin(a) * r * 0.8]; }); FIN.t = 0; FIN.on = true; FIN.fin = fin; FIN.st.forEach(s => { s.visible = true; }); }
   FXQ.push({ tick: (() => { let last = performance.now(); return () => { const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now; const d = IS();
     if (d.ch6 && !FIN.on) { if (!FIN.st.length && FIN.pl === null) { /* 重新進遊戲後：七十顆星光仍掛在校園上空 */ const b = (() => { try { return NPLACES.find(p => p.name === '梅花廣場') || { x: 0, z: -45 }; } catch (e) { return { x: 0, z: -45 }; } })(); finMake(b.x, b.z + 10); FIN.st.forEach(s => { const f = s.userData.f; s.position.set(f[0], f[1], f[2]); s.visible = true; }); }
-      FIN.st.forEach((s, i) => { s.material.opacity = 0.65 + Math.sin(performance.now() / 500 + i) * 0.3; }); }
+      FIN.st.forEach((s, i) => { s.material.opacity = 0.65 + Math.sin(performance.now() / 500 + i) * 0.3; }); if (FIN.slogan) { FIN.slogan.visible = true; FIN.slogan.material.opacity = 0.85; } }
     if (!FIN.on) return; FIN.t += dt; const t = FIN.t, e = k => k < 0 ? 0 : k > 1 ? 1 : k * k * (3 - 2 * k);
     FIN.st.forEach((s, i) => { const f = s.userData.f, g = FIN.tg[i], a = FIN.st0, d0 = i * 0.04;
       if (t < 4.5) { const k = e((t - d0) / 3.2); s.position.set(a.x + (g[0] - a.x) * k + Math.sin(k * 6 + i) * 4 * (1 - k), a.y + (g[1] - a.y) * k + Math.sin(k * Math.PI) * 10, a.z + (g[2] - a.z) * k); }
       else if (t < 6.5) s.position.set(g[0], g[1] + Math.sin(t * 3 + i) * 0.3, g[2]);
       else { const k = e((t - 6.5 - i * 0.02) / 3.2); s.position.set(g[0] + (f[0] - g[0]) * k, g[1] + (f[1] - g[1]) * k, g[2] + (f[2] - g[2]) * k); }
       s.material.opacity = 1; });
+    if (FIN.slogan) { FIN.slogan.visible = t > 9; FIN.slogan.material.opacity = Math.min(1, Math.max(0, (t - 9) / 1.5)); }
     if (t > 11) { FIN.on = false; const f = FIN.fin; FIN.fin = null; if (f) f(); } }; })() });
   function musicAct() {
     const d = IS();
@@ -11344,7 +11347,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       finStart({ x: g.x, y: g.y, z: g.z }, () => finEnd()); }, '看向天空');
   }
   function finEnd() {
-    spSay('🌠 天空', ['星光一顆一顆落進校園的窗口、操場和鐘樓。\n地面上，老師、同學、校工都抬起了頭，每個人臉上都有光。', '🧓 老校工喃喃：「那是……我們的校歌。」', '天之城緩緩降下，與地之城的地基貼合。\n🔮 小知在你身旁展開藍圖：「吻合度——100%。」\n鐘樓的影子不再指向天空，而是指向落在操場上的星光。', '三個被淨化的小影子站在校園一角揮手。\n🦥 懶惰靈：「今天要不要先做第一步？」', '🎩 校長 停停・鄧不利站在鐘樓下，看著天空，說出這個故事的結語：\n\n「學校不是一棟會記得的建築，而是一群願意一起唱下去的人。」', '天空中，七十顆星光排成「七十」。\n\n——《Project: TLPS Youth》天之城篇　完——\n（天之城已解鎖，可隨時回訪）'], AV(0), () => {
+    spSay('🌠 天空', ['星光一顆一顆落進校園的窗口、操場和鐘樓。\n地面上，老師、同學、校工都抬起了頭，每個人臉上都有光。', '🧓 老校工喃喃：「那是……我們的校歌。」', '天之城緩緩降下，與地之城的地基貼合。\n🔮 小知在你身旁展開藍圖：「吻合度——100%。」\n鐘樓的影子不再指向天空，而是指向落在操場上的星光。', '三個被淨化的小影子站在校園一角揮手。\n🦥 懶惰靈：「今天要不要先做第一步？」', '🎩 校長 停停・鄧不利站在鐘樓下，看著天空，說出這個故事的結語：\n\n「學校不是一棟會記得的建築，而是一群願意一起唱下去的人。」', '天空中，七十顆星光排成「七十」，下方浮現一行字：\n\n✨ 同心七十　樂而自信 ✨\n\n——《Project: TLPS Youth》天之城篇　完——\n（天之城已解鎖，可隨時回訪）'], AV(0), () => {
       const d = IS(); d.ch6 = 1; addPts(100, '🌟 七十顆星光回家（終章）'); try { S.badges = S.badges || []; if (S.badges.indexOf('七十顆星光') < 0) S.badges.push('七十顆星光'); } catch (e) { /* 忽略 */ } save(); WIZ.hold = null; try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🏅 獲得徽章「七十顆星光」（+100 點）', 4200); }, '完成');
   }
   FXQ.push({ tick: () => { const d = IS(); MB.gp.visible = !!d.ch5; MB.bm.material.opacity = d.ch6 ? 0.15 : 0.3 + Math.sin(performance.now() / 400) * 0.1; if (HALL.shade) HALL.shade.visible = !d.ch5; } });
