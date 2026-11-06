@@ -9635,8 +9635,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     document.body.appendChild(e); return e;
   })();
   const bbq = id => bbEl.querySelector('#' + id);
-  function bbHud() { const d = BB(); bbq('bbtx').textContent = '🏀 剩 ' + (BBMAX - d.n) + ' 球　進 ' + d.ok + ' 球　(轉動視角對準籃框，沿著光點投)'; }
-  function bbHoops() { const hs = window.__hoops || []; return hs.map(h => { h.rim.updateWorldMatrix(true, false); const v = new T.Vector3(); h.rim.getWorldPosition(v); const f = new T.Vector3(1, 0, 0).transformDirection(h.rim.parent.matrixWorld); return { x: v.x, y: v.y, z: v.z, fx: f.x, fz: f.z }; }); }   // 球場有旋轉，所以用籃球架的朝向（fx, fz 指向場內）
+  function bbHud() { if (BBS.trial) { const t = BBS.trial; bbq('bbtx').textContent = '🏀 塔下試煉：剩 ' + (t.max - t.n) + ' 球　進 ' + t.ok + '／' + t.need + ' 球　(對準籃框，沿光點投)'; return; } const d = BB(); bbq('bbtx').textContent = '🏀 剩 ' + (BBMAX - d.n) + ' 球　進 ' + d.ok + ' 球　(轉動視角對準籃框，沿著光點投)'; }
+  function bbHoops() { const hs = (window.__hoops || []).filter(h => !h.isl || BBS.trial); return hs.map(h => { h.rim.updateWorldMatrix(true, false); const v = new T.Vector3(); h.rim.getWorldPosition(v); const f = new T.Vector3(1, 0, 0).transformDirection(h.rim.parent.matrixWorld); return { x: v.x, y: v.y, z: v.z, fx: f.x, fz: f.z }; }); }   // 球場有旋轉，所以用籃球架的朝向（fx, fz 指向場內）
   // 依目前站位與面向，挑出要投的籃框，並算出「剛好進籃」所需的速度與仰角
   function bbAim() {
     const hs = bbHoops(); if (!hs.length) return null;
@@ -9671,17 +9671,20 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (BBS.st !== 'ready') return; const a = bbAim(); const d = BB();
     if (!a) { toast('請先面向籃框（距離 1.5～12 公尺）', 2200); return; }
     const sp = a.v * (0.72 + 0.56 * BBS.pw), vx = Math.sin(a.az) * Math.cos(a.th) * sp, vz = Math.cos(a.az) * Math.cos(a.th) * sp, vy = Math.sin(a.th) * sp;
-    d.n++; save();
+    if (!BBS.trial) { d.n++; save(); } else BBS.trial.n++;
     BBS.fl = { p: new T.Vector3(a.ox, a.oy, a.oz), v: new T.Vector3(vx, vy, vz), h: a.h, t: 0, done: false, bounced: 0 };
     BBS.st = 'fly'; BBS.ball.visible = true; BBS.ball.position.copy(BBS.fl.p); BBS.pts.visible = false; bbq('bbgo').style.opacity = '.4';
     try { SFX.play('jump', 300); } catch (e) { /* 忽略 */ }
   }
   function bbEnd(msg) {
-    BBS.on = false; BBS.st = 'idle'; BBS.hold = false; bbEl.style.display = 'none'; if (BBS.ball) BBS.ball.visible = false; if (BBS.pts) BBS.pts.visible = false;
+    if (BBS.trial) BBS.trial = null; BBS.on = false; BBS.st = 'idle'; BBS.hold = false; bbEl.style.display = 'none'; if (BBS.ball) BBS.ball.visible = false; if (BBS.pts) BBS.pts.visible = false;
     const d = BB(); if (msg) say('🏀 投籃挑戰', msg + '\n今天進 ' + d.ok + ' 球，還剩 ' + Math.max(0, BBMAX - d.n) + ' 球。', [{ label: '好', pri: true }]);
   }
   function bbResult(ok) {
     const fl = BBS.fl, d = BB(); BBS.fl = null; if (BBS.ball) BBS.ball.visible = false;
+    if (BBS.trial) { const t = BBS.trial; if (ok) { t.ok++; try { SFX.play('coin', 300); } catch (e) { /* 忽略 */ } BBS.burst = { x: fl.h.x, y: fl.h.y, z: fl.h.z, t: 0 }; } else toast('沒進～ 再試一次', 1500); bbHud();
+      if (t.ok >= t.need || t.n >= t.max) { BBS.trial = null; bbEnd(''); close(); t.fin(t.ok >= t.need); return; }
+      BBS.st = 'ready'; bbq('bbgo').style.opacity = '1'; return; }
     if (ok) { d.ok++; S.bbOk = (S.bbOk || 0) + 1; addPts(1, '🏀 進球！'); try { SFX.play('coin', 300); } catch (e) { /* 忽略 */ } if (fl) BBS.burst = { x: fl.h.x, y: fl.h.y, z: fl.h.z, t: 0 }; }
     else toast('沒進～ 調整力道，再試一次', 1800);
     S.bbN = (S.bbN || 0) + 1; save(); refreshAll(); bbHud();
@@ -9699,7 +9702,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         if (d < 0.35) { fl.done = 'in'; fl.p.set(h.x, h.y, h.z); fl.v.set(0, -1.5, 0); }
         else if (d < 0.65 && !fl.bounced) { fl.bounced = 1; fl.v.y = Math.abs(fl.v.y) * 0.35; fl.v.x += (fl.p.x - h.x) * 3; fl.v.z += (fl.p.z - h.z) * 3; }
       }
-      if (fl.p.y < 0.25 || fl.t > 5) { fl.done = fl.done || 'miss'; }
+      if (fl.p.y < (BBS.floorY || 0) + 0.25 || fl.t > 5) { fl.done = fl.done || 'miss'; }
     }
     if (BBS.ball) { BBS.ball.position.copy(fl.p); BBS.ball.rotation.x += dt * 8; }
     if (fl.done) { if (fl.done === 'in') { BBS.fl.t2 = (BBS.fl.t2 || 0) + dt; if (BBS.fl.t2 < 0.35) { BBS.ball.position.y -= BBS.fl.t2 * 1.5; return; } } bbResult(fl.done === 'in'); }
@@ -9708,6 +9711,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const d = BB(); if (d.n >= BBMAX) { say('🏀 投籃挑戰', '今天的 ' + BBMAX + ' 球都投完囉，進了 ' + d.ok + ' 球。\n明天再來！', [{ label: '好', pri: true }]); return; }
     close(); bbBallInit(); BBS.on = true; BBS.st = 'ready'; BBS.hold = false; BBS.pw = 0; bbEl.style.display = 'block'; bbq('bbgo').style.opacity = '1'; bbHud();
     const a = bbAim(); if (!a) { const hs = bbHoops(), h = hs.sort((p, q) => Math.hypot(p.x - PL.x, p.z - PL.z) - Math.hypot(q.x - PL.x, q.z - PL.z))[0]; if (h) PL.yaw = Math.atan2(-(h.x - PL.x), -(h.z - PL.z)); }
+  }
+  function bbTrialStart(need, max, fin) {   // 島上東塔試煉：不計每日球數、不加點，進 need 球算過關
+    close(); bbBallInit(); BBS.trial = { need, max, n: 0, ok: 0, fin }; BBS.floorY = ISY(); BBS.on = true; BBS.st = 'ready'; BBS.hold = false; BBS.pw = 0; bbEl.style.display = 'block'; bbq('bbgo').style.opacity = '1'; bbHud();
+    const hs = bbHoops(), h = hs.sort((p, q) => Math.hypot(p.x - PL.x, p.z - PL.z) - Math.hypot(q.x - PL.x, q.z - PL.z))[0]; if (h) PL.yaw = Math.atan2(-(h.x - PL.x), -(h.z - PL.z));
   }
   function bbTick(dt) {
     if (!BBS.on) return;
@@ -11064,12 +11071,114 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const go = (lx, lz) => { const w = ISW(lx, lz); PL.x = w.x; PL.z = w.z; PL.y = HALL.shade.parent.position.y + 3.55; PL.vy = 0; };
     const done = (msg) => { save(); toast('🛠 ' + msg, 3200); };
     say('🛠 管理者・故事進度', '選擇要從哪一章開始（會設定進度並傳送）。\n目前：神器 ' + spArt() + '/5・拱門 ' + (sp.portal ? '已開' : '未開') + '・石碑 ' + Object.keys(d.stele).length + '/5・大廳教學 ' + (d.hall >= 2 ? '完成' : d.hall ? '進行中' : '未開始'), [
-      { label: '▶ 從第二章開始（棄念者教學）', pri: true, fn: () => { base(); steles(true); d.hall = 0; go(0, 2); done('已設定：第一章完成，傳送到城堡大廳'); } },
+      { label: '▶ 從第二章開始（棄念者教學）', pri: true, fn: () => { base(); steles(true); d.hall = 0; d.tw = {}; go(0, 2); done('已設定：第一章完成，傳送到城堡大廳'); } },
       { label: '▶ 從第一章開始（石子路石碑）', fn: () => { base(); steles(false); d.hall = 0; go(21.8, 20); done('已設定：從第一章開始，傳送到石子路入口'); } },
-      { label: '▶ 第二章已完成（準備第三章）', fn: () => { base(); steles(true); d.hall = 2; go(0, 2); done('已設定：第二章完成'); } },
-      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; done('故事進度已重置'); } },
+      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
+      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; done('故事進度已重置'); } },
       { label: '關閉' }], AV(0));
   }
+
+  /* ---------- 第三章：五座塔（本階段完成四座藍頂塔：東＝投籃、西＝節奏、南＝機關、北＝健康題；紅頂主塔留待第四章）---------- */
+  const TW = [
+    { k: 'e', n: 0, name: '東塔', who: '小樂', icon: '🏀', col: 0xff7a1a, tx: 17, tz: -17, sx: 10.6, sz: -10.6 },
+    { k: 'w', n: 1, name: '西塔', who: '小同', icon: '🎵', col: 0xb06bff, tx: -17, tz: -17, sx: -12.5, sz: -12.5 },
+    { k: 's', n: 2, name: '南塔', who: '小創', icon: '⚙️', col: 0x3fa7ff, tx: -17, tz: 20, sx: -12.5, sz: 15.5 },
+    { k: 'n', n: 3, name: '北塔', who: '小味', icon: '🍎', col: 0x3ddc84, tx: 17, tz: 20, sx: 12.5, sz: 15.5 } ];
+  const twD = () => { const d = IS(); return d.tw || (d.tw = {}); }, twN = () => Object.keys(twD()).filter(k => twD()[k]).length;
+  const TWL = {};   // 各塔的 3D 物件（光柱、記號）
+  TW.forEach(o => {
+    const gp = new T.Group(); gp.position.set(o.tx, 5, o.tz); ISL.g.add(gp);
+    const beam = new T.Mesh(new T.CylinderGeometry(1.1, 1.5, 46, 16, 1, true), new T.MeshBasicMaterial({ color: o.col, transparent: true, opacity: 0.0, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide }));
+    beam.position.y = 38; beam.frustumCulled = false; gp.add(beam);
+    const mk = new T.Group(); mk.position.set(o.sx, 5.2, o.sz); ISL.g.add(mk);
+    const ring = new T.Mesh(new T.RingGeometry(1.0, 1.35, 28), new T.MeshBasicMaterial({ color: o.col, transparent: true, opacity: 0.85, side: T.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; ring.frustumCulled = false; mk.add(ring);
+    const em = new T.Sprite(new T.SpriteMaterial({ map: emojiTex(o.icon), transparent: true, depthTest: false })); em.scale.set(1.6, 1.6, 1); em.position.y = 2.6; em.renderOrder = 31; em.frustumCulled = false; mk.add(em);
+    TWL[o.k] = { gp, beam, mk, ring, em };
+    ia({ id: 'islTw' + o.k, get x() { return ISW(o.sx, o.sz).x; }, get y() { return ISY(); }, get z() { return ISW(o.sx, o.sz).z; }, r: 2.6,
+      txt: () => twD()[o.k] ? '✨ ' + o.name + '（已點亮）' : o.icon + ' ' + o.name + '・' + o.who + '的最初的快樂', act: () => twStart(o) });
+  });
+  // 東塔小球場：一座籃框（朝向院子中央），只在投籃試煉時才參與投籃計算
+  const EH = (() => { const hg = new T.Group(), dx = -1, dz = 1, th = Math.atan2(-dz, dx); hg.position.set(14.3, 5, -14.3); hg.rotation.y = th; hg.scale.setScalar(1 / ISK); ISL.g.add(hg);
+    const m = c => new T.MeshLambertMaterial({ color: c }), add = (geo, c, x, y, z) => { const q = new T.Mesh(geo, m(c)); q.position.set(x, y, z); q.frustumCulled = false; hg.add(q); return q; };
+    add(new T.CylinderGeometry(0.06, 0.07, 3.3, 8), 0x555a66, -0.38, 1.65, 0); add(new T.BoxGeometry(0.06, 1.05, 1.8), 0xf4f4f4, 0.05, 3.3, 0); add(new T.BoxGeometry(0.4, 0.04, 0.04), 0x555a66, -0.15, 3.05, 0);
+    const rim = new T.Mesh(new T.TorusGeometry(0.23, 0.02, 6, 20), new T.MeshBasicMaterial({ color: 0xff5a1f })); rim.rotation.x = Math.PI / 2; rim.position.set(0.45, 3.05, 0); rim.frustumCulled = false; hg.add(rim);
+    (window.__hoops = window.__hoops || []).push({ rim, dir: null, isl: true }); return { hg, rim }; })();
+  const twSay = (o, lines, done, label) => spSay(o.who === '小樂' ? '🏀 小樂' : '💬 ' + o.who, lines, AV(o.n), done, label);
+  function twDone(o) {
+    const d = twD(); if (d[o.k]) return; d[o.k] = 1; addPts(10, '✨ 點亮' + o.name); save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ }
+    toast('✨ ' + o.name + '亮起光柱！（' + twN() + '/4）', 3200);
+    if (twN() >= 4) setTimeout(() => spSay('🔮 小知', ['四座塔頂依序亮起光柱，把整座天之城照得金黃。', '小知看著中央那座紅頂主塔：「只剩我們了。」', '主塔頂端，兩團影子靠在一起，笑得很開心：\n「來嘛，一起玩～」', '（第三章完成　主塔的「雙影」將在下一階段開放）'], AV(4), () => { d.all = 1; addPts(20, '🌟 四座塔全部點亮'); save(); }), 1200);
+  }
+  function twFail(o, msg) { say('💬 ' + o.who, msg, [{ label: '再試一次', pri: true, fn: () => twStart(o) }, { label: '等一下' }], AV(o.n)); }
+  function twStart(o) {
+    if (IS().hall < 2) { say('🏰 塔門', '塔門被一層薄薄的灰色擋著，還不能進去。\n先到城堡大廳，幫忙把旗桿扶正吧。', [{ label: '好' }]); return; }
+    if (twD()[o.k]) { say('✨ ' + o.name, o.who + '的光柱還亮著。\n「謝謝你，記得這份快樂喔。」', [{ label: '好' }], AV(o.n)); return; }
+    if (o.k === 'e') twEast(o); else if (o.k === 'w') twWest(o); else if (o.k === 's') twSouth(o); else twNorth(o);
+  }
+  /* 東塔：投籃（進 2 球／最多 5 球） */
+  function twEast(o) {
+    twSay(o, ['這裡是東塔的小球場。我想起第一次把球投進、大家一起歡呼的那天……', '🦥 懶惰靈從半空飄來，球上掛了一張牌子：\n「明天再投也可以啦……」', '拿起球，手有點抖。\n沿著黃色光點瞄準，按住「投籃」鈕（或按住 R），在綠色區放開——5 球內投進 2 球就行！'], () => bbTrialStart(2, 5, ok => {
+      if (ok) twSay(o, ['一球出手，劃出金色的弧線——進了！', '🦥 懶惰靈縮成一小團，打了個大呵欠：「……好啦好啦。」', '小樂：「就是這個感覺！謝謝你，東塔亮起來了。」'], () => twDone(o));
+      else twFail(o, '5 球投完了，還差一點點。\n「沒關係，再一次就好。」小樂把球遞回給你。');
+    }), '開始投籃');
+  }
+  /* 北塔：健康題（3 題答對 2 題） */
+  function twNorth(o) {
+    const bank = peBank(), pool0 = bank.filter(q => /營養|飲食|健康|生活/.test(q.cat || '')), pool = pool0.length >= 3 ? pool0 : bank;
+    if (pool.length < 3) { toast('題庫載入失敗', 2000); return; }
+    twSay(o, ['北塔有一桌美食，旁邊有好多空盤子。我想起看到別人吃得很開心的樣子……', '😈 誘惑影變成一大盤炸雞和飲料，擺在最前面：\n「選這個比較快樂吧？」', '回答 3 個健康小問題，答對 2 題，就能找到真正讓身體快樂的選擇。'], () => {
+      const qs = shuffled(pool, Math.random).slice(0, 3), run = { i: 0, ok: 0 };
+      const ask = () => { const q = qs[run.i];
+        if (!q) { if (run.ok >= 2) twSay(o, ['你伸手選了水果盤。', '😈 誘惑影的炸雞慢慢變淡，像一縷煙：「……好吧，這次算你的。」', '小味：「看到你吃得開心，我就開心。北塔亮起來了！」'], () => twDone(o)); else twFail(o, '答對 ' + run.ok + ' 題，還差一點。\n「再看看桌上有什麼，慢慢選。」'); return; }
+        const opts = q.kind === 'tf' ? ['是', '否'] : shuffled([q.a].concat(q.w), Math.random);
+        say('🍎 北塔健康題（' + (run.i + 1) + '/3）', q.q, opts.map(t => ({ label: q.kind === 'tf' ? (t === '是' ? '⭕ 是' : '❌ 否') : t, fn: () => { const ok = t === q.a; if (ok) run.ok++; run.i++;
+          say(ok ? '✅ 答對了！' : '❌ 再想想看', (ok ? '' : '正確答案：' + q.a + '\n') + (q.ex || ''), [{ label: run.i < 3 ? '下一題 ▶' : '看結果 🏁', pri: true, fn: ask }], AV(o.n)); } })), AV(o.n)); };
+      ask(); }, '開始回答');
+  }
+  /* 南塔：機關（把修理步驟依序排好） */
+  const TWS = [
+    { t: '停擺的大齒輪卡在半空，怎麼修？', h: '大問題拆成小步驟：先觀察，再動手。', s: ['先看看是哪一個零件卡住了', '量一量需要多大的新零件', '換上新零件並鎖緊', '試轉一下，看看會不會動'] },
+    { t: '機關的鐘擺不擺了，怎麼處理？', h: '先找原因，再修，最後要驗收。', s: ['先聽一聽、看一看哪裡不對勁', '把鬆掉的螺絲拆下來檢查', '把螺絲重新鎖緊', '輕輕推一下鐘擺，確認會擺動'] } ];
+  function twSouth(o) {
+    const sc = TWS[Math.floor(Math.random() * TWS.length)];
+    twSay(o, ['南塔的機關停擺了，卡在半空中。我想起第一次親手把壞掉的東西修好……', '🦥 懶惰靈打了個大呵欠，所有零件都變慢了：「好麻煩喔……不要修了啦……」', '小創：「大問題拆成小步驟就好。」\n請把下面的修理步驟，照順序一個一個接上去。'], () => {
+      let k = 0; const order = sc.s.slice(), shuf = shuffled(order, Math.random), taken = [];
+      const ask = () => { if (k >= order.length) { twSay(o, ['最後一個零件接上了——齒輪「喀」地一聲，開始轉動！', '🦥 懶惰靈：「……咦，好像也沒那麼麻煩。」', '小創：「第一步最難，你做到了。南塔亮起來了！」'], () => twDone(o)); try { SFX.play('coin', 300); } catch (e) { /* 忽略 */ } return; }
+        const left = shuf.filter(x => !taken.includes(x));
+        say('⚙️ 南塔機關（第 ' + (k + 1) + ' 步／共 ' + order.length + ' 步）', sc.t + '\n\n已完成：' + (taken.length ? taken.map((x, i) => (i + 1) + '. ' + x).join('\n　　　　') : '（還沒有）') + '\n\n接下來要做哪一步？', left.map(x => ({ label: x, fn: () => { if (x === order[k]) { taken.push(x); k++; toast('⚙️ 接上了！', 1200); setTimeout(ask, 120); } else { toast('🤔 順序不太對：' + sc.h, 2800); setTimeout(ask, 120); } } })), AV(o.n)); };
+      ask(); }, '開始修理');
+  }
+  /* 西塔：節奏（三條音軌，唱完整段；J K L 或點按鈕） */
+  const RH = { on: false, win: 0.28, fall: 1.7, notes: [], hits: 0, t0: 0, fin: null, raf: 0, H: 250 };
+  const rhEl = (() => { const e = document.createElement('div'); e.id = 'rhy'; e.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;display:none;width:330px;padding:12px;border-radius:16px;background:rgba(20,16,40,.92);color:#fff;font:600 14px/1.4 system-ui,"Noto Sans TC",sans-serif;text-align:center;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+    e.innerHTML = '<div id="rhtx" style="margin-bottom:6px"></div><div id="rhf" style="position:relative;height:250px;overflow:hidden;border-radius:10px;background:linear-gradient(#2a2058,#3b2a7a)"><div style="position:absolute;left:33.3%;top:0;bottom:0;width:1px;background:#fff3"></div><div style="position:absolute;left:66.6%;top:0;bottom:0;width:1px;background:#fff3"></div><div style="position:absolute;left:0;right:0;bottom:38px;height:3px;background:#ffd54a"></div></div>'
+      + '<div style="display:flex;gap:6px;margin-top:8px"><button data-l="0" style="flex:1;padding:12px 0;font-size:18px;border-radius:10px;border:0;background:#ff6b9a;color:#fff">J</button><button data-l="1" style="flex:1;padding:12px 0;font-size:18px;border-radius:10px;border:0;background:#ffd54a;color:#333">K</button><button data-l="2" style="flex:1;padding:12px 0;font-size:18px;border-radius:10px;border:0;background:#6bd0ff;color:#333">L</button></div>'
+      + '<button id="rhsk" style="margin-top:8px;padding:6px 12px;border-radius:10px;border:1px dashed #ff9ab8;background:transparent;color:#ff9ab8;font-size:13px">😈 這一段很長耶，跳過嘛～</button>';
+    document.body.appendChild(e); return e; })();
+  function rhEnd(ok, skipped) { if (!RH.on) return; RH.on = false; cancelAnimationFrame(RH.raf); rhEl.style.display = 'none'; const f = RH.fin; RH.fin = null; if (f) f(ok, skipped); }
+  function rhTick() { if (!RH.on) return; const now = (performance.now() - RH.t0) / 1000, F = rhEl.querySelector('#rhf');
+    RH.notes.forEach(n => { if (n.hit) { n.el.style.display = 'none'; return; } const p = 1 - (n.t - now) / RH.fall; n.el.style.top = (p * (RH.H - 38) - 16) + 'px'; n.el.style.opacity = p < 0 || p > 1.25 ? 0 : 1; if (!n.miss && now - n.t > RH.win) { n.miss = true; n.el.style.filter = 'grayscale(1)'; } });
+    rhEl.querySelector('#rhtx').textContent = '🎵 唱完整段：已對上 ' + RH.hits + '／' + RH.notes.length + '（過關 ' + RH.need + '）';
+    if (now > RH.notes[RH.notes.length - 1].t + 0.9) { rhEnd(RH.hits >= RH.need, false); return; } RH.raf = requestAnimationFrame(rhTick); }
+  function rhHit(l) { if (!RH.on) return; const now = (performance.now() - RH.t0) / 1000; let b = null;
+    RH.notes.forEach(n => { if (n.l === l && !n.hit && Math.abs(n.t - now) <= RH.win && (!b || Math.abs(n.t - now) < Math.abs(b.t - now))) b = n; });
+    if (b) { b.hit = true; RH.hits++; try { SFX.play('coin', 120); } catch (e) { /* 忽略 */ } } }
+  function rhStart(fin) {
+    close(); const N = 14, cols = ['#ff6b9a', '#ffd54a', '#6bd0ff'], F = rhEl.querySelector('#rhf'); F.querySelectorAll('.rn').forEach(x => x.remove());
+    let l = 1; RH.notes = []; for (let i = 0; i < N; i++) { l = Math.random() < 0.45 ? l : Math.floor(Math.random() * 3); const el = document.createElement('div'); el.className = 'rn'; el.style.cssText = 'position:absolute;width:30%;height:32px;border-radius:16px;top:-40px;left:' + (l * 33.3 + 1.7) + '%;background:' + cols[l] + ';box-shadow:0 0 10px ' + cols[l] + ';font-size:18px;line-height:32px'; el.textContent = '♪'; F.appendChild(el); RH.notes.push({ l, t: 2.2 + i * 0.75, el, hit: false, miss: false }); }
+    RH.hits = 0; RH.need = 9; RH.fin = fin; RH.on = true; RH.t0 = performance.now(); rhEl.style.display = 'block'; RH.raf = requestAnimationFrame(rhTick);
+  }
+  rhEl.querySelectorAll('button[data-l]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); rhHit(+b.dataset.l); }));
+  rhEl.querySelector('#rhsk').addEventListener('click', () => rhEnd(false, true));
+  addEventListener('keydown', e => { if (!RH.on || e.repeat) return; const m = { KeyJ: 0, KeyK: 1, KeyL: 2 }[e.code]; if (m !== undefined) { e.preventDefault(); rhHit(m); } });
+  function twWest(o) {
+    twSay(o, ['西塔是一座圓形舞台，音符在空中飄。我想起全班第一次合唱出同一個音的那天……', '😈 誘惑影變成一個發光的按鈕：「這一段很長耶，跳過嘛～」', '音符落到黃線時，按對應的 J／K／L（或點下方按鈕）。唱完整段，14 個音對上 9 個就過關。\n你可以選擇——不要跳過。'], () => rhStart((ok, skipped) => {
+      if (ok) twSay(o, ['最後一個音落下，整座舞台安靜了一秒——然後亮了起來。', '😈 誘惑影變淡了一格：「……真的唱完了？」', '小同：「全班一起唱的感覺，就是這樣。西塔亮起來了！」'], () => twDone(o));
+      else twFail(o, skipped ? '你按了「跳過」……誘惑影得意地閃了閃。\n「沒關係，再來一次，這次唱完它。」' : '對上 ' + RH.hits + ' 個，還差一點點。\n「再唱一次，我陪你。」');
+    }), '上舞台');
+  }
+  FXQ.push({ tick: t => { TW.forEach(o => { const w = TWL[o.k], on = !!twD()[o.k]; w.beam.material.opacity += ((on ? 0.34 : 0) - w.beam.material.opacity) * 0.08; w.mk.visible = !on && IS().hall >= 2; w.em.position.y = 2.6 + Math.sin(t * 2 + o.n) * 0.25; w.ring.rotation.z = t * 0.8; }); } });
+  L.tw = { TW, twD, twN, twStart, RH, rhHit, EH };
 
   /* ---------- 校長室的停停.鄧不利（原創 NPC，站在辦公桌旁；每天可請校長勉勵一次）---------- */
   if (window.ROOM_POS && window.ROOM_POS['校長室']) { const rp = window.ROOM_POS['校長室'];
