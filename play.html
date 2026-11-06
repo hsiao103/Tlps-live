@@ -10611,6 +10611,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const r7 = document.createElement('div'); r7.className = 'row'; r7.id = 'gLowRow'; r7.innerHTML = '<span class="lab">省電模式</span><button type="button" id="bLow"></button>';
       const b7 = r7.querySelector('#bLow'), sync7 = () => { b7.textContent = S.lowGfx ? '🔋 已開啟（較順、畫質較低）' : '🔋 關閉（點此開啟，手機較順）'; b7.className = S.lowGfx ? 'on' : ''; };
       b7.onclick = () => { S.lowGfx = S.lowGfx ? 0 : 1; S.lowHint = 1; save(); sync7(); toast(S.lowGfx ? '🔋 省電模式：陰影關閉、解析度降低、隱藏部分裝飾' : '已回到標準畫質', 2600); }; sync7(); r6.after(r7);
+      const r8 = document.createElement('div'); r8.className = 'row'; r8.id = 'gGalRow'; r8.innerHTML = '<span class="lab">故事圖鑑</span><button type="button" id="bGal">📖 查看章節封面</button>';
+      r8.querySelector('#bGal').onclick = () => { document.body.classList.remove('gearopen'); coverGallery(); }; r7.after(r8);
     }
     setTimeout(festSync, 300);
   }
@@ -11040,6 +11042,37 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       crys.forEach((c, i) => { cm.emissiveIntensity = 0.5 + Math.sin(t * 1.5) * 0.2; });
       isl.forEach(o => { o.g.position.y = o.y + Math.sin(t * 0.5 + o.ph) * 0.9; }); } });
   })();
+  /* ---------- 章節封面卡與故事圖鑑 ---------- */
+  const COVERS = [
+    { k: 'c1', t: '第 1 章｜校門口的轉學生', f: 'cover/ch1.webp', th: 'cover/ch1_s.webp', sub: '你轉生到同樂宇宙的第一天' },
+    { k: 'c2', t: '第 2 章｜天之城的秘密', f: 'cover/ch2.webp', th: 'cover/ch2_s.webp', sub: '浮空的城堡裡，藏著大家忘記的事' }
+  ];
+  (() => { const st = document.createElement('style'); st.textContent = '#gCov{position:fixed;inset:0;z-index:95;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,8,28,.93);font-family:var(--font-ui);opacity:0;transition:opacity .5s}#gCov.show{display:flex}#gCov.on{opacity:1}#gCov img.big{max-width:min(96vw,720px);max-height:calc(100vh - 110px);max-height:calc(100dvh - 110px);object-fit:contain;border-radius:14px;box-shadow:0 8px 40px rgba(120,80,255,.45)}#gCov .cap{margin-top:10px;color:#fff;text-align:center;font-weight:800;font-size:15px;padding:0 12px}#gCov .cap small{display:block;font-weight:500;opacity:.8;margin-top:2px}#gCov .go{margin-top:8px;padding:8px 22px;border-radius:999px;border:0;background:#f5821f;color:#fff;font:800 15px var(--font-ui)}'
+    + '#gGal{position:fixed;inset:0;z-index:94;display:none;align-items:center;justify-content:center;background:rgba(10,8,28,.82);font-family:var(--font-ui)}#gGal.show{display:flex}#gGal .bx{width:min(560px,94vw);max-height:90vh;max-height:90dvh;overflow:auto;background:#fffaf0;border-radius:18px;padding:14px 14px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}#gGal h3{margin:0 0 4px;font-size:17px;color:#3b2a6b}#gGal p{margin:0 0 10px;font-size:13px;color:#6a5f80}#gGal .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}#gGal .cd{border:0;padding:0;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(60,40,120,.2);text-align:center;font:700 12.5px/1.35 var(--font-ui);color:#3b2a6b}#gGal .cd img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}#gGal .cd span{display:block;padding:6px 4px 8px}#gGal .cd.lk img{filter:grayscale(1) brightness(.5)}#gGal .cd.lk{opacity:.75}#gGal .cd .ph{aspect-ratio:3/4;display:grid;place-items:center;background:#e6e0f5;font-size:30px}#gGal .x{display:block;margin:12px auto 0;padding:7px 22px;border-radius:999px;border:0;background:#8a7bd0;color:#fff;font:800 14px var(--font-ui)}'; document.head.appendChild(st); })();
+  const cvSeen = () => (S.cvSeen = S.cvSeen || {});
+  function coverShow(c, done) {
+    let el = document.getElementById('gCov');
+    if (!el) { el = document.createElement('div'); el.id = 'gCov'; el.innerHTML = '<img class="big" alt=""><div class="cap"></div><button type="button" class="go">繼續 ▶</button>'; document.body.appendChild(el); }
+    const im = el.querySelector('img'); im.src = c.f; im.alt = c.t; el.querySelector('.cap').innerHTML = c.t + '<small>' + c.sub + '</small>';
+    el.classList.add('show'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
+    const t0 = performance.now(); let off = false;
+    const close = () => { if (off || performance.now() - t0 < 700) return; off = true; el.classList.remove('on'); document.removeEventListener('keydown', kd, true); setTimeout(() => { el.classList.remove('show'); if (done) done(); }, 420); };
+    const kd = e => { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); e.stopPropagation(); close(); } };
+    document.addEventListener('keydown', kd, true); el.onclick = close; try { SFX.play('open', 0); } catch (e) { /* 忽略 */ }
+  }
+  function coverOnce(k, done) { const c = COVERS.find(x => x.k === k), sd = cvSeen(); if (!c || sd[k]) { if (done) done(); return; } sd[k] = 1; save(); coverShow(c, done); }
+  function coverGallery() {
+    let el = document.getElementById('gGal'); if (!el) { el = document.createElement('div'); el.id = 'gGal'; document.body.appendChild(el); el.onclick = e => { if (e.target === el) el.classList.remove('show'); }; }
+    const sd = cvSeen(), adm = (() => { try { return isAdm2(); } catch (e) { return false; } })();
+    el.innerHTML = '<div class="bx"><h3>📖 故事圖鑑</h3><p>遇到新的章節就會解鎖封面，點一下可以重看。</p><div class="gr"></div><button type="button" class="x">關閉</button></div>';
+    const gr = el.querySelector('.gr');
+    COVERS.forEach(c => { const ok = sd[c.k] || adm, b = document.createElement('button'); b.type = 'button'; b.className = 'cd' + (ok ? '' : ' lk'); b.innerHTML = '<img src="' + c.th + '" alt="" loading="lazy"><span>' + (ok ? c.t : '🔒 尚未解鎖') + '</span>'; b.onclick = () => { if (!ok) { toast('還沒遇到這一章，繼續冒險就會解鎖', 2400); return; } el.classList.remove('show'); coverShow(c, () => el.classList.add('show')); }; gr.appendChild(b); });
+    const mo = document.createElement('div'); mo.className = 'cd lk'; mo.innerHTML = '<div class="ph">✨</div><span>更多章節<br>繪製中</span>'; gr.appendChild(mo);
+    el.querySelector('.x').onclick = () => el.classList.remove('show'); el.classList.add('show');
+  }
+  { let on = false; FXQ.push({ tick: () => { if (on || cvSeen().c2) return; const g = ISL.g, K = 0.7, dx = (PL.x - g.position.x) / K, dz = (PL.z - g.position.z) / K;
+    if (Math.abs(dx) < 30 && Math.abs(dz) < 30 && PL.y > g.position.y + 2 && !FIN.on && !document.body.classList.contains('intro')) { on = true; setTimeout(() => { on = false; coverOnce('c2'); }, 900); } } }); }
+  L.cover = { COVERS, coverShow, coverOnce, coverGallery };
   /* ---------- 省電模式（陰影、解析度、遠景裝飾）與卡頓提示 ---------- */
   { const GX = { on: null, acc: 0, n: 0, t0: 0, warned: false };
     const apply = low => { GX.on = low;
@@ -12543,7 +12576,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   L.opening = { start: startOpening, battle, practice: synPractice, get active() { return opActive; }, applyPast };
   { const st = document.createElement('style'); st.id = 'gLand'; st.textContent = "@media (max-height:500px) and (orientation:landscape){\n#joyL,#joyR{bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;width:104px;height:104px}#joyL .knob,#joyR .knob{left:32px;top:32px}#tbtns{flex-direction:row!important;right:calc(24px + 104px + 14px)!important;bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;gap:12px!important}#tbtns button{width:58px;height:58px}#gAct{bottom:calc(36px + env(safe-area-inset-bottom,0px))!important}\nbody.intro #gHud{display:none}\n#intro{bottom:8px;left:8px;padding:10px 16px;width:min(460px,calc(100vw - 16px));max-height:calc(100vh - 16px)}#intro h2{font-size:20px;margin:2px 0 6px}#intro p{font-size:12.5px;margin:0 0 6px;line-height:1.5}#intro .go{margin:8px 0}#intro .go button{min-height:36px;font-size:14px}#intro .eb{font-size:13px}\n#gDlg{max-height:calc(100dvh - 12px);overflow:auto}#gDlg .av{width:44px;height:44px}#gDlg .tx{font-size:13.5px;line-height:1.5}\n#gBag .pn,#gBag>div{max-height:calc(100dvh - 10px);overflow:auto}\n#gBag .qk{display:flex;gap:6px;margin:0 34px 6px 0;position:sticky;top:0;z-index:1}#gBag .qk button{flex:1;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);color:var(--fg);padding:6px 4px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}#gBag .lgb.wks,#gBag .lgb.jb2,#gBag .lgb.mk2{display:none}\n#gBat .bp{width:min(780px,calc(100vw - 16px));max-height:calc(100dvh - 8px);padding:8px;display:grid;grid-template-columns:1fr 1fr;column-gap:10px;row-gap:4px;align-content:start}\n#gBat .bh{grid-column:1/-1;margin:0}#gBat .be{grid-column:1;grid-row:2;margin:0}#gBat .ba{grid-column:1;grid-row:3;margin:0}#gBat .bc{grid-column:2;grid-row:2;margin:0;font-size:12px;padding:4px 8px}#gBat .bm{grid-column:2;grid-row:3;min-height:0;margin:0;font-size:12.5px}#gBat .bb{grid-column:2;grid-row:4}#gBat .be .en i{font-size:28px}#gBat .en b,#gBat .en small{font-size:11px}#gBat .al img,#gBat .al .pe{width:34px;height:34px;font-size:20px}#gBat .bb button{padding:8px 2px}#gBat .bl{grid-template-columns:70px 1fr 44px}\n#gJob .jp{max-height:calc(100dvh - 10px);overflow:auto;padding:8px}#gJob .jc{font-size:22px;padding:5px 0}#gJob .jg{gap:5px}\n#gRoom .pn{max-height:calc(100dvh - 8px)}\n}\n"; document.head.appendChild(st); }  /* 手機橫式（矮螢幕）排版，放最後以覆蓋前面樣式 */
   if (pastOf() >= 0 && !S.opening) S.opening = 1;
-  const go = $('iGo'); if (go) go.addEventListener('click', () => { try { BGM.start(); } catch (e) { /* 忽略 */ } view.third = true; view.iso = false; setMode('walk'); const nw = pastOf() < 0 && !S.opening, tt = nw ? !S.noTitle : (!S.noTitle && !S.ttlSeen); (tt ? playTitle(nw) : Promise.resolve()).then(() => { if (tt) { S.ttlSeen = 1; save(); } if (nw) setTimeout(() => startOpening(false, tt), 400); else if (pastOf() < 0) setTimeout(pickPast, 500); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); }); });
+  const go = $('iGo'); if (go) go.addEventListener('click', () => { try { BGM.start(); } catch (e) { /* 忽略 */ } view.third = true; view.iso = false; setMode('walk'); const nw = pastOf() < 0 && !S.opening, tt = nw ? !S.noTitle : (!S.noTitle && !S.ttlSeen); (tt ? playTitle(nw) : Promise.resolve()).then(() => new Promise(r => coverOnce('c1', r))).then(() => { if (tt) { S.ttlSeen = 1; save(); } if (nw) setTimeout(() => startOpening(false, tt), 400); else if (pastOf() < 0) setTimeout(pickPast, 500); else setTimeout(() => toast('走近有 ❗ 的人或有圖示的東西，按「F」或螢幕按鈕互動', 5200), 800); }); });
   L.TIERS = TIERS; setTimeout(() => { CP(); applyComp(); }, 0);
   L.TIERS = TIERS; L.tier = level; L.lvNeed = lvNeed; L.addPts = addPts;
 /*@@MP@@*/
