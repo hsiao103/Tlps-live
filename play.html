@@ -11029,7 +11029,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const OV = { 0: [19.2, 28.8], 3: [-3.4, 25.5] }; let fx = px, fz = pz; if (OV[n]) { fx = OV[n][0]; fz = OV[n][1]; gp.position.set(fx, 5.15, fz); gp.lookAt(new T.Vector3(0, 5.15, 20)); gp.rotation.x = 0; gp.rotation.z = 0; }   // 第 4 塊原本卡在城門牆上，移到門外路旁
       gp.scale.setScalar(1.6);
       const beam = new T.Mesh(new T.CylinderGeometry(0.5, 0.8, 16, 12, 1, true), new T.MeshBasicMaterial({ color: 0xffa51f, transparent: true, opacity: 0.6, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide })); beam.position.y = 8 + 1; beam.scale.setScalar(1 / 1.6); beam.frustumCulled = false; gp.add(beam);
-      const lb = new T.Sprite(new T.SpriteMaterial({ map: emojiTex('📜'), transparent: true, depthTest: false })); lb.scale.set(1.3 / 1.6, 1.3 / 1.6, 1); lb.position.y = 3.3; lb.renderOrder = 31; lb.frustumCulled = false; gp.add(lb);
+      const lb = new T.Sprite(new T.SpriteMaterial({ map: emojiTex('📜'), transparent: true, depthTest: false })); lb.scale.set(0.8 / 1.6, 0.8 / 1.6, 1); lb.position.y = 3.3; lb.renderOrder = 31; lb.frustumCulled = false; gp.add(lb);
       STL.push({ gp, st, beam, lb, lx: fx, lz: fz, n }); });
     STL.forEach(o => ia({ id: 'islStele' + o.n, get x() { return ISW(o.lx, o.lz).x; }, get y() { return ISY(); }, get z() { return ISW(o.lx, o.lz).z; }, r: 3.2,
       txt: () => '📜 賢者的石碑 ' + STN[o.n] + '（' + Object.keys(IS().stele).length + '/5）' + (IS().stele[o.n] ? ' ✓' : ''),
@@ -11078,9 +11078,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     say('🛠 管理者・故事進度', '選擇要從哪一章開始（會設定進度並傳送）。\n目前：神器 ' + spArt() + '/5・拱門 ' + (sp.portal ? '已開' : '未開') + '・石碑 ' + Object.keys(d.stele).length + '/5・大廳教學 ' + (d.hall >= 2 ? '完成' : d.hall ? '進行中' : '未開始'), [
       { label: '▶ 從第二章開始（棄念者教學）', pri: true, fn: () => { base(); steles(true); d.hall = 0; d.tw = {}; go(0, 2); done('已設定：第一章完成，傳送到城堡大廳'); } },
       { label: '▶ 從第一章開始（石子路石碑）', fn: () => { base(); steles(false); d.hall = 0; go(21.8, 20); done('已設定：從第一章開始，傳送到石子路入口'); } },
-      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; d.pur = 0; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
+      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
+      { label: '▶ 從第五章開始（灰燼守門獸）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 0; d.gs = {}; d.ch5 = 0; go(CV.sx, CV.sz); done('已設定：雙影已淨化，傳送到封印洞穴'); } },
       { label: '▶ 從第四章開始（雙影小戰）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 0; go(3.4, -3.2); done('已設定：四座塔已點亮，可到發光的書挑戰雙影'); } },
-      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; d.pur = 0; done('故事進度已重置'); } },
+      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; done('故事進度已重置'); } },
       { label: '關閉' }], AV(0));
   }
 
@@ -11169,10 +11170,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function rhHit(l) { if (!RH.on) return; const now = (performance.now() - RH.t0) / 1000; let b = null;
     RH.notes.forEach(n => { if (n.l === l && !n.hit && Math.abs(n.t - now) <= RH.win && (!b || Math.abs(n.t - now) < Math.abs(b.t - now))) b = n; });
     if (b) { b.hit = true; RH.hits++; try { SFX.play('coin', 120); } catch (e) { /* 忽略 */ } } }
-  function rhStart(fin) {
-    close(); const N = 14, cols = ['#ff6b9a', '#ffd54a', '#6bd0ff'], F = rhEl.querySelector('#rhf'); F.querySelectorAll('.rn').forEach(x => x.remove());
+  function rhStart(fin, nn, need) {
+    close(); const N = nn || 14, cols = ['#ff6b9a', '#ffd54a', '#6bd0ff'], F = rhEl.querySelector('#rhf'); F.querySelectorAll('.rn').forEach(x => x.remove());
     let l = 1; RH.notes = []; for (let i = 0; i < N; i++) { l = Math.random() < 0.45 ? l : Math.floor(Math.random() * 3); const el = document.createElement('div'); el.className = 'rn'; el.style.cssText = 'position:absolute;width:30%;height:32px;border-radius:16px;top:-40px;left:' + (l * 33.3 + 1.7) + '%;background:' + cols[l] + ';box-shadow:0 0 10px ' + cols[l] + ';font-size:18px;line-height:32px'; el.textContent = '♪'; F.appendChild(el); RH.notes.push({ l, t: 2.2 + i * 0.75, el, hit: false, miss: false }); }
-    RH.hits = 0; RH.need = 9; RH.fin = fin; RH.on = true; RH.t0 = performance.now(); rhEl.style.display = 'block'; RH.raf = requestAnimationFrame(rhTick);
+    RH.hits = 0; RH.need = need || 9; RH.fin = fin; RH.on = true; RH.t0 = performance.now(); rhEl.style.display = 'block'; RH.raf = requestAnimationFrame(rhTick);
   }
   rhEl.querySelectorAll('button[data-l]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); rhHit(+b.dataset.l); }));
   rhEl.querySelector('#rhsk').addEventListener('click', () => rhEnd(false, true));
@@ -11231,6 +11232,69 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     ask();
   }
   L.twin = { twinStart, twinFight, GH, BK, kPool };
+  /* ---------- 第五章：灰燼守門獸（封印洞穴）：點亮 5 顆星光；最後一顆靠第六個聲音 ---------- */
+  const CV = (() => { const cx = 27, cz = 15, dir = Math.atan2(cz, cx) + Math.PI / 2, ox = Math.cos(dir), oz = Math.sin(dir), ex = cx + ox * 8.6, ez = cz + oz * 8.6; return { ox, oz, ex, ez, sx: ex - 3.05 + ox * 0.0 - 0, sz: ez + 2.0, face: Math.atan2(ox, oz) }; })();
+  CV.sx = 17.7; CV.sz = 24.5;
+  const GST = [{ k: 1, n: '勇氣星', who: '小樂', av: 0, col: 0xff7a1a, ic: '🏀' }, { k: 2, n: '快樂星', who: '小同', av: 1, col: 0xb06bff, ic: '🎵' }, { k: 3, n: '合作星', who: '小創', av: 2, col: 0x3fa7ff, ic: '⚙️' }, { k: 4, n: '照顧星', who: '小味', av: 3, col: 0x3ddc84, ic: '🍲' }, { k: 5, n: '好奇星', who: '小知', av: 4, col: 0xffd54a, ic: '📖' }];
+  const gsD = () => { const d = IS(); return d.gs || (d.gs = {}); }, gsN = () => Object.keys(gsD()).filter(k => gsD()[k]).length;
+  // 第二座籃框：洞口前的小空地（只在試煉時參與投籃計算）
+  { const hg = new T.Group(), dx = 5.2, dz = 1.0, th = Math.atan2(-dz, dx); hg.position.set(12.5, 5, 23.5); hg.rotation.y = th; hg.scale.setScalar(1 / ISK); ISL.g.add(hg);
+    const m = c => new T.MeshLambertMaterial({ color: c }), add = (geo, c, x, y, z) => { const q = new T.Mesh(geo, m(c)); q.position.set(x, y, z); q.frustumCulled = false; hg.add(q); return q; };
+    add(new T.CylinderGeometry(0.06, 0.07, 3.3, 8), 0x555a66, -0.38, 1.65, 0); add(new T.BoxGeometry(0.06, 1.05, 1.8), 0xf4f4f4, 0.05, 3.3, 0); add(new T.BoxGeometry(0.4, 0.04, 0.04), 0x555a66, -0.15, 3.05, 0);
+    const rim = new T.Mesh(new T.TorusGeometry(0.23, 0.02, 6, 20), new T.MeshBasicMaterial({ color: 0xff5a1f })); rim.rotation.x = Math.PI / 2; rim.position.set(0.45, 3.05, 0); rim.frustumCulled = false; hg.add(rim);
+    (window.__hoops = window.__hoops || []).push({ rim, dir: null, isl: true }); }
+  const BST = (() => { const g = new T.Group(); g.position.set(CV.ex + CV.ox * 1.2, 5, CV.ez + CV.oz * 1.2); g.rotation.y = CV.face; ISL.g.add(g);
+    const gray = new T.MeshLambertMaterial({ color: 0x6f6c68 }), dark = new T.MeshLambertMaterial({ color: 0x4d4b49 }), ad = (geo, mat, x, y, z) => { const q = new T.Mesh(geo, mat); q.position.set(x, y, z); q.frustumCulled = false; g.add(q); return q; };
+    const body = ad(new T.IcosahedronGeometry(3.3, 1), gray, 0, 3.3, 0); body.scale.set(1, 1.1, 0.9);
+    ad(new T.SphereGeometry(1.7, 12, 10), gray, 0, 7.3, 0.4); ad(new T.SphereGeometry(1.2, 8, 6), dark, -3.4, 3.4, 0.5); ad(new T.SphereGeometry(1.2, 8, 6), dark, 3.4, 3.4, 0.5);
+    [-0.6, 0.6].forEach(x => ad(new T.BoxGeometry(0.5, 0.25, 0.1), new T.MeshBasicMaterial({ color: 0xffe28a }), x, 7.5, 2.0));
+    const stars = GST.map((s, i) => { const q = ad(new T.OctahedronGeometry(0.42), new T.MeshBasicMaterial({ color: 0x3a3a3a }), -2.0 + i, 3.6 + (i % 2 ? 0.35 : 0), 2.85); return q; });
+    g.visible = false; return { g, stars, sc: 1, sit: false }; })();
+  const beastLine = (n, who) => spSay('🌫 灰燼守門獸', n, AV(4));
+  function starLit(s, msg, then) { const d = gsD(); d[s.k] = 1; addPts(5, '⭐ 點亮' + s.n); save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('⭐ ' + s.n + '亮了！（' + gsN() + '/5）', 2600); spSay('⭐ ' + s.n, [msg], AV(s.av), then || beastMenu, '繼續'); }
+  function puzzleRun(sc, who, done) { let k = 0; const order = sc.s.slice(), shuf = shuffled(order, Math.random), taken = [];
+    const ask = () => { if (k >= order.length) { done(); return; } const left = shuf.filter(x => !taken.includes(x));
+      say('⚙️ 合作星機關（第 ' + (k + 1) + ' 步／共 ' + order.length + ' 步）', sc.t + '\n\n已完成：' + (taken.length ? taken.map((x, i) => (i + 1) + '. ' + x).join('\n　　　　') : '（還沒有）') + '\n\n接下來要做哪一步？', left.map(x => ({ label: x, fn: () => { if (x === order[k]) { taken.push(x); k++; toast('⚙️ 接上了！', 1200); setTimeout(ask, 120); } else { toast('🤔 順序不太對：' + sc.h, 2800); setTimeout(ask, 120); } } })), AV(2)); }; ask(); }
+  function beastTalk() {
+    const d = IS();
+    if (!d.pur) { say('🕳 封印洞穴', '洞口被厚厚的灰色封住，裡面有東西在緩慢地呼吸……\n先到城堡大廳的「發光的書」，把雙影的事解決吧。', [{ label: '好' }], AV(4)); return; }
+    if (d.ch5) { say('🌫 棄念者', '洞口坐著小小的棄念者，臉上有淡淡的笑。\n「謝謝你……先說了那句話。」', [{ label: '好' }]); return; }
+    if (!d.beast) { spSay('🕳 封印洞穴', ['洞穴深處，灰燼堆成一座小山——山在呼吸。', '它站了起來，高到快碰到洞頂，身體裡浮著五顆熄滅的星光。', '🌫 灰燼守門獸：「……算了吧。」\n灰燼風吹來，你被吹得退了一步。', '🔮 小知：「要把五顆星光一顆一顆點亮！每顆星光，對應一座塔的心意。」\n（不會被打倒，失敗最多重來，放心試。）'], AV(4), () => { d.beast = 1; save(); beastMenu(); }, '知道了'); return; }
+    beastMenu();
+  }
+  function beastMenu() {
+    const d = IS(), g = gsD(), n4 = [1, 2, 3, 4].every(k => g[k]); close();
+    const row = GST.map(s => (g[s.k] ? '⭐ ' : '☆ ') + s.n + '（' + s.who + '）').join('\n');
+    const btns = GST.filter(s => s.k <= 4 && !g[s.k]).map(s => ({ label: s.ic + ' ' + s.n + '（' + s.who + '）', fn: () => starGame(s) }));
+    if (n4 && !g[5]) btns.push({ label: '🌟 最後一顆：好奇星', pri: true, fn: starFinal });
+    btns.push({ label: '先離開' });
+    say('🌫 灰燼守門獸', '「……算了吧。」\n\n五顆星光：\n' + row + '\n\n' + (n4 ? '前四顆都亮了，最後一顆在守門獸胸口最深處。' : '選一顆星光，一起把它點亮。'), btns, AV(4));
+  }
+  function starGame(s) {
+    const retry = (m) => say('💬 ' + s.who, m, [{ label: '再試一次', pri: true, fn: () => starGame(s) }, { label: '回到選單', fn: beastMenu }], AV(s.av));
+    if (s.k === 1) spSay('🏀 小樂', ['小樂遞給你一顆球：「勇氣，就是先投出去！」', '洞口前有一座小籃框。4 球內進 1 球，就能點亮勇氣星。'], AV(0), () => bbTrialStart(1, 4, ok => ok ? starLit(s, '球劃出金色的弧線，進了！\n勇氣星「噗」地亮了起來，守門獸縮小了一圈，灰燼風也弱了一點。') : retry('4 球都沒進，沒關係，再來一次！')), '開始投籃');
+    else if (s.k === 2) spSay('🎵 小同', ['小同站在你旁邊：「快樂，要跟上拍子才唱得出來！」', '8 個音對上 5 個，就能點亮快樂星。（J／K／L 或點按鈕）'], AV(1), () => rhStart((ok) => ok ? starLit(s, '音符一個接一個對上了！\n快樂星亮起，守門獸又縮小了一圈。') : retry('拍子有點亂掉了，再唱一次吧。'), 8, 5), '開始');
+    else if (s.k === 3) spSay('⚙️ 小創', ['小創指著洞口卡住的機關：「合作，就是一個人接一步。」', '把修理步驟依序接好，合作星就會亮。'], AV(2), () => puzzleRun(TWS[Math.floor(Math.random() * TWS.length)], '小創', () => starLit(s, '最後一個零件接上，齒輪喀地轉動！\n合作星亮了，灰燼風又弱了一點。')), '開始');
+    else { const bank = peBank(), pool0 = bank.filter(q => /營養|飲食|健康|生活/.test(q.cat || '')), q = shuffled(pool0.length ? pool0 : bank, Math.random)[0]; if (!q) { toast('題庫載入失敗', 2000); return; }
+      spSay('🍲 小味', ['小味遞來一碗熱湯：「照顧自己，也是一種勇敢。」', '答對一題健康與營養題，照顧星就會亮。'], AV(3), () => { const opts = q.kind === 'tf' ? ['是', '否'] : shuffled([q.a].concat(q.w), Math.random);
+        say('🍲 照顧星', q.q, opts.map(o => ({ label: q.kind === 'tf' ? (o === '是' ? '⭕ 是' : '❌ 否') : o, fn: () => { if (o === q.a) starLit(s, (q.ex || '') + '\n\n熱湯暖暖的，照顧星亮起來了！'); else retry('正確答案：' + q.a + '\n' + (q.ex || '') + '\n「沒關係，換一題再試。」'); } })), AV(3)); }, '好'); }
+  }
+  function starFinal() {
+    const s = GST[4], g = gsD(); const bank = kPool(), q = shuffled(bank, Math.random)[0];
+    spSay('📖 小知', ['小知翻開魔導書：「好奇星……我來試試！」', '書頁發出微光，星光亮了一下——又暗下去了。', '🌫 灰燼守門獸低下頭，聲音很輕：\n「大家都說算了，我就也說算了……」'], AV(4), () => {
+      spSay('🌟 第六個聲音', ['最後一顆星，怎麼都亮不起來——它在守門獸胸口最深處。', '你深吸一口氣，張開嘴。\n這是第六個聲音。\n你要唱出《同樂之光》的第一句。\n（8 個音對上 5 個；J／K／L 或點按鈕）'], AV(0), () => rhStart(ok => {
+        if (!ok) { say('🌟 第六個聲音', '聲音有點抖，星光閃了一下又暗下去。\n夥伴們在你身後輕輕說：「再唱一次，我們都在。」', [{ label: '再唱一次', pri: true, fn: starFinal }, { label: '回到選單', fn: beastMenu }], AV(4)); return; }
+        g[5] = 1; addPts(5, '⭐ 點亮好奇星'); save(); toast('⭐ 好奇星亮了！（5/5）', 2600);
+        spSay('✨ 星光', ['最後一顆星光亮起，灰燼散成金色的光點！', '灰燼守門獸慢慢縮小，縮回最初的棄念者，坐在地上：\n「……我只是想有人先對我說「沒關係，再試一次」。」', '你蹲下，對他說出那句話：\n「沒關係，再試一次。」', '他慢慢露出微笑——第一次有表情。', '🔮 小知：「五顆星光亮了，天之城的最後一道封印鬆開了……」\n\n（第五章完成　終章「七十顆星光回家」將在下一階段開放）'], AV(4), () => { IS().ch5 = 1; addPts(30, '🌟 灰燼守門獸淨化'); save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🌟 灰燼守門獸變回棄念者！（+30 點）', 3600); });
+      }, 8, 5), '開始唱');
+    }, '繼續');
+  }
+  ia({ id: 'islBeast', get x() { return ISW(CV.sx, CV.sz).x; }, get y() { return ISY(); }, get z() { return ISW(CV.sx, CV.sz).z; }, r: 3.0,
+    txt: () => { const d = IS(); return d.ch5 ? '🌫 洞口的棄念者' : d.beast ? '🌫 灰燼守門獸（星光 ' + gsN() + '/5）' : '🕳 封印洞穴'; }, act: beastTalk });
+  FXQ.push({ tick: t => { const d = IS(), g = gsD(), b = BST; b.g.visible = !!d.pur;
+    if (d.pur) { const lit = d.ch5 ? 5 : gsN(), tgt = d.ch5 ? 0.3 : (d.beast ? 1 - lit * 0.1 : 1); b.sc += (tgt - b.sc) * 0.05; b.g.scale.setScalar(b.sc); b.g.position.y = 5 + (d.ch5 ? 0 : Math.sin(t * 1.2) * 0.12);
+      b.stars.forEach((q, i) => { const on = !!g[i + 1]; q.material.color.setHex(on ? GST[i].col : 0x3a3a3a); q.rotation.y = t * (on ? 2 : 0.3); q.scale.setScalar(on ? 1.3 + Math.sin(t * 4 + i) * 0.15 : 1); q.visible = !d.ch5; }); } } });
+  L.beast = { GST, gsD, gsN, beastTalk, beastMenu, BST, CV };
 
   /* ---------- 校長室的停停.鄧不利（原創 NPC，站在辦公桌旁；每天可請校長勉勵一次）---------- */
   if (window.ROOM_POS && window.ROOM_POS['校長室']) { const rp = window.ROOM_POS['校長室'];
