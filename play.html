@@ -11157,24 +11157,47 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       ask(); }, '開始修理');
   }
   /* 西塔：節奏（三條音軌，唱完整段；J K L 或點按鈕） */
+  /* 音遊曲庫：10 首公有領域的兒歌／古典旋律（只用旋律，不含歌詞）；每次隨機一首，旋律會在背景演奏，音符落到黃線時按對應的鍵 */
+  const SONGS = [
+    { n: '小星星', b: 0.65, m: "1 1 5 5 6 6 5:2 4 4 3 3 2 2 1:2 5 5 4 4 3 3 2:2 5 5 4 4 3 3 2:2 1 1 5 5 6 6 5:2 4 4 3 3 2 2 1:2" },
+    { n: '歡樂頌', b: 0.65, m: "3 3 4 5 5 4 3 2 1 1 2 3 3:1.5 2:.5 2:2 3 3 4 5 5 4 3 2 1 1 2 3 2:1.5 1:.5 1:2" },
+    { n: '瑪莉有隻小綿羊', b: 0.65, m: "3 2 1 2 3 3 3:2 2 2 2:2 3 5 5:2 3 2 1 2 3 3 3 3 2 2 3 2 1:4" },
+    { n: '兩隻老虎', b: 0.7, m: "1 2 3 1 1 2 3 1 3 4 5:2 3 4 5:2 5:.5 6:.5 5:.5 4:.5 3 1 5:.5 6:.5 5:.5 4:.5 3 1 1 5, 1:2 1 5, 1:2" },
+    { n: '鈴兒響叮噹', b: 0.7, m: "3 3 3:2 3 3 3:2 3 5 1:1.5 2:.5 3:4 4 4 4:1.5 4:.5 4 3 3 3:.5 3:.5 3 2 2 3 2:2 5:2" },
+    { n: '倫敦鐵橋垮下來', b: 0.65, m: "5:1.5 6:.5 5 4 3 4 5:2 2 3 4:2 3 4 5:2 5:1.5 6:.5 5 4 3 4 5 2 5 3 1:2" },
+    { n: '划，划，划小船', b: 0.65, m: "1 1 1:1.5 2:.5 3 3:1.5 2:.5 3:1.5 4:.5 5:2 1' 1' 1' 5 5 5 3 3 3 1 1 1 5 4 3:1.5 2:.5 1:2" },
+    { n: '生日快樂歌', b: 0.7, m: "5:.75 5:.25 6 5 1' 7:2 5:.75 5:.25 6 5 2' 1':2 5:.75 5:.25 5' 3' 1' 7 6:2 4':.75 4':.25 3' 1' 2' 1':2" },
+    { n: '小蜜蜂', b: 0.65, m: "5 3 3:2 4 2 2:2 1 2 3 4 5 5 5:2 5 3 3:2 4 2 2:2 1 3 5 5 3:4" },
+    { n: '聖者進行曲', b: 0.65, m: "1 3 4 5:3 1 3 4 5:3 1 3 4 5 3 1 3 2:3 3 3 2 1 1 3 5 5 4:2" } ];
+  const SONG_MOTIF = { n: '同樂之光（示意旋律）', b: 0.6, m: "1 3 5 1' 7 5 6:2 5 3 1 3 5:2 6 6 5 3 2 3 1:2 1 3 5 1' 3' 2' 1':3" };
+  const SF = { 1: 0, 2: 2, 3: 4, 4: 5, 5: 7, 6: 9, 7: 11 };
+  function songParse(sg) { const out = []; let t = 0; sg.m.split(/\s+/).forEach(tk => { const m = /^([0-7])([,']?)(?::([\d.]+))?$/.exec(tk); if (!m) return; const d = m[3] ? parseFloat(m[3]) : 1, deg = +m[1];
+      if (deg > 0) { const st = SF[deg] + (m[2] === "'" ? 12 : m[2] === ',' ? -12 : 0); out.push({ t, d, st, f: 261.63 * Math.pow(2, st / 12) }); } t += d; }); return out; }
+  const RHA = { ac: null, master: null };
+  function rhPlay(evs, beat, lead) { try { const ac = SFX.ctx(); if (!ac || S.noSfx) return; if (RHA.master) { try { RHA.master.disconnect(); } catch (e) { /* 忽略 */ } } const m = ac.createGain(); m.gain.value = 0.9; m.connect(ac.destination); RHA.master = m; const t0 = ac.currentTime + lead;
+      evs.forEach(e => { const o = ac.createOscillator(), g = ac.createGain(), a = t0 + e.t * beat, d = Math.max(0.12, e.d * beat * 0.92); o.type = 'triangle'; o.frequency.value = e.f; g.gain.setValueAtTime(0.0001, a); g.gain.linearRampToValueAtTime(0.22, a + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, a + d); o.connect(g); g.connect(m); o.start(a); o.stop(a + d + 0.05); }); } catch (e) { /* 忽略 */ } }
+  function rhStop() { try { if (RHA.master) { RHA.master.disconnect(); RHA.master = null; } } catch (e) { /* 忽略 */ } }
   const RH = { on: false, win: 0.28, fall: 1.7, notes: [], hits: 0, t0: 0, fin: null, raf: 0, H: 250 };
   const rhEl = (() => { const e = document.createElement('div'); e.id = 'rhy'; e.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;display:none;width:330px;padding:12px;border-radius:16px;background:rgba(20,16,40,.92);color:#fff;font:600 14px/1.4 system-ui,"Noto Sans TC",sans-serif;text-align:center;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 8px 30px rgba(0,0,0,.5)';
     e.innerHTML = '<div id="rhtx" style="margin-bottom:6px"></div><div id="rhf" style="position:relative;height:250px;overflow:hidden;border-radius:10px;background:linear-gradient(#2a2058,#3b2a7a)"><div style="position:absolute;left:33.3%;top:0;bottom:0;width:1px;background:#fff3"></div><div style="position:absolute;left:66.6%;top:0;bottom:0;width:1px;background:#fff3"></div><div style="position:absolute;left:0;right:0;bottom:38px;height:3px;background:#ffd54a"></div></div>'
       + '<div style="display:flex;gap:6px;margin-top:8px"><button data-l="0" style="flex:1;padding:12px 0;font-size:18px;border-radius:10px;border:0;background:#ff6b9a;color:#fff">J</button><button data-l="1" style="flex:1;padding:12px 0;font-size:18px;border-radius:10px;border:0;background:#ffd54a;color:#333">K</button><button data-l="2" style="flex:1;padding:12px 0;font-size:18px;border-radius:10px;border:0;background:#6bd0ff;color:#333">L</button></div>'
       + '<button id="rhsk" style="margin-top:8px;padding:6px 12px;border-radius:10px;border:1px dashed #ff9ab8;background:transparent;color:#ff9ab8;font-size:13px">😈 這一段很長耶，跳過嘛～</button>';
     document.body.appendChild(e); return e; })();
-  function rhEnd(ok, skipped) { if (!RH.on) return; RH.on = false; cancelAnimationFrame(RH.raf); rhEl.style.display = 'none'; const f = RH.fin; RH.fin = null; if (f) f(ok, skipped); }
+  function rhEnd(ok, skipped) { if (!RH.on) return; RH.on = false; rhStop(); cancelAnimationFrame(RH.raf); rhEl.style.display = 'none'; const f = RH.fin; RH.fin = null; if (f) f(ok, skipped); }
   function rhTick() { if (!RH.on) return; const now = (performance.now() - RH.t0) / 1000, F = rhEl.querySelector('#rhf');
     RH.notes.forEach(n => { if (n.hit) { n.el.style.display = 'none'; return; } const p = 1 - (n.t - now) / RH.fall; n.el.style.top = (p * (RH.H - 38) - 16) + 'px'; n.el.style.opacity = p < 0 || p > 1.25 ? 0 : 1; if (!n.miss && now - n.t > RH.win) { n.miss = true; n.el.style.filter = 'grayscale(1)'; } });
-    rhEl.querySelector('#rhtx').textContent = '🎵 唱完整段：已對上 ' + RH.hits + '／' + RH.notes.length + '（過關 ' + RH.need + '）';
+    rhEl.querySelector('#rhtx').textContent = '🎵 《' + (RH.title || '') + '》已對上 ' + RH.hits + '／' + RH.notes.length + '（過關 ' + RH.need + '）';
     if (now > RH.notes[RH.notes.length - 1].t + 0.9) { rhEnd(RH.hits >= RH.need, false); return; } RH.raf = requestAnimationFrame(rhTick); }
   function rhHit(l) { if (!RH.on) return; const now = (performance.now() - RH.t0) / 1000; let b = null;
     RH.notes.forEach(n => { if (n.l === l && !n.hit && Math.abs(n.t - now) <= RH.win && (!b || Math.abs(n.t - now) < Math.abs(b.t - now))) b = n; });
     if (b) { b.hit = true; RH.hits++; try { SFX.play('coin', 120); } catch (e) { /* 忽略 */ } } }
-  function rhStart(fin, nn, need) {
+  function rhStart(fin, nn, need, opts) {
     close(); const N = nn || 14, cols = ['#ff6b9a', '#ffd54a', '#6bd0ff'], F = rhEl.querySelector('#rhf'); F.querySelectorAll('.rn').forEach(x => x.remove());
-    let l = 1; RH.notes = []; for (let i = 0; i < N; i++) { l = Math.random() < 0.45 ? l : Math.floor(Math.random() * 3); const el = document.createElement('div'); el.className = 'rn'; el.style.cssText = 'position:absolute;width:30%;height:32px;border-radius:16px;top:-40px;left:' + (l * 33.3 + 1.7) + '%;background:' + cols[l] + ';box-shadow:0 0 10px ' + cols[l] + ';font-size:18px;line-height:32px'; el.textContent = '♪'; F.appendChild(el); RH.notes.push({ l, t: 2.2 + i * 0.75, el, hit: false, miss: false }); }
-    RH.hits = 0; RH.need = need || 9; RH.fin = fin; RH.on = true; RH.t0 = performance.now(); rhEl.style.display = 'block'; RH.raf = requestAnimationFrame(rhTick);
+    const sg = (opts && opts.song) || SONGS[Math.floor(Math.random() * SONGS.length)], beat = sg.b, lead = 2.2, evs = songParse(sg);
+    const gm = evs.filter(e => e.d >= 0.5).slice(0, N), last = gm[gm.length - 1], play = evs.filter(e => e.t <= last.t);
+    const uq = Array.from(new Set(gm.map(e => e.st))).sort((a, b) => a - b), laneOf = st => Math.min(2, Math.floor(uq.indexOf(st) * 3 / uq.length));
+    RH.notes = []; RH.title = sg.n; gm.forEach(e => { const l = laneOf(e.st), el = document.createElement('div'); el.className = 'rn'; el.style.cssText = 'position:absolute;width:30%;height:32px;border-radius:16px;top:-40px;left:' + (l * 33.3 + 1.7) + '%;background:' + cols[l] + ';box-shadow:0 0 10px ' + cols[l] + ';font-size:18px;line-height:32px'; el.textContent = '♪'; F.appendChild(el); RH.notes.push({ l, t: lead + e.t * beat, el, hit: false, miss: false }); });
+    RH.hits = 0; RH.need = Math.min(need || 9, RH.notes.length); RH.fin = fin; RH.on = true; RH.t0 = performance.now(); rhEl.style.display = 'block'; rhPlay(play, beat, lead); RH.raf = requestAnimationFrame(rhTick);
   }
   rhEl.querySelectorAll('button[data-l]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); rhHit(+b.dataset.l); }));
   rhEl.querySelector('#rhsk').addEventListener('click', () => rhEnd(false, true));
@@ -11186,7 +11209,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     }), '上舞台');
   }
   FXQ.push({ tick: t => { TW.forEach(o => { const w = TWL[o.k], on = !!twD()[o.k]; w.beam.material.opacity += ((on ? 0.34 : 0) - w.beam.material.opacity) * 0.08; w.mk.visible = !on && IS().hall >= 2; w.em.position.y = 2.6 + Math.sin(t * 2 + o.n) * 0.25; w.ring.rotation.z = t * 0.8; }); } });
-  L.tw = { TW, twD, twN, twStart, RH, rhHit, EH };
+  L.tw = { TW, twD, twN, twStart, RH, rhHit, EH, SONGS, SONG_MOTIF, songParse, rhStart };
   /* ---------- 第四章：雙影（主塔頂層小戰與淨化）：3 回合知識題，誘惑影＝偷看答案、懶惰靈＝先放著 ---------- */
   const BK = { x: 5.6, z: -5.6 };
   { const gp = new T.Group(); gp.position.set(BK.x, 5, BK.z); ISL.g.add(gp);
@@ -11287,7 +11310,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
         if (!ok) { say('🌟 第六個聲音', '聲音有點抖，星光閃了一下又暗下去。\n夥伴們在你身後輕輕說：「再唱一次，我們都在。」', [{ label: '再唱一次', pri: true, fn: starFinal }, { label: '回到選單', fn: beastMenu }], AV(4)); return; }
         g[5] = 1; addPts(5, '⭐ 點亮好奇星'); save(); toast('⭐ 好奇星亮了！（5/5）', 2600);
         spSay('✨ 星光', ['最後一顆星光亮起，灰燼散成金色的光點！', '灰燼守門獸慢慢縮小，縮回最初的棄念者，坐在地上：\n「……我只是想有人先對我說「沒關係，再試一次」。」', '你蹲下，對他說出那句話：\n「沒關係，再試一次。」', '他慢慢露出微笑——第一次有表情。', '🔮 小知：「五顆星光亮了，天之城的最後一道封印鬆開了……」\n\n（第五章完成　終章「七十顆星光回家」將在下一階段開放）'], AV(4), () => { IS().ch5 = 1; addPts(30, '🌟 灰燼守門獸淨化'); save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🌟 灰燼守門獸變回棄念者！（+30 點）', 3600); });
-      }, 8, 5), '開始唱');
+      }, 8, 5, { song: SONG_MOTIF }), '開始唱');
     }, '繼續');
   }
   ia({ id: 'islBeast', get x() { return ISW(CV.sx, CV.sz).x; }, get y() { return ISY(); }, get z() { return ISW(CV.sx, CV.sz).z; }, r: 3.0,
@@ -11337,7 +11360,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       let i = 0; const nxt = () => { if (i >= 5) { yourTurn(); return; } const v = VOICES[i]; [v.f, v.f * 1.25, v.f * 1.5].forEach((f, k) => bell(f, k * 0.22)); spSay('🎵 合唱', lines[i], AV(v.av), () => { i++; setTimeout(nxt, 120); }, i < 4 ? '下一個聲音 ▶' : '輪到你了'); }; nxt(); }, '圍成一圈');
     function yourTurn() { spSay('🎵 第六個聲音', ['最後一句，由你唱出。\n（8 個音對上 5 個；J／K／L 或點按鈕）'], AV(0), () => rhStart(ok => {
       if (!ok) { say('🎵 第六個聲音', '音符有點散了。\n夥伴們輕聲說：「再來一次，我們陪你。」', [{ label: '再唱一次', pri: true, fn: yourTurn }, { label: '等一下' }], AV(4)); return; }
-      chorus(6); lidOpen(); }, 8, 5), '開始唱'); }
+      chorus(6); lidOpen(); }, 8, 5, { song: SONG_MOTIF }), '開始唱'); }
   }
   function lidOpen() {
     spSay('✨ 七十顆星光', ['六種顏色的音符在空中交織。盒蓋緩緩打開——', '裡面飛出一顆顆星光：七十顆，是同樂七十年的每一屆。', '星光穿過窗口，飛向地面……'], AV(4), () => {
