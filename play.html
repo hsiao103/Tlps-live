@@ -8999,6 +8999,10 @@ body.live.gearopen #modes .grp{position:static!important}
 body.live.gearopen #modes button{font-size:13.5px;padding:6px 11px;width:auto!important;flex:none!important;max-width:none!important;position:static!important;margin:0!important;display:inline-block}
 body.live.gearopen #modes>button{width:100%!important;display:block}
 #gearT{font:800 14px var(--font-ui);color:var(--fg);margin-bottom:-2px}
+body.live.gearopen #modes{flex-wrap:nowrap!important;overflow-x:hidden;overflow-y:auto!important}
+body.live.gearopen #modes>*{flex:none!important;min-height:0}
+body.live.gearopen #modes{max-height:calc(100vh - 90px);max-height:calc(100dvh - 84px - env(safe-area-inset-top,0px));-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+@media (max-width:640px),(max-height:620px){body.live.gearopen #modes{top:calc(56px + env(safe-area-inset-top,0px));right:8px;width:min(300px,calc(100vw - 16px));gap:5px;padding:9px 11px calc(14px + env(safe-area-inset-bottom,0px))}body.live.gearopen #modes button{font-size:12.5px;padding:5px 9px}body.live.gearopen #modes select{max-width:100%;font-size:14px}body.live.gearopen #modes .row{flex-wrap:wrap;gap:4px}body.live.gearopen #modes .row .lab{width:100%}}
 #gGear{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;z-index:31;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.14);padding:0}
 #gGear svg{width:24px;height:24px;transition:transform .4s}body.gearopen #gGear svg{transform:rotate(90deg)}body.intro #gGear{display:none}
 @media(max-width:1100px){#gGear{right:68px}}
@@ -11343,7 +11347,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function finStart(pl, fin, dir) { const w = ISW(MB.x, MB.z); finMake(pl.x, pl.z, dir && dir.x, dir && dir.z); FIN.pl = pl; FIN.st0 = { x: w.x, y: ISY() + 2, z: w.z }; FIN.tg = FIN.st.map((s, i) => { const a = i / 70 * Math.PI * 2 * 3.1 + 0.4, r = 5 + (i * 7 % 23); return [pl.x + Math.cos(a) * r, (pl.y || 0) + 2 + (i % 5) * 1.4, pl.z + Math.sin(a) * r * 0.8]; }); FIN.t = 0; FIN.on = true; FIN.fin = fin; FIN.st.forEach(s => { s.visible = true; }); }
   FXQ.push({ tick: (() => { let last = performance.now(); return () => { const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now; const d = IS();
     if (d.ch6 && !FIN.on) { if (!FIN.st.length && FIN.pl === null) { /* 重新進遊戲後：七十顆星光仍掛在校園上空 */ const b = (() => { try { return NPLACES.find(p => p.name === '梅花廣場') || { x: 0, z: -45 }; } catch (e) { return { x: 0, z: -45 }; } })(); finMake(b.x, b.z + 10); FIN.st.forEach(s => { const f = s.userData.f; s.position.set(f[0], f[1], f[2]); s.visible = true; }); }
-      FIN.st.forEach((s, i) => { s.material.opacity = 0.65 + Math.sin(performance.now() / 500 + i) * 0.3; }); if (FIN.slogan) { FIN.slogan.visible = true; FIN.slogan.material.opacity = 0.85; } }
+      FIN.st.forEach((s, i) => { s.visible = !S.noFinSt; s.material.opacity = 0.65 + Math.sin(performance.now() / 500 + i) * 0.3; }); if (FIN.slogan) { FIN.slogan.visible = !S.noFinTx; FIN.slogan.material.opacity = 0.85; } }
+    if (FIN.rows) { const sh = d.ch6 ? '' : 'none'; FIN.rows.forEach(r => { if (r.style.display !== sh) r.style.display = sh; }); }
     if (!FIN.on) return; FIN.t += dt; const t = FIN.t, e = k => k < 0 ? 0 : k > 1 ? 1 : k * k * (3 - 2 * k);
     FIN.st.forEach((s, i) => { const f = s.userData.f, g = FIN.tg[i], a = FIN.st0, d0 = i * 0.04;
       if (t < 4.5) { const k = e((t - d0) / 3.2); s.position.set(a.x + (g[0] - a.x) * k + Math.sin(k * 6 + i) * 4 * (1 - k), a.y + (g[1] - a.y) * k + Math.sin(k * Math.PI) * 10, a.z + (g[2] - a.z) * k); }
@@ -11352,6 +11357,22 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       s.material.opacity = 1; });
     if (FIN.slogan) { FIN.slogan.visible = t > 9; FIN.slogan.material.opacity = Math.min(1, Math.max(0, (t - 9) / 1.5)); }
     if (t > 11) { FIN.on = false; const f = FIN.fin; FIN.fin = null; if (f) f(); } }; })() });
+  { /* 通關後的設定：重播終章動畫、七十星光／標語顯示開關 */
+    const m = document.getElementById('modes');
+    if (m) {
+      const mk = (id, lab, html) => { const r = document.createElement('div'); r.className = 'row'; r.id = id; r.style.display = 'none'; r.innerHTML = '<span class="lab">' + lab + '</span>' + html; return r; };
+      const rp = mk('gFinRow', '終章', '<button type="button" id="bFinRp">🌠 重播終章動畫</button>');
+      rp.querySelector('#bFinRp').onclick = () => { document.body.classList.remove('gearopen'); finGo(true); };
+      const r1 = mk('gFinStRow', '70週年星光', '<button type="button" id="bFinSt"></button>');
+      const b1 = r1.querySelector('#bFinSt'), s1 = () => { b1.textContent = S.noFinSt ? '✨ 已隱藏（點此顯示）' : '✨ 顯示（點此隱藏）'; b1.className = S.noFinSt ? '' : 'on'; };
+      b1.onclick = () => { S.noFinSt = S.noFinSt ? 0 : 1; save(); s1(); }; s1();
+      const r2 = mk('gFinTxRow', '70週年標語', '<button type="button" id="bFinTx"></button>');
+      const b2 = r2.querySelector('#bFinTx'), s2 = () => { b2.textContent = S.noFinTx ? '🔤 已隱藏（點此顯示）' : '🔤 顯示（點此隱藏）'; b2.className = S.noFinTx ? '' : 'on'; };
+      b2.onclick = () => { S.noFinTx = S.noFinTx ? 0 : 1; save(); s2(); }; s2();
+      const anchor = m.querySelector('#gSkyRow') || m.lastElementChild; if (anchor) { anchor.after(rp); rp.after(r1); r1.after(r2); } else { m.appendChild(rp); m.appendChild(r1); m.appendChild(r2); }
+      FIN.rows = [rp, r1, r2];
+    }
+  }
   function musicAct() {
     const d = IS();
     if (d.ch6) { say('🎼 星光音樂盒', '盒子裡的星光已經回家了，但它還記得那一天。\n要做什麼呢？', [{ label: '🎼 再聽一次六個聲音的合唱', pri: true, fn: () => { toast('🎼 六個聲音再次響起……', 2400); chorus(6); } }, { label: '🌠 重播終章動畫（星光與天之城降落）', fn: () => finGo(true) }, { label: '先不要' }], AV(4)); return; }
