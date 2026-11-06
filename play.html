@@ -11078,8 +11078,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     say('🛠 管理者・故事進度', '選擇要從哪一章開始（會設定進度並傳送）。\n目前：神器 ' + spArt() + '/5・拱門 ' + (sp.portal ? '已開' : '未開') + '・石碑 ' + Object.keys(d.stele).length + '/5・大廳教學 ' + (d.hall >= 2 ? '完成' : d.hall ? '進行中' : '未開始'), [
       { label: '▶ 從第二章開始（棄念者教學）', pri: true, fn: () => { base(); steles(true); d.hall = 0; d.tw = {}; go(0, 2); done('已設定：第一章完成，傳送到城堡大廳'); } },
       { label: '▶ 從第一章開始（石子路石碑）', fn: () => { base(); steles(false); d.hall = 0; go(21.8, 20); done('已設定：從第一章開始，傳送到石子路入口'); } },
-      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
-      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; done('故事進度已重置'); } },
+      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; d.pur = 0; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
+      { label: '▶ 從第四章開始（雙影小戰）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 0; go(3.4, -3.2); done('已設定：四座塔已點亮，可到發光的書挑戰雙影'); } },
+      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; d.pur = 0; done('故事進度已重置'); } },
       { label: '關閉' }], AV(0));
   }
 
@@ -11184,6 +11185,52 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   }
   FXQ.push({ tick: t => { TW.forEach(o => { const w = TWL[o.k], on = !!twD()[o.k]; w.beam.material.opacity += ((on ? 0.34 : 0) - w.beam.material.opacity) * 0.08; w.mk.visible = !on && IS().hall >= 2; w.em.position.y = 2.6 + Math.sin(t * 2 + o.n) * 0.25; w.ring.rotation.z = t * 0.8; }); } });
   L.tw = { TW, twD, twN, twStart, RH, rhHit, EH };
+  /* ---------- 第四章：雙影（主塔頂層小戰與淨化）：3 回合知識題，誘惑影＝偷看答案、懶惰靈＝先放著 ---------- */
+  const BK = { x: 5.6, z: -5.6 };
+  { const gp = new T.Group(); gp.position.set(BK.x, 5, BK.z); ISL.g.add(gp);
+    const ped = new T.Mesh(new T.CylinderGeometry(0.7, 0.9, 1.1, 10), new T.MeshLambertMaterial({ color: 0x9d9684 })); ped.position.y = 0.55; ped.frustumCulled = false; gp.add(ped);
+    const bk = new T.Mesh(new T.BoxGeometry(1.1, 0.16, 0.8), new T.MeshBasicMaterial({ color: 0xfff0a0 })); bk.position.y = 1.35; bk.rotation.x = -0.35; bk.frustumCulled = false; gp.add(bk);
+    const bm = new T.Mesh(new T.CylinderGeometry(0.4, 0.9, 7, 12, 1, true), new T.MeshBasicMaterial({ color: 0xffe28a, transparent: true, opacity: 0.4, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide })); bm.position.y = 4.6; bm.frustumCulled = false; gp.add(bm);
+    BK.gp = gp; BK.bk = bk; BK.bm = bm;
+    ia({ id: 'islBook', get x() { return ISW(BK.x, BK.z).x; }, get y() { return ISY(); }, get z() { return ISW(BK.x, BK.z).z; }, r: 2.8,
+      txt: () => IS().pur ? '📖 發光的書（雙影已淨化）' : '📖 發光的書・登上主塔頂層', act: () => twinStart() }); }
+  const GH = { t: sprite(emojiTex('😈'), [1.3, 1.3], 0, 0, 0, 31), l: sprite(emojiTex('🦥'), [1.3, 1.3], 0, 0, 0, 31), lv: { t: 3, l: 3 }, fight: false };
+  GH.t.visible = GH.l.visible = false;
+  FXQ.push({ tick: (() => { let rem = 0; return t => { const d = IS(), pur = !!d.pur;
+    const show = pur || (d.all && IS().hall >= 2); GH.t.visible = GH.l.visible = show;
+    if (show) { const w = ISW(BK.x, BK.z), by = ISY() + 2.6 + Math.sin(t * 1.6) * 0.2;
+      if (pur) { const a = PL.yaw || 0; [[GH.t, 1], [GH.l, -1]].forEach(([s, k]) => { const tx = PL.x + Math.cos(a) * 0.55 * k, tz = PL.z - Math.sin(a) * 0.55 * k, ty = PL.y + 1.75 + Math.sin(t * 2 + k) * 0.08; s.position.x += (tx - s.position.x) * 0.12; s.position.y += (ty - s.position.y) * 0.12; s.position.z += (tz - s.position.z) * 0.12; s.scale.set(0.5, 0.5, 1); s.material.opacity = 1; }); }
+      else { GH.t.position.set(w.x - 1.1, by, w.z); GH.l.position.set(w.x + 1.1, by + 0.15, w.z); [['t', GH.t], ['l', GH.l]].forEach(([k, s]) => { const lv = GH.fight ? GH.lv[k] : 3; s.material.opacity = 0.25 + lv * 0.25; s.scale.setScalar(0.9 + lv * 0.25); }); } }
+    BK.bm.material.opacity = d.pur ? 0.2 : 0.4 + Math.sin(t * 2) * 0.1;
+    if (pur && !dlgOpen) { rem += 1 / 60; if (rem > 300) { rem = 0; const L2 = ['🦥 懶惰靈（現在是好朋友了）：「現在要不要先做第一步？只做一小步就好。」', '😈 誘惑影（現在是好朋友了）：「先做今天的第一個任務吧，做完再玩更快樂～」']; toast(L2[Math.floor(Math.random() * 2)], 4200); } } }; })() });
+  const kPool = () => { let a = []; try { Object.keys(window.TL_TFQ || {}).forEach(k => { a = a.concat(window.TL_TFQ[k]); }); } catch (e) { /* 忽略 */ } a = a.concat(window.TL_PEC && window.TL_PEC.length ? window.TL_PEC : window.TL_PE || [], window.TL_GQC && window.TL_GQC.length ? window.TL_GQC : window.TL_GQ || []); return a.filter(x => x && x.q && x.a && Array.isArray(x.w) && x.w.length >= 1); };
+  function twinStart() {
+    const d = IS();
+    if (!d.all) { say('📖 發光的書', '書頁被灰色的霧蓋著，翻不開。\n先把四座藍頂塔都點亮吧（' + twN() + '/4）。', [{ label: '好' }], AV(4)); return; }
+    if (d.pur) { say('📖 發光的書', '書頁上寫著：「先做第一步就好。」\n兩個小小的影子在你肩上眨眼睛。', [{ label: '好' }], AV(4)); return; }
+    spSay('🔮 小知', ['主塔頂層是一座圓形平台，中央有一本發光的書。\n「我想起翻到一頁沒人讀過的校史……」', '😈🦥 誘惑影與懶惰靈同時現身，手拉著手：\n「來嘛，一起玩～」「先放著啦……」', '共 3 回合，每回合一題，要靠你自己作答。\n誘惑影會偷偷說可以「偷看答案」，懶惰靈會說「先放著吧」——選擇權在你。'], AV(4), twinFight, '開始');
+  }
+  function twinFight() {
+    const pool = kPool(); if (pool.length < 3) { toast('題庫載入失敗', 2000); return; }
+    const st = { q: shuffled(pool, Math.random).slice(0, 3).map(q => ({ q, pp: false })), done: 0, miss: 0, peeks: 0, ok: 0, queue: null, lastSay: false };
+    st.queue = st.q.slice(); GH.lv.t = 3; GH.lv.l = 3; GH.fight = true;
+    const end = () => { GH.fight = false; };
+    const lose = () => { end(); say('🌪 雙影', '兩團影子合起來吹出一陣灰風，把你推回塔下。\n「沒關係，再來一次，會換新的題目。」', [{ label: '🔁 重新挑戰', pri: true, fn: () => twinFight() }, { label: '先休息一下' }], AV(4)); };
+    const win = () => { end(); GH.lv.t = GH.lv.l = 0; const pts = 20 + (st.peeks === 0 ? 10 : 0); const d = IS();
+      spSay('🌟 金光', [st.peeks ? '你一路撐到最後——金光從腳下炸開！' : '你自己答對了——金光從腳下炸開！', '影子褪色，兩個小小的影子露出原本的顏色。\n你蹲下，對他們說：「先做第一步就好。」', '他們眨眨眼，變成軟軟的小靈，飄到你肩上。', '🔮 小知輕聲說：「他們不是壞人，只是很會說服自己。」\n\n（誘惑影與懶惰靈成為你的小夥伴，偶爾會提醒你：現在要不要先做第一步？）' + (st.peeks === 0 ? '\n✨ 全程沒有偷看，額外 +10 點！' : '')], AV(4), () => { d.pur = 1; d.ch4 = 1; addPts(pts, '🌟 淨化雙影'); save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🌟 雙影淨化完成！（+' + pts + ' 點）', 3600); }); };
+    const nxt = () => { st.queue.shift(); st.done++; if (!st.queue.length) win(); else ask(); };
+    const ask = () => { const it = st.queue[0], q = it.q, final = st.queue.length === 1 && st.done === 2, round = st.done + 1;
+      const go = () => { const opts = q.kind === 'tf' ? ['是', '否'] : shuffled([q.a].concat(q.w), Math.random);
+        const btn = opts.map(o => ({ label: q.kind === 'tf' ? (o === '是' ? '⭕ 是' : '❌ 否') : o, fn: () => {
+          if (o === q.a) { st.ok++; if (!it.peeked) { GH.lv.t = Math.max(0, GH.lv.t - 1); } if (!it.pp) GH.lv.l = Math.max(0, GH.lv.l - 1); addPts(5, '✅ 雙影答對'); toast('✨ 影子淡了一格', 1800); say('✅ 答對了！', (q.ex || '') + (final ? '' : '\n（影子變淡了一點）'), [{ label: st.queue.length > 1 ? '下一回合 ▶' : '看結果 ✨', pri: true, fn: nxt }], AV(4)); }
+          else { st.miss++; if (st.miss >= 3) { lose(); return; } toast('🤔 再想想看（還能錯 ' + (3 - st.miss) + ' 次）', 2400); setTimeout(ask, 150); } } }));
+        btn.push({ label: '👀 偷看答案（誘惑影：「沒人會知道喔～」）', fn: () => { st.peeks++; it.peeked = true; GH.lv.t = Math.min(3, GH.lv.t + 1); addPts(1, '👀 偷看答案'); say('😈 誘惑影', '正確答案是：' + q.a + '\n這題過了，但影子也變濃了一點，得到的點數也比較少。\n下一題試著自己想想看——答錯也沒關係，慢慢來就好。', [{ label: '知道了', pri: true, fn: nxt }], AV(4)); } });
+        if (!it.pp && st.queue.length > 1) btn.push({ label: '⏳ 先放著吧（懶惰靈：「明天再說啦～」）', fn: () => { it.pp = true; st.queue.push(st.queue.shift()); toast('⏳ 這題被延後了，最後要一次補完', 2600); setTimeout(ask, 150); } });
+        say('🏯 雙影・第 ' + round + ' 回合' + (final ? '（雙頭灰影）' : ''), (q.cat ? '【' + q.cat + '】' : '') + q.q + (it.pp ? '\n（之前先放著的題目）' : ''), btn, AV(4)); };
+      if (final && !st.lastSay) { st.lastSay = true; spSay('🌪 雙頭灰影', ['兩團影子合成一個雙頭的灰影，狂風大作！', '夥伴們站在你身後，手搭在你肩上：\n「我們都在！」'], AV(0), go, '迎戰'); } else go(); };
+    ask();
+  }
+  L.twin = { twinStart, twinFight, GH, BK, kPool };
 
   /* ---------- 校長室的停停.鄧不利（原創 NPC，站在辦公桌旁；每天可請校長勉勵一次）---------- */
   if (window.ROOM_POS && window.ROOM_POS['校長室']) { const rp = window.ROOM_POS['校長室'];
