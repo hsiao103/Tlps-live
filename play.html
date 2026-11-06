@@ -5904,6 +5904,7 @@ FOOT.push({ x0: GX0, z0: GZ0, x1: GX1, z1: GZ1, c: '#5c88b8', tf: CTX.tf, gym: t
     [-0.295, 0.295].forEach(zz => ad(new T.BoxGeometry(0.045, 0.47, 0.02), og, 1.93, 3.445, zz));
     ad(new T.BoxGeometry(0.17, 0.03, 0.14), st, 1.99, 3.05, 0);
     const rim = ad(new T.TorusGeometry(0.23, 0.014, 6, 24), og, 2.3, 3.05, 0); rim.rotation.x = Math.PI / 2;
+    (window.__hoops = window.__hoops || []).push({ rim, dir });   // 供投籃遊戲取得籃框世界座標
     ad(new T.CylinderGeometry(0.23, 0.13, 0.42, 14, 1, true), new T.MeshBasicMaterial({ color: 0xffffff, wireframe: true }), 2.3, 2.84, 0);
     box(xb - dir * 0.7 - 0.5, ZC - 1.0, xb - dir * 0.7 + 0.5, ZC + 1.0, Y0, 1.2, M.steel, { wall: true, noShadow: true }).visible = false; }); }
 });
@@ -9623,6 +9624,117 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       beacon({ x: p.x, y: p.y, z: p.z, col: 0xe0861a, hex: '#e0861a', icon: '🏅', name: '體育與健康小教室', r: 1.6, h: 3.4, lw: 3.0, active: () => PE().n < PEMAX });
       ia({ id: 'peQuiz', x: p.x, y: p.y, z: p.z, r: 2.8, txt: () => { const d = PE(); return d.n >= PEMAX ? '🏅 體育小教室（今天已完成）' : '🏅 體育與健康小教室（今天剩 ' + (PEMAX - d.n) + ' 回）'; }, act: peStation });
       L.pe = { PE, pePick, peStation, pos: p }; } }
+  /* ---------- 風雨球場：投籃挑戰（視角瞄準＋蓄力條；每天 10 球，進一球 +1 點；單人、純投籃）---------- */
+  const BBMAX = 10, BBG = 9.8;
+  const BB = () => { const d = D(); if (!d.bb) d.bb = { n: 0, ok: 0 }; return d.bb; };
+  const BBS = { on: false, hold: false, pw: 0, t0: 0, ball: null, fl: null, hoop: null, st: 'idle', pts: null, tries: 0 };
+  const bbEl = (() => {
+    const e = document.createElement('div'); e.id = 'bbhud';
+    e.style.cssText = 'position:fixed;left:50%;bottom:172px;transform:translateX(-50%);z-index:60;display:none;text-align:center;font:600 15px/1.4 system-ui,"Noto Sans TC",sans-serif;color:#fff;text-shadow:0 1px 3px #000;user-select:none;-webkit-user-select:none;touch-action:none';
+    e.innerHTML = '<div id="bbtx" style="margin-bottom:6px"></div><div style="position:relative;width:280px;height:18px;margin:0 auto 8px;background:rgba(0,0,0,.55);border-radius:9px;border:2px solid #fff;overflow:hidden"><div style="position:absolute;left:42%;width:16%;top:0;bottom:0;background:#3ddc84;opacity:.85"></div><div id="bbpw" style="position:absolute;left:0;top:0;bottom:0;width:0;background:#ff9d2f;opacity:.8"></div><div id="bbmk" style="position:absolute;top:-2px;bottom:-2px;width:4px;left:0;background:#fff"></div></div><button id="bbgo" style="padding:12px 26px;font:700 17px system-ui;border:0;border-radius:24px;background:#ff7a1a;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4);touch-action:none">按住蓄力・放開投籃（R）</button> <button id="bbx" style="padding:8px 14px;font:600 14px system-ui;border:0;border-radius:18px;background:rgba(0,0,0,.55);color:#fff;margin-left:6px">結束</button>';
+    document.body.appendChild(e); return e;
+  })();
+  const bbq = id => bbEl.querySelector('#' + id);
+  function bbHud() { const d = BB(); bbq('bbtx').textContent = '🏀 剩 ' + (BBMAX - d.n) + ' 球　進 ' + d.ok + ' 球　(轉動視角對準籃框，沿著光點投)'; }
+  function bbHoops() { const hs = window.__hoops || []; return hs.map(h => { h.rim.updateWorldMatrix(true, false); const v = new T.Vector3(); h.rim.getWorldPosition(v); const f = new T.Vector3(1, 0, 0).transformDirection(h.rim.parent.matrixWorld); return { x: v.x, y: v.y, z: v.z, fx: f.x, fz: f.z }; }); }   // 球場有旋轉，所以用籃球架的朝向（fx, fz 指向場內）
+  // 依目前站位與面向，挑出要投的籃框，並算出「剛好進籃」所需的速度與仰角
+  function bbAim() {
+    const hs = bbHoops(); if (!hs.length) return null;
+    const fa = Math.atan2(-Math.sin(PL.yaw), -Math.cos(PL.yaw)), ox = PL.x, oy = PL.y + 1.9, oz = PL.z; let best = null;
+    hs.forEach(h => { const dx = h.x - ox, dz = h.z - oz, D = Math.hypot(dx, dz), bear = Math.atan2(dx, dz); let df = bear - fa; df = Math.atan2(Math.sin(df), Math.cos(df)); if (D < 12.5 && D > 1.3 && Math.abs(df) < 1.4 && (!best || Math.abs(df) < Math.abs(best.df))) best = { h, D, bear, df }; });
+    if (!best) return null;
+    let th = 0.96; const hh = best.h.y - oy; let den; for (let i = 0; i < 8; i++) { den = best.D * Math.tan(th) - hh; if (den > 0.25) break; th += 0.08; }
+    const v2 = BBG * best.D * best.D / (2 * Math.cos(th) * Math.cos(th) * Math.max(0.05, den)); best.v = Math.sqrt(v2); best.th = th;
+    best.az = best.bear - best.df * 0.6;   // 瞄準輔助：把偏差縮減到 40%
+    best.ox = ox; best.oy = oy; best.oz = oz; return best;
+  }
+  function bbBallInit() {
+    if (BBS.ball) return;
+    const g = new T.Group(); g.add(new T.Mesh(new T.SphereGeometry(0.13, 14, 10), new T.MeshLambertMaterial({ color: 0xe8661a })));
+    const lm = new T.MeshBasicMaterial({ color: 0x2a1408 }); [0, 1].forEach(i => { const r = new T.Mesh(new T.TorusGeometry(0.131, 0.007, 4, 20), lm); if (i) r.rotation.y = Math.PI / 2; g.add(r); });
+    g.visible = false; G.add(g); BBS.ball = g;
+    const pg = new T.BufferGeometry(); pg.setAttribute('position', new T.BufferAttribute(new Float32Array(16 * 3), 3));
+    BBS.pts = new T.Points(pg, new T.PointsMaterial({ color: 0xffe14d, size: 0.16, transparent: true, opacity: 0.9, depthTest: false, sizeAttenuation: true })); BBS.pts.renderOrder = 30; BBS.pts.frustumCulled = false; BBS.pts.visible = false; G.add(BBS.pts);
+  }
+  function bbPreview(a) {
+    if (!BBS.pts) return; if (!a) { BBS.pts.visible = false; return; }
+    const arr = BBS.pts.geometry.attributes.position.array, vx = Math.sin(a.az) * Math.cos(a.th) * a.v, vz = Math.cos(a.az) * Math.cos(a.th) * a.v, vy = Math.sin(a.th) * a.v, T0 = a.D / (Math.cos(a.th) * a.v);
+    for (let i = 0; i < 16; i++) { const t = T0 * (i + 1) / 17; arr[i * 3] = a.ox + vx * t; arr[i * 3 + 1] = a.oy + vy * t - 0.5 * BBG * t * t; arr[i * 3 + 2] = a.oz + vz * t; }
+    BBS.pts.geometry.attributes.position.needsUpdate = true; BBS.pts.visible = true;
+  }
+  function bbCharge(on) {
+    if (!BBS.on || BBS.st !== 'ready' || dlgOpen) { if (!on) BBS.hold = false; return; }
+    if (on) { if (!BBS.hold) { BBS.hold = true; BBS.t0 = performance.now(); } }
+    else if (BBS.hold) { BBS.hold = false; bbShoot(); }
+  }
+  function bbShoot() {
+    if (BBS.st !== 'ready') return; const a = bbAim(); const d = BB();
+    if (!a) { toast('請先面向籃框（距離 1.5～12 公尺）', 2200); return; }
+    const sp = a.v * (0.72 + 0.56 * BBS.pw), vx = Math.sin(a.az) * Math.cos(a.th) * sp, vz = Math.cos(a.az) * Math.cos(a.th) * sp, vy = Math.sin(a.th) * sp;
+    d.n++; save();
+    BBS.fl = { p: new T.Vector3(a.ox, a.oy, a.oz), v: new T.Vector3(vx, vy, vz), h: a.h, t: 0, done: false, bounced: 0 };
+    BBS.st = 'fly'; BBS.ball.visible = true; BBS.ball.position.copy(BBS.fl.p); BBS.pts.visible = false; bbq('bbgo').style.opacity = '.4';
+    try { SFX.play('jump', 300); } catch (e) { /* 忽略 */ }
+  }
+  function bbEnd(msg) {
+    BBS.on = false; BBS.st = 'idle'; BBS.hold = false; bbEl.style.display = 'none'; if (BBS.ball) BBS.ball.visible = false; if (BBS.pts) BBS.pts.visible = false;
+    const d = BB(); if (msg) say('🏀 投籃挑戰', msg + '\n今天進 ' + d.ok + ' 球，還剩 ' + Math.max(0, BBMAX - d.n) + ' 球。', [{ label: '好', pri: true }]);
+  }
+  function bbResult(ok) {
+    const fl = BBS.fl, d = BB(); BBS.fl = null; if (BBS.ball) BBS.ball.visible = false;
+    if (ok) { d.ok++; S.bbOk = (S.bbOk || 0) + 1; addPts(1, '🏀 進球！'); try { SFX.play('coin', 300); } catch (e) { /* 忽略 */ } if (fl) BBS.burst = { x: fl.h.x, y: fl.h.y, z: fl.h.z, t: 0 }; }
+    else toast('沒進～ 調整力道，再試一次', 1800);
+    S.bbN = (S.bbN || 0) + 1; save(); refreshAll(); bbHud();
+    if (d.n >= BBMAX) { bbEnd('10 球投完了！' + (d.ok >= 8 ? '🔥 神射手！' : d.ok >= 5 ? '👏 不錯喔！' : '明天再接再厲！')); return; }
+    BBS.st = 'ready'; bbq('bbgo').style.opacity = '1';
+  }
+  function bbStep(dt) {
+    const fl = BBS.fl; if (!fl) return; const h = fl.h, n = 4;
+    for (let s = 0; s < n && !fl.done; s++) {
+      const q = dt / n, px = fl.p.x, py = fl.p.y, pz = fl.p.z; fl.v.y -= BBG * q; fl.p.addScaledVector(fl.v, q); fl.t += q;
+      const s0 = (px - h.x) * h.fx + (pz - h.z) * h.fz, s1 = (fl.p.x - h.x) * h.fx + (fl.p.z - h.z) * h.fz, lat = (fl.p.x - h.x) * -h.fz + (fl.p.z - h.z) * h.fx;   // 沿籃框朝向的距離（籃板在 -0.4 處）
+      if (s0 > -0.4 && s1 <= -0.4 && Math.abs(lat) < 0.95 && Math.abs(fl.p.y - (h.y + 0.35)) < 0.58) { const vf = fl.v.x * h.fx + fl.v.z * h.fz; fl.v.x -= vf * 1.55 * h.fx; fl.v.z -= vf * 1.55 * h.fz; fl.p.x += (-0.38 - s1) * h.fx; fl.p.z += (-0.38 - s1) * h.fz; }
+      if (py > h.y && fl.p.y <= h.y && fl.v.y < 0) {
+        const d = Math.hypot(fl.p.x - h.x, fl.p.z - h.z);
+        if (d < 0.35) { fl.done = 'in'; fl.p.set(h.x, h.y, h.z); fl.v.set(0, -1.5, 0); }
+        else if (d < 0.65 && !fl.bounced) { fl.bounced = 1; fl.v.y = Math.abs(fl.v.y) * 0.35; fl.v.x += (fl.p.x - h.x) * 3; fl.v.z += (fl.p.z - h.z) * 3; }
+      }
+      if (fl.p.y < 0.25 || fl.t > 5) { fl.done = fl.done || 'miss'; }
+    }
+    if (BBS.ball) { BBS.ball.position.copy(fl.p); BBS.ball.rotation.x += dt * 8; }
+    if (fl.done) { if (fl.done === 'in') { BBS.fl.t2 = (BBS.fl.t2 || 0) + dt; if (BBS.fl.t2 < 0.35) { BBS.ball.position.y -= BBS.fl.t2 * 1.5; return; } } bbResult(fl.done === 'in'); }
+  }
+  function bbStart() {
+    const d = BB(); if (d.n >= BBMAX) { say('🏀 投籃挑戰', '今天的 ' + BBMAX + ' 球都投完囉，進了 ' + d.ok + ' 球。\n明天再來！', [{ label: '好', pri: true }]); return; }
+    close(); bbBallInit(); BBS.on = true; BBS.st = 'ready'; BBS.hold = false; BBS.pw = 0; bbEl.style.display = 'block'; bbq('bbgo').style.opacity = '1'; bbHud();
+    const a = bbAim(); if (!a) { const hs = bbHoops(), h = hs.sort((p, q) => Math.hypot(p.x - PL.x, p.z - PL.z) - Math.hypot(q.x - PL.x, q.z - PL.z))[0]; if (h) PL.yaw = Math.atan2(-(h.x - PL.x), -(h.z - PL.z)); }
+  }
+  function bbTick(dt) {
+    if (!BBS.on) return;
+    const hs = bbHoops(); if (!hs.some(h => Math.hypot(h.x - PL.x, h.z - PL.z) < 15)) { bbEnd('離球場太遠了，挑戰先結束。'); return; }
+    if (BBS.st === 'ready') {
+      if (BBS.hold) { const ph = ((performance.now() - BBS.t0) / 1600) % 2; BBS.pw = ph < 1 ? ph : 2 - ph; } else BBS.pw = 0;
+      bbq('bbpw').style.width = (BBS.pw * 100) + '%'; bbq('bbmk').style.left = 'calc(' + (BBS.pw * 100) + '% - 2px)'; bbPreview(bbAim());
+    } else if (BBS.st === 'fly') bbStep(dt);
+    if (BBS.burst) { const b = BBS.burst; b.t += dt; if (b.t > 0.05 && !b.done) { b.done = 1; try { beaconPop(b); } catch (e) { /* 忽略 */ } } if (b.t > 1) BBS.burst = null; }
+  }
+  const beaconPop = b => { const sp = sprite(emojiTex('✨'), [1.4, 1.4], b.x, b.y + 0.2, b.z, 31); setTimeout(() => { try { G.remove(sp); } catch (e) { /* 忽略 */ } }, 900); };
+  bbq('bbgo').addEventListener('pointerdown', e => { e.preventDefault(); bbCharge(true); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => bbq('bbgo').addEventListener(ev, () => bbCharge(false)));
+  bbq('bbx').addEventListener('click', () => bbEnd(''));
+  addEventListener('keydown', e => { if (e.code === 'KeyR' && !e.repeat && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))) bbCharge(true); });
+  addEventListener('keyup', e => { if (e.code === 'KeyR') bbCharge(false); });
+  function bbStation() {
+    const d = BB();
+    say('🏀 投籃挑戰', '每天可以投 ' + BBMAX + ' 球，進一球得 1 點。\n玩法：轉動視角對準籃框，沿著黃色光點的弧線；按住「投籃」鈕（或按住 R）讓力道條來回擺動，在綠色區放開就會剛好進籃。\n今天已投 ' + d.n + ' 球，進 ' + d.ok + ' 球。',
+      [d.n >= BBMAX ? { label: '好', pri: true } : { label: '🏀 開始投籃', pri: true, fn: bbStart }, d.n >= BBMAX ? null : { label: '先不要' }].filter(Boolean));
+  }
+  FXQ.push({ tick: (() => { let last = performance.now(); return () => { const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now; bbTick(dt);
+    if (!BBS.hoop && BBS.tries < 1500) { BBS.tries++; const hs = bbHoops(); if (hs.length >= 2) { BBS.hoop = hs;
+      hs.forEach((h, i) => { const p = { x: h.x + h.fx * 4.2, y: 0.13, z: h.z + h.fz * 4.2 };
+        beacon({ x: p.x, y: p.y, z: p.z, col: 0xff7a1a, hex: '#ff7a1a', icon: '🏀', name: '投籃挑戰', r: 1.3, h: 3.0, lw: 2.6, active: () => BB().n < BBMAX });
+        ia({ id: 'bbStn' + i, x: p.x, y: p.y, z: p.z, r: 2.4, txt: () => { const d = BB(); return d.n >= BBMAX ? '🏀 投籃挑戰（今天已完成）' : '🏀 投籃挑戰（今天剩 ' + (BBMAX - d.n) + ' 球）'; }, act: bbStation }); });
+      L.bb = { BB, bbStart, bbStation, BBS, bbAim, bbShoot, bbCharge }; } } }; })() });
   /* ---------- 健康中心通廊旁：AED（自動體外心臟電擊去顫器）紅色小櫃 ---------- */
   { const q = (() => { try { return NPLACES.find(x => x.name === '健康中心'); } catch (e) { return null; } })();
     if (q) { const y0 = q.lv * H + 0.1, p = snap(q.x + 1.8, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 1.6 }) || snap(q.x, q.z, { y0: y0 + 1.2, maxY: y0 + 0.9, maxR: 3.2 }) || { x: q.x, y: y0, z: q.z };
