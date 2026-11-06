@@ -11015,7 +11015,46 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
           if (got) { say('校長・停停.鄧不利', '辦公桌後面的獎盃，是同樂的孩子們一路累積的榮譽；旁邊的書櫃藏著許多老書，會議桌是大家討論學校大小事的地方。', [{ label: '謝謝校長', pri: true }]); return; }
           d.prinTalk = 1; const w = WORDS[Math.floor(Math.random() * WORDS.length)]; addPts(3, '🎓 聽了停停.鄧不利的勉勵'); try { addAttr('social', 1); } catch (e) { /* 忽略 */ } save();
           say('校長・停停.鄧不利', w + '\n\n（今天的勉勵已領取，明天再來吧）', [{ label: '謝謝校長', pri: true }]);
-        } }, { label: '下次再來' }], AV(0)); } }); }
+        } }, { label: '🌌 天空的城堡', fn: () => { const sp = S.sp || {}; let n = 0; try { n = spArt(); } catch (e) { /* 忽略 */ }
+          say('校長・停停.鄧不利', n >= 5 && !sp.portal ? '五件神器都到齊了！到西北小森林的拱門前找我吧，我在那裡等你。' : sp.portal ? '天空的城堡，已經在等你了。記得——遇到想放棄的時候，先做一件很小的事。' : !sp.blue ? '最近天空多了一座漂浮的城堡……你有沒有注意到？\n想知道它的祕密，先到校史室找小知吧，她在研究一卷很古老的藍圖。' : '還有夥伴守著神器喔，到各自的地方找找看，集齊五件之後，來森林拱門前找我。', [{ label: '謝謝校長', pri: true }], AV(0)); } }, { label: '下次再來' }], AV(0)); } }); }
+  /* ---------- 校長・停停.鄧不利：法師袍帽 3D 造型（平時在校長室；集齊五件神器、拱門待啟動時，會站到森林拱門前說「是時候了」）---------- */
+  const WIZ = (() => {
+    const g = new T.Group(), M = (c, o) => new T.Mesh(o.geo, o.basic ? new T.MeshBasicMaterial({ color: c }) : gm(c));
+    const add = (geo, c, x, y, z, o) => { const m = M(c, Object.assign({ geo }, o || {})); m.position.set(x, y, z); if (!(o && o.basic)) m.castShadow = true; g.add(m); return m; };
+    const NAVY = 0x1f3a7a, GOLD = 0xf2c230, SKIN = 0xf1c9a5, WHITE = 0xf4f1ea;
+    add(new T.CylinderGeometry(0.27, 0.52, 1.25, 16), NAVY, 0, 0.64, 0);                                        // 長袍
+    const hem = add(new T.TorusGeometry(0.5, 0.025, 6, 28), GOLD, 0, 0.05, 0, { basic: true }); hem.rotation.x = Math.PI / 2;   // 金色下襬
+    add(new T.CylinderGeometry(0.285, 0.285, 0.07, 14), GOLD, 0, 0.98, 0);                                        // 腰帶
+    [-1, 1].forEach(s => { const sl = add(new T.CylinderGeometry(0.1, 0.19, 0.62, 10), NAVY, s * 0.36, 1.0, 0.04); sl.rotation.z = s * 0.34; add(new T.SphereGeometry(0.065, 8, 6), SKIN, s * 0.5, 0.7, 0.05); });   // 寬袖＋手
+    add(new T.SphereGeometry(0.17, 14, 12), SKIN, 0, 1.5, 0);                                                    // 頭
+    const bd = add(new T.ConeGeometry(0.15, 0.42, 10), WHITE, 0, 1.3, 0.1); bd.rotation.x = Math.PI;             // 白鬍鬚
+    [-1, 1].forEach(s => { add(new T.BoxGeometry(0.09, 0.025, 0.03), WHITE, s * 0.07, 1.56, 0.155);               // 白眉
+      const rg = add(new T.TorusGeometry(0.045, 0.006, 5, 14), 0x3a3a40, s * 0.07, 1.5, 0.165, { basic: true }); });   // 圓框眼鏡
+    add(new T.CylinderGeometry(0.34, 0.34, 0.03, 18), NAVY, 0, 1.63, 0);                                         // 帽緣
+    const hat = add(new T.ConeGeometry(0.23, 0.62, 14), NAVY, 0, 1.95, 0); hat.rotation.z = 0.16;                // 帽身（微彎）
+    const hb = add(new T.TorusGeometry(0.235, 0.025, 6, 20), GOLD, 0, 1.68, 0, { basic: true }); hb.rotation.x = Math.PI / 2;   // 金色帽帶
+    add(new T.OctahedronGeometry(0.05), GOLD, 0, 1.73, 0.24, { basic: true });                                    // 帽上星星
+    add(new T.CylinderGeometry(0.025, 0.025, 1.95, 8), 0x6b4423, 0.52, 0.98, 0.1);                                // 法杖
+    const star = add(new T.OctahedronGeometry(0.1), 0xfff3a0, 0.52, 2.0, 0.1, { basic: true });                   // 杖頭星光
+    g.userData.star = star; g.visible = false; G.add(g);
+    const lab = sprite(nameTex('🎩 校長 停停・鄧不利', '#1f3a7a'), [1.9, 0.38], 0, 0, 0, 30);
+    return { g, lab, star, at: '' };
+  })();
+  const wizPut = (key, x, y, z) => { if (WIZ.at === key) return; WIZ.at = key; WIZ.g.position.set(x, y, z); WIZ.lab.position.set(x, y + 2.45, z); WIZ.g.visible = true; };
+  const wizReady = () => { try { return spArt() >= 5 && !(S.sp && S.sp.portal); } catch (e) { return false; } };
+  FXQ.push({ tick: t => {
+    const rp = window.ROOM_POS && window.ROOM_POS['校長室'], ready = wizReady();
+    if (ready && SKY0) wizPut('arch', SKY0.x + 3.0, SKY0.y, SKY0.z + 1.6); else if (rp) wizPut('office', rp.x + 1.2, rp.y + 0.1, rp.z);
+    if (!WIZ.g.visible) return;
+    const g = WIZ.g, dx = PL.x - g.position.x, dz = PL.z - g.position.z;
+    if (Math.hypot(dx, dz) < 10 && Math.abs(PL.y - g.position.y) < 3.4) { let d = Math.atan2(dx, dz) - g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); g.rotation.y += d * 0.08; }
+    WIZ.star.rotation.y = t * 1.6; WIZ.star.scale.setScalar(1 + Math.sin(t * 3) * 0.12); g.position.y += 0;
+  } });
+  L.wiz = WIZ;
+  ia({ id: 'prinArch', get x() { return WIZ.g.position.x; }, get y() { return WIZ.g.position.y; }, get z() { return WIZ.g.position.z; }, r: 2.8,
+    txt: () => WIZ.at === 'arch' ? '🎩 與校長停停・鄧不利說話' : '',
+    act: () => { if (WIZ.at !== 'arch') return;
+      spSay('校長・停停.鄧不利', ['（黃昏的森林，校長穿著深藍法師袍，拄著頂端有星光的法杖，站在拱門前。）\n「是時候了，同學。」', '「有些門，要五個人一起，才打得開。」', '「鑰匙在天上等你，去把它找回來。」'], AV(0), () => portalGate(() => {})); } });
   /* ---------- 遊戲器材區：溜滑梯、蹺蹺板、鞦韆、攀爬架、沙坑、旋轉盤、搖搖馬、單槓（走近按 F 遊玩）---------- */
   { const PG = window.PLAYG; if (PG && PG.items) {
     const KINDS = [['slide', '🛝', '溜滑梯'], ['saw', '⚖️', '蹺蹺板'], ['swing', '🎠', '鞦韆'], ['climb', '🧗', '攀爬架'], ['sand', '🏖', '沙坑'], ['merry', '🎡', '旋轉盤'], ['horse', '🐴', '搖搖馬'], ['bar', '💪', '單槓']];
