@@ -10608,6 +10608,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const r6 = document.createElement('div'); r6.className = 'row'; r6.id = 'gSkyRow'; r6.innerHTML = '<span class="lab">浮空島城堡</span><button type="button" id="bSky"></button>';
       const b6 = r6.querySelector('#bSky'), sync6 = () => { b6.textContent = S.noSky ? '🏰 已關閉（點此開啟）' : '🏰 開啟（點此關閉）'; b6.className = S.noSky ? '' : 'on'; };
       b6.onclick = () => { S.noSky = S.noSky ? 0 : 1; save(); sync6(); }; sync6(); r5.after(r6);
+      const r7 = document.createElement('div'); r7.className = 'row'; r7.id = 'gLowRow'; r7.innerHTML = '<span class="lab">省電模式</span><button type="button" id="bLow"></button>';
+      const b7 = r7.querySelector('#bLow'), sync7 = () => { b7.textContent = S.lowGfx ? '🔋 已開啟（較順、畫質較低）' : '🔋 關閉（點此開啟，手機較順）'; b7.className = S.lowGfx ? 'on' : ''; };
+      b7.onclick = () => { S.lowGfx = S.lowGfx ? 0 : 1; S.lowHint = 1; save(); sync7(); toast(S.lowGfx ? '🔋 省電模式：陰影關閉、解析度降低、隱藏部分裝飾' : '已回到標準畫質', 2600); }; sync7(); r6.after(r7);
     }
     setTimeout(festSync, 300);
   }
@@ -10998,14 +11001,14 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const add = (m, x, y, z, par) => { m.position.set(x, y, z); m.frustumCulled = false; (par || ISL.g).add(m); return m; };
     const cv = (w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; return t; };
     const star = (x, cx, cy, R, r, col) => { x.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? r : R; x[i ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * q, cy + Math.sin(a) * q); } x.closePath(); x.fillStyle = col; x.fill(); };
-    const trunk = M(0x6b4a2b), pinks = [M(0xf7a8c8), M(0xffc2da), M(0xf28fb7)];
+    const trunk = M(0x6b4a2b), pinks = [M(0xf7a8c8), M(0xffc2da), M(0xf28fb7)]; ISL.deco = [];
     // 為避免與原本的針葉樹重疊，把靠近新物件的舊樹藏起來
     const clear = (x, z, r) => ISL.g.children.forEach(c => { if (c.isGroup && c.children.length === 2 && Math.abs(c.position.y - Y) < 0.6 && Math.hypot(c.position.x - x, c.position.z - z) < r) c.visible = false; });
     // 櫻花樹
     [[-27, -7], [-29, 3], [-22, -24], [27, -9], [29, 1], [9, -28], [-10, -29]].forEach(([x, z], i) => { clear(x, z, 4.2);
       const g = new T.Group(), h = 4.2 + (i % 3) * 0.6; add(new T.Mesh(new T.CylinderGeometry(0.35, 0.55, h, 6), trunk), 0, h / 2, 0, g);
       [[0, h + 1.4, 0, 2.7], [1.6, h + 0.6, 0.6, 1.9], [-1.5, h + 0.8, -0.5, 2.0], [0.2, h + 2.6, 0.3, 1.6]].forEach((q, k) => add(new T.Mesh(new T.SphereGeometry(q[3], 9, 7), pinks[(i + k) % 3]), q[0], q[1], q[2], g));
-      g.position.set(x, Y, z); g.rotation.y = i * 1.3; ISL.g.add(g); });
+      g.position.set(x, Y, z); g.rotation.y = i * 1.3; ISL.g.add(g); ISL.deco.push(g); });
     // 星光地磚（城堡前庭）
     { const tex = cv(256, 256, (x, w, h) => { x.fillStyle = '#c9d4f5'; x.beginPath(); x.arc(128, 128, 124, 0, 7); x.fill(); x.fillStyle = '#eef2ff'; x.beginPath(); x.arc(128, 128, 104, 0, 7); x.fill(); x.strokeStyle = '#e0b84a'; x.lineWidth = 6; x.beginPath(); x.arc(128, 128, 112, 0, 7); x.stroke();
         for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; x.fillStyle = i % 2 ? '#e0b84a' : '#f6d86a'; x.beginPath(); x.moveTo(128 + Math.cos(a) * 100, 128 + Math.sin(a) * 100); x.lineTo(128 + Math.cos(a + 0.2) * 28, 128 + Math.sin(a + 0.2) * 28); x.lineTo(128 + Math.cos(a - 0.2) * 28, 128 + Math.sin(a - 0.2) * 28); x.closePath(); x.fill(); }
@@ -11026,17 +11029,27 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const cm = new T.MeshLambertMaterial({ color: 0xb48cf0, emissive: 0x6a3fc0, emissiveIntensity: 0.6, transparent: true, opacity: 0.92 }), crys = [];
     [[-27, 11], [28, -16], [-13, -28]].forEach(([x, z], i) => { clear(x, z, 3.2); const g = new T.Group(); add(new T.Mesh(new T.DodecahedronGeometry(1.5, 0), M(0x6a6258)), 0, 0.5, 0, g);
       [[0, 1.7, 0, 0.55, 2.6, 0], [0.8, 1.2, 0.3, 0.4, 1.8, 0.3], [-0.7, 1.1, -0.3, 0.38, 1.6, -0.35]].forEach(q => { const c = new T.Mesh(new T.OctahedronGeometry(1, 0), cm); c.scale.set(q[3], q[4] / 2, q[3]); c.rotation.z = q[5]; add(c, q[0], q[1], q[2], g); });
-      g.position.set(x, Y, z); g.rotation.y = i * 2; ISL.g.add(g); crys.push(g); });
+      g.position.set(x, Y, z); g.rotation.y = i * 2; ISL.g.add(g); crys.push(g); ISL.deco.push(g); });
     // 小浮島（主島下方與旁邊的小島，緩緩漂浮）
     const isl = []; [[48, -4, 22, 5.2], [-50, -12, -22, 4.2], [30, -20, -44, 3.4]].forEach(([x, y, z, r], i) => { const g = new T.Group(); add(new T.Mesh(new T.CylinderGeometry(r, r * 0.9, 1.2, 12), M(0x6fae4e)), 0, 0, 0, g);
       add(new T.Mesh(new T.ConeGeometry(r * 0.9, r * 1.5, 8), M(0x7a6a58)), 0, -0.6 - r * 0.75, 0, g).rotation.x = Math.PI;
       const tg = new T.Group(); add(new T.Mesh(new T.CylinderGeometry(0.25, 0.35, 2.2, 5), trunk), 0, 1.1, 0, tg); add(new T.Mesh(new T.SphereGeometry(1.5, 8, 6), pinks[i % 3]), 0, 2.8, 0, tg); tg.position.set(r * 0.25, 0.6, 0); g.add(tg);
-      g.position.set(x, y, z); ISL.g.add(g); isl.push({ g, y, ph: i * 2.1 }); });
+      g.position.set(x, y, z); ISL.g.add(g); isl.push({ g, y, ph: i * 2.1 }); ISL.deco.push(g); });
     FXQ.push({ tick: t => { flags.forEach(f => { f.fl.rotation.y = Math.sin(t * 1.6 + f.ph) * 0.22; });
       lamps.forEach((l, i) => { l.rotation.y = t * 1.2 + i; const k = 1 + Math.sin(t * 2.4 + i) * 0.08; l.scale.set(k, 1.25 * k, 0.5 * k); });
       crys.forEach((c, i) => { cm.emissiveIntensity = 0.5 + Math.sin(t * 1.5) * 0.2; });
       isl.forEach(o => { o.g.position.y = o.y + Math.sin(t * 0.5 + o.ph) * 0.9; }); } });
   })();
+  /* ---------- 省電模式（陰影、解析度、遠景裝飾）與卡頓提示 ---------- */
+  { const GX = { on: null, acc: 0, n: 0, t0: 0, warned: false };
+    const apply = low => { GX.on = low;
+      try { renderer.setPixelRatio(low ? 1 : Math.min(window.devicePixelRatio || 1, 2)); renderer.shadowMap.enabled = !low; scene.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { m.needsUpdate = true; }); }); window.dispatchEvent(new Event('resize')); } catch (e) { /* 忽略 */ }
+      if (ISL.deco) ISL.deco.forEach(g => { g.visible = !low; }); };
+    FXQ.push({ tick: t => { const low = !!S.lowGfx; if (low !== GX.on) apply(low);
+      if (!GX.t0) GX.t0 = performance.now(); const now = performance.now();
+      if (!low && !S.lowHint && !GX.warned && document.visibilityState === 'visible' && !document.body.classList.contains('intro')) { if (GX.last) { const dt = now - GX.last; if (dt < 500) { GX.acc += dt; GX.n++; } } GX.last = now;
+        if (GX.acc > 9000) { const fps = GX.n / (GX.acc / 1000); GX.acc = 0; GX.n = 0; if (fps < 22) { GX.warned = true; S.lowHint = 1; save(); toast('🐢 畫面好像有點卡？到 ⚙ 設定開啟「省電模式」會比較順', 6000); } } } else GX.last = 0; } });
+    L.gfx = { GX, apply }; }
   /* ---------- 天空傳送門：地面 ⇄ 浮空島 ---------- */
   const ISK = 0.7, ISY = () => ISL.g.position.y + 5 * ISK;
   ISL.g.updateMatrixWorld(true);
@@ -11722,7 +11735,10 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (ISL.splash) { const k = (t * 1.4) % 1; ISL.splash.scale.setScalar(0.8 + k * 2.4); ISL.splash.material.opacity = 0.7 * (1 - k); }
     if (ISL.mist) ISL.mist.scale.set(1 + Math.sin(t * 3) * 0.08, 0.55 + Math.sin(t * 4) * 0.06, 1 + Math.sin(t * 3) * 0.08);
     if (ISL.pond) ISL.pond.material.opacity = 0.78 + Math.sin(t * 2) * 0.05;
-    g.visible = !S.noSky;
+    { /* 視錐剔除：浮空島約 600 個物件都關閉了自動剔除，鏡頭沒看向它時整座隱藏以省繪製量 */
+      const C = ISL.cu || (ISL.cu = { fr: new T.Frustum(), pm: new T.Matrix4(), sp: new T.Sphere(new T.Vector3(), 72) });
+      let inV = true; try { camera.updateMatrixWorld(); C.pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); C.fr.setFromProjectionMatrix(C.pm); C.sp.center.set(g.position.x, g.position.y + 4, g.position.z); inV = C.fr.intersectsSphere(C.sp); } catch (e) { inV = true; }
+      ISL.inView = inV; g.visible = !S.noSky && inV; }
   }
   let wxLast = 0, wxAcc = 0, wxId = '', wxVacKey = '', wxFog = null, wxBn = 160, wxBf = 900;
   function wxFrame(now) {
