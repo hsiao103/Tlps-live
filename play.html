@@ -11078,11 +11078,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     say('🛠 管理者・故事進度', '選擇要從哪一章開始（會設定進度並傳送）。\n目前：神器 ' + spArt() + '/5・拱門 ' + (sp.portal ? '已開' : '未開') + '・石碑 ' + Object.keys(d.stele).length + '/5・大廳教學 ' + (d.hall >= 2 ? '完成' : d.hall ? '進行中' : '未開始'), [
       { label: '▶ 從第二章開始（棄念者教學）', pri: true, fn: () => { base(); steles(true); d.hall = 0; d.tw = {}; go(0, 2); done('已設定：第一章完成，傳送到城堡大廳'); } },
       { label: '▶ 從第一章開始（石子路石碑）', fn: () => { base(); steles(false); d.hall = 0; go(21.8, 20); done('已設定：從第一章開始，傳送到石子路入口'); } },
-      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
-      { label: '▶ 從第六章開始（終章：星光音樂盒）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 1; d.gs = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 }; d.ch5 = 1; d.ch6 = 0; S.islDock = 0; ISL.dk = null; go(MB.x + 2.2, MB.z); done('已設定：灰燼守門獸已淨化，傳送到星光音樂盒'); } },
-      { label: '▶ 從第五章開始（灰燼守門獸）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; go(CV.sx, CV.sz); done('已設定：雙影已淨化，傳送到封印洞穴'); } },
+      { label: '▶ 從第三章開始（五座塔）', fn: () => { base(); steles(true); d.hall = 2; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; ISL.landed = null; go(0, 2); done('已設定：第二章完成，可前往四座藍頂塔'); } },
+      { label: '▶ 從第六章開始（終章：星光音樂盒）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 1; d.gs = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 }; d.ch5 = 1; d.ch6 = 0; S.islDock = 0; ISL.dk = null; ISL.landed = null; go(MB.x + 2.2, MB.z); done('已設定：灰燼守門獸已淨化，傳送到星光音樂盒'); } },
+      { label: '▶ 從第五章開始（灰燼守門獸）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; ISL.landed = null; go(CV.sx, CV.sz); done('已設定：雙影已淨化，傳送到封印洞穴'); } },
       { label: '▶ 從第四章開始（雙影小戰）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 0; go(3.4, -3.2); done('已設定：四座塔已點亮，可到發光的書挑戰雙影'); } },
-      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; done('故事進度已重置'); } },
+      { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; ISL.landed = null; done('故事進度已重置'); } },
       { label: '關閉' }], AV(0));
   }
 
@@ -11335,12 +11335,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const finForm = () => { if (FIN.form.length) return FIN.form; const c = document.createElement('canvas'); c.width = 240; c.height = 120; const x = c.getContext('2d'); x.fillStyle = '#000'; x.font = '900 112px "Noto Sans TC","Microsoft JhengHei",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('七十', 120, 64);
     const d = x.getImageData(0, 0, 240, 120).data, pts = []; for (let yy = 4; yy < 120; yy += 5) for (let xx = 4; xx < 240; xx += 5) if (d[(yy * 240 + xx) * 4 + 3] > 140) pts.push([xx / 240 - 0.5, 0.5 - yy / 120]);
     const out = []; for (let i = 0; i < 70; i++) out.push(pts[Math.floor(i * pts.length / 70)] || [0, 0]); return (FIN.form = out); };
-  function finMake(fx, fz) { const f = finForm(); FIN.cx = fx; FIN.cz = fz;
+  function finMake(fx, fz, dx, dz) { const f = finForm(); FIN.cx = fx; FIN.cz = fz; let ux = dx || 0, uz = dz || 0; const dl = Math.hypot(ux, uz); if (dl < 1e-6) { ux = 0; uz = -1; } else { ux /= dl; uz /= dl; } dx = ux; dz = uz; FIN.dir = { dx, dz }; const ccx = fx + dx * 36, ccz = fz + dz * 36, rx = -dz, rz = dx;
     if (!FIN.st.length) for (let i = 0; i < 70; i++) { const s = sprite(emojiTex('⭐'), [3.2, 3.2], 0, -999, 0, 31); s.visible = false; FIN.st.push(s); }
-    FIN.st.forEach((s, i) => { s.userData.f = [fx + f[i][0] * 60, 40 + f[i][1] * 28, fz - 36]; });
+    FIN.st.forEach((s, i) => { s.userData.f = [ccx + rx * f[i][0] * 60, 40 + f[i][1] * 28, ccz + rz * f[i][0] * 60]; });
     if (!FIN.slogan) { const sp = new T.Sprite(new T.SpriteMaterial({ map: txtTex('同心七十　樂而自信', '#ffe28a', 1024, 160, 104), transparent: true, depthTest: false })); sp.scale.set(64, 10, 1); sp.renderOrder = 31; sp.visible = false; sp.frustumCulled = false; G.add(sp); FIN.slogan = sp; }
-    FIN.slogan.position.set(fx, 16, fz - 36); }
-  function finStart(pl, fin) { const w = ISW(MB.x, MB.z); finMake(pl.x, pl.z); FIN.pl = pl; FIN.st0 = { x: w.x, y: ISY() + 2, z: w.z }; FIN.tg = FIN.st.map((s, i) => { const a = i / 70 * Math.PI * 2 * 3.1 + 0.4, r = 5 + (i * 7 % 23); return [pl.x + Math.cos(a) * r, (pl.y || 0) + 2 + (i % 5) * 1.4, pl.z + Math.sin(a) * r * 0.8]; }); FIN.t = 0; FIN.on = true; FIN.fin = fin; FIN.st.forEach(s => { s.visible = true; }); }
+    FIN.slogan.position.set(ccx, 16, ccz); }
+  function finStart(pl, fin, dir) { const w = ISW(MB.x, MB.z); finMake(pl.x, pl.z, dir && dir.x, dir && dir.z); FIN.pl = pl; FIN.st0 = { x: w.x, y: ISY() + 2, z: w.z }; FIN.tg = FIN.st.map((s, i) => { const a = i / 70 * Math.PI * 2 * 3.1 + 0.4, r = 5 + (i * 7 % 23); return [pl.x + Math.cos(a) * r, (pl.y || 0) + 2 + (i % 5) * 1.4, pl.z + Math.sin(a) * r * 0.8]; }); FIN.t = 0; FIN.on = true; FIN.fin = fin; FIN.st.forEach(s => { s.visible = true; }); }
   FXQ.push({ tick: (() => { let last = performance.now(); return () => { const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now; const d = IS();
     if (d.ch6 && !FIN.on) { if (!FIN.st.length && FIN.pl === null) { /* 重新進遊戲後：七十顆星光仍掛在校園上空 */ const b = (() => { try { return NPLACES.find(p => p.name === '梅花廣場') || { x: 0, z: -45 }; } catch (e) { return { x: 0, z: -45 }; } })(); finMake(b.x, b.z + 10); FIN.st.forEach(s => { const f = s.userData.f; s.position.set(f[0], f[1], f[2]); s.visible = true; }); }
       FIN.st.forEach((s, i) => { s.material.opacity = 0.65 + Math.sin(performance.now() / 500 + i) * 0.3; }); if (FIN.slogan) { FIN.slogan.visible = true; FIN.slogan.material.opacity = 0.85; } }
@@ -11362,32 +11362,39 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       if (!ok) { say('🎵 第六個聲音', '音符有點散了。\n夥伴們輕聲說：「再來一次，我們陪你。」', [{ label: '再唱一次', pri: true, fn: yourTurn }, { label: '等一下' }], AV(4)); return; }
       chorus(6); lidOpen(); }, 8, 5, { song: SONG_MOTIF }), '開始唱'); }
   }
-  function finGo(rp) {   // 啟動終章動畫：傳送到校園廣場 → 星光 → 天之城降落（rp＝重播，不給獎勵）
-    if (FIN.on || ISL.dk) return;
-    const bp = (() => { try { return NPLACES.find(p => p.name === '梅花廣場') || NPLACES.find(p => p.name === '鐘樓') || { x: 0, z: -45 }; } catch (e) { return { x: 0, z: -45 }; } })(), g = snap(bp.x, bp.z + 8, { maxR: 5 }) || { x: bp.x, y: 0.03, z: bp.z + 8 };
-    close(); skyGo(g.x, g.y, g.z, g.x, g.z - 40, rp ? '🌠 重播：星光回家' : '🌠 星光回家了——抬頭看看天空');
-    if (rp) ISL.hold92 = true;   // 重播：天之城先回到天空，等星光落定再降下
+  function finGo(rp) {   // 啟動終章動畫：降落到操場（開闊、不擋視角）→ 星光 → 天之城降到小森林 → 升回天空（rp＝重播，不給獎勵）
+    if (FIN.on || ISL.dk || ISL.landed) return;
+    const bp = (() => { try { return NPLACES.find(p => p.name === '操場') || NPLACES.find(p => p.name === '梅花廣場') || { x: 0, z: -45 }; } catch (e) { return { x: 0, z: -45 }; } })(), g = snap(bp.x, bp.z, { maxR: 6 }) || { x: bp.x, y: 0.03, z: bp.z };
+    let dx = SKY0.x - g.x, dz = SKY0.z - g.z; const dl = Math.hypot(dx, dz); if (dl < 5) { dx = 0; dz = -1; } else { dx /= dl; dz /= dl; }
+    close(); skyGo(g.x, g.y, g.z, SKY0.x, SKY0.z, rp ? '🌠 重播：星光回家' : '🌠 星光回家了——抬頭看看天空');
     WIZ.hold = { key: 'finale', x: g.x + 2.2, y: g.y, z: g.z - 1.5 };
-    finStart({ x: g.x, y: g.y, z: g.z }, () => finEnd(rp));
+    finStart({ x: g.x, y: g.y, z: g.z }, () => finEnd(rp), { x: dx, z: dz });
   }
   function lidOpen() {
     spSay('✨ 七十顆星光', ['六種顏色的音符在空中交織。盒蓋緩緩打開——', '裡面飛出一顆顆星光：七十顆，是同樂七十年的每一屆。', '星光穿過窗口，飛向地面……'], AV(4), () => finGo(false), '看向天空');
   }
   function finEnd(rp) {
-    spSay('🌠 天空', ['星光一顆一顆落進校園的窗口、操場和鐘樓。\n地面上，老師、同學、校工都抬起了頭，每個人臉上都有光。', '🧓 老校工喃喃：「那是……我們的校歌。」', '遠方的天空，那座漂浮已久的天之城，開始緩緩降下……'], AV(0), () => {
+    spSay('🌠 天空', ['星光一顆一顆落進校園的窗口、操場和鐘樓。\n地面上，老師、同學、校工都抬起了頭，每個人臉上都有光。', '🧓 老校工喃喃：「那是……我們的校歌。」', '遠方的天空，那座漂浮已久的天之城，朝著西北的小森林，開始緩緩降下……'], AV(0), () => {
       toast('🏰 天之城緩緩降下……', 4000); try { [392, 523, 659, 784].forEach((f, i) => bell(f, i * 1.2)); } catch (e) { /* 忽略 */ }
-      ISL.hold92 = false; ISL.dk = { t: 0, y0: ISL.g.position.y, done: () => { try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } finEnd2(rp); } }; }, '抬頭看');
+      let gy = SKY0.y; try { gy = groundAt(SKY0.x, 60, SKY0.z); } catch (e) { /* 忽略 */ } if (!(gy > -5 && gy < 30)) gy = SKY0.y || 0;
+      const A = { x: ISL.g.position.x, y: ISL.g.position.y, z: ISL.g.position.z };
+      ISL.dk = { t: 0, a: A, b: { x: SKY0.x, y: gy - 5 * ISK + 0.12, z: SKY0.z }, land: true, done: () => { try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } finEnd2(rp); } }; }, '抬頭看');
+  }
+  function finRise() {   // 完成後：天之城持續升回天空原位
+    const L0 = ISL.landed || { x: ISL.g.position.x, y: ISL.g.position.y, z: ISL.g.position.z }; ISL.landed = null; const h = ISL.home || { x: 0, z: -120 };
+    toast('🏰 天之城緩緩升回天空……', 4000); try { [784, 659, 523, 392].forEach((f, i) => bell(f, i * 1.0)); } catch (e) { /* 忽略 */ }
+    ISL.dk = { t: 0, a: L0, b: { x: h.x, y: 92, z: h.z }, land: false, done: null };
   }
   function finEnd2(rp) {
-    if (rp) { spSay('🏰 天之城', ['天之城再次輕輕落地，與地之城的地基貼合。\n\n✨ 同心七十　樂而自信 ✨'], AV(0), () => { WIZ.hold = null; }, '完成重播'); return; }
-    spSay('🏰 天之城', ['天之城輕輕落地，與地之城的地基貼合了。\n🔮 小知在你身旁展開藍圖：「吻合度——100%。」', '鐘樓的影子不再指向天空，而是指向落在操場上的星光。', '三個被淨化的小影子站在校園一角揮手。\n🦥 懶惰靈：「今天要不要先做第一步？」', '🎩 校長 停停・鄧不利站在鐘樓下，看著天空，說出這個故事的結語：\n\n「學校不是一棟會記得的建築，而是一群願意一起唱下去的人。」', '天空中，七十顆星光排成「七十」，下方浮現一行字：\n\n✨ 同心七十　樂而自信 ✨\n\n——《Project: TLPS Youth》天之城篇　完——\n（天之城已與校園相連，可隨時回訪）'], AV(0), () => {
-      const d = IS(); d.ch6 = 1; addPts(100, '🌟 七十顆星光回家（終章）'); try { S.badges = S.badges || []; if (S.badges.indexOf('七十顆星光') < 0) S.badges.push('七十顆星光'); } catch (e) { /* 忽略 */ } save(); WIZ.hold = null; try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🏅 獲得徽章「七十顆星光」（+100 點）', 4200); }, '完成');
+    if (rp) { spSay('🏰 天之城', ['天之城再次輕輕落在小森林。\n\n✨ 同心七十　樂而自信 ✨'], AV(0), () => { WIZ.hold = null; finRise(); }, '完成重播'); return; }
+    spSay('🏰 天之城', ['天之城輕輕落在西北的小森林，與地之城的地基貼合了。\n🔮 小知在你身旁展開藍圖：「吻合度——100%。」', '鐘樓的影子不再指向天空，而是指向落在操場上的星光。', '三個被淨化的小影子站在校園一角揮手。\n🦥 懶惰靈：「今天要不要先做第一步？」', '🎩 校長 停停・鄧不利站在鐘樓下，看著天空，說出這個故事的結語：\n\n「學校不是一棟會記得的建築，而是一群願意一起唱下去的人。」', '天空中，七十顆星光排成「七十」，下方浮現一行字：\n\n✨ 同心七十　樂而自信 ✨\n\n——《Project: TLPS Youth》天之城篇　完——\n（天之城會再升回天空，隨時可從森林拱門回訪）'], AV(0), () => {
+      const d = IS(); d.ch6 = 1; addPts(100, '🌟 七十顆星光回家（終章）'); try { S.badges = S.badges || []; if (S.badges.indexOf('七十顆星光') < 0) S.badges.push('七十顆星光'); } catch (e) { /* 忽略 */ } save(); WIZ.hold = null; try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🏅 獲得徽章「七十顆星光」（+100 點）', 4200); finRise(); }, '完成');
   }
   const skEl = (() => { const e = document.createElement('button'); e.id = 'finskip'; e.textContent = '⏭ 跳過動畫'; e.style.cssText = 'position:fixed;right:14px;bottom:200px;z-index:65;display:none;padding:8px 14px;border-radius:18px;border:1px solid #fff8;background:rgba(0,0,0,.55);color:#fff;font:600 14px system-ui,"Noto Sans TC",sans-serif'; document.body.appendChild(e);
     e.addEventListener('click', () => { if (FIN.on) FIN.t = Math.max(FIN.t, 11); else if (ISL.dk) ISL.dk.t = 9; }); return e; })();
   FXQ.push({ tick: () => { skEl.style.display = (FIN.on || ISL.dk) ? 'block' : 'none'; } });
   FXQ.push({ tick: () => { const d = IS(); MB.gp.visible = !!d.ch5; MB.bm.material.opacity = d.ch6 ? 0.15 : 0.3 + Math.sin(performance.now() / 400) * 0.1; if (HALL.shade) HALL.shade.visible = !d.ch5; } });
-  L.fin = { FIN, MB, musicAct, finStart, VOICES, ISL, finGo };
+  L.fin = { FIN, MB, musicAct, finStart, VOICES, ISL, finGo, finRise };
 
   /* ---------- 校長室的停停.鄧不利（原創 NPC，站在辦公桌旁；每天可請校長勉勵一次）---------- */
   if (window.ROOM_POS && window.ROOM_POS['校長室']) { const rp = window.ROOM_POS['校長室'];
@@ -11596,10 +11603,9 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function islTick(dt, night, c) {
     if (L.pgTick) L.pgTick(dt);
     ISL.t += dt; const t = ISL.t, g = ISL.g;
-    const DK = ISL.dk, dockY = (ISL.dockY !== undefined ? ISL.dockY : (ISL.dockY = (() => { let gy = 0; try { gy = groundAt(g.position.x, 40, g.position.z) || 0; } catch (e) { gy = 0; } if (!(gy > -5 && gy < 30)) gy = 0; return gy - 5 * ISK + 0.12; })()));
-    if (DK) { DK.t += dt; const k = Math.min(1, DK.t / 9), e = k * k * (3 - 2 * k); g.position.y = DK.y0 + (dockY - DK.y0) * e; g.rotation.y *= 0.985; if (k >= 1) { ISL.dk = null; S.islDock = 1; save(); if (DK.done) DK.done(); } }
-    else if (ISL.hold92) { g.position.y = 92 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25; }
-    else if (S.islDock || (S.islStory && S.islStory.ch6)) { g.position.y = dockY; g.rotation.y *= 0.9; }
+    const DK = ISL.dk; if (!ISL.home) ISL.home = { x: g.position.x, z: g.position.z };
+    if (DK) { DK.t += dt; const k = Math.min(1, DK.t / 9), e = k * k * (3 - 2 * k); g.position.set(DK.a.x + (DK.b.x - DK.a.x) * e, DK.a.y + (DK.b.y - DK.a.y) * e, DK.a.z + (DK.b.z - DK.a.z) * e); g.rotation.y *= 0.985; if (k >= 1) { ISL.dk = null; if (DK.land) ISL.landed = { x: DK.b.x, y: DK.b.y, z: DK.b.z }; if (DK.done) DK.done(); } }
+    else if (ISL.landed) { g.position.set(ISL.landed.x, ISL.landed.y, ISL.landed.z); g.rotation.y *= 0.9; }
     else { if (!g.userData.fix) g.position.y = 92 + Math.sin(t * 0.35) * 3; g.rotation.y = Math.sin(t * 0.05) * 0.25; }
     if (ISL.wmat) ISL.wmat.color.setHex(night || c.dark > 0.3 ? 0xffd25a : 0x8a8f9c);
     const fl = ISL.flag; if (fl) { const pa = fl.geometry.attributes.position, b = fl.userData.base; for (let i = 0; i < pa.count; i++) { const x = b[i * 3] + 2.5; pa.array[i * 3 + 2] = Math.sin(t * 4 + x * 1.2) * 0.35 * (x / 5); } pa.needsUpdate = true; }
