@@ -6159,6 +6159,25 @@ const avatar = new T.Group();
   const l = new T.Mesh(new T.BoxGeometry(0.4, 0.4, 0.2), M.blue); l.position.y = 0.2;
   [b, h, l].forEach(m => { m.castShadow = true; avatar.add(m); }); avatar.visible = false; scene.add(avatar); }
 
+const CAMS = { t: 0, in: false, d: 4.2, f: 1 };
+// 鏡頭碰撞：從角色頭部到鏡頭的線段與所有牆（AABB，含旋轉）做 slab 相交，回傳可到達的比例 0.12–1（扣掉約 0.3 m 緩衝）
+function camClip(ax, ay, az, bx, by, bz, dist) {
+  let best = 1;
+  for (let i = 0; i < WALLS.length; i++) {
+    const w = WALLS[i]; let x0 = ax, z0 = az, x1 = bx, z1 = bz;
+    if (w.tf) { const t = w.tf; let dx = ax - t.x, dz = az - t.z; x0 = dx * t.c - dz * t.s; z0 = dx * t.s + dz * t.c; dx = bx - t.x; dz = bz - t.z; x1 = dx * t.c - dz * t.s; z1 = dx * t.s + dz * t.c; }
+    if (Math.max(x0, x1) < w.x0 - 0.05 || Math.min(x0, x1) > w.x1 + 0.05 || Math.max(z0, z1) < w.z0 - 0.05 || Math.min(z0, z1) > w.z1 + 0.05) continue;
+    let tn = 0, tf = best;
+    const ax_ = [[x0, x1 - x0, w.x0 - 0.05, w.x1 + 0.05], [ay, by - ay, w.y0, w.y1], [z0, z1 - z0, w.z0 - 0.05, w.z1 + 0.05]];
+    let ok = true;
+    for (let k = 0; k < 3; k++) { const o = ax_[k][0], d = ax_[k][1], lo = ax_[k][2], hi = ax_[k][3];
+      if (Math.abs(d) < 1e-9) { if (o < lo || o > hi) { ok = false; break; } continue; }
+      let t1 = (lo - o) / d, t2 = (hi - o) / d; if (t1 > t2) { const q = t1; t1 = t2; t2 = q; }
+      if (t1 > tn) tn = t1; if (t2 < tf) tf = t2; if (tn > tf) { ok = false; break; } }
+    if (ok && tn < best) best = tn;
+  }
+  return best >= 1 ? 1 : Math.max(0.12, best - 0.3 / Math.max(0.5, dist));
+}
 function groundAt(x, y, z) {
   ray.set(tmp.set(x, y + 0.7, z), DOWN); ray.far = 8;
   const hit = ray.intersectObjects(walk, false);
@@ -6465,9 +6484,14 @@ function frame(now) {
       camera.position.set(tx + Math.sin(iso.az) * sp2 * iso.d, ty + Math.cos(iso.pol) * iso.d, tz + Math.cos(iso.az) * sp2 * iso.d); camera.lookAt(tx, ty, tz);
       avatar.visible = true; avatar.position.set(PL.x, PL.y, PL.z); avatar.rotation.y = PL.yaw;
     } else if (view.third) {
-      const dist = 4.2, bx = PL.x + Math.sin(PL.yaw) * dist * cy, bz = PL.z + Math.cos(PL.yaw) * dist * cy, by = eye + 0.6 + Math.sin(-PL.pitch) * dist;
-      camera.position.set(bx, Math.max(by, PL.y + 0.5), bz); camera.lookAt(PL.x, PL.y + 1.2, PL.z);
-      avatar.visible = true; avatar.position.set(PL.x, PL.y, PL.z); avatar.rotation.y = PL.yaw;
+      // 第三人稱鏡頭：室內縮短距離（C）＋鏡頭與牆碰撞偵測（A），避免被牆擋住或穿進牆裡
+      CAMS.t -= dt; if (CAMS.t <= 0) { CAMS.t = 0.3; try { CAMS.in = typeof whereAmI === 'function' && whereAmI().indoor; } catch (e) { CAMS.in = false; } }
+      CAMS.d += ((CAMS.in ? 2.7 : 4.2) - CAMS.d) * Math.min(1, dt * 4);
+      const dist = CAMS.d, bx = PL.x + Math.sin(PL.yaw) * dist * cy, bz = PL.z + Math.cos(PL.yaw) * dist * cy, by = Math.max(eye + 0.6 + Math.sin(-PL.pitch) * dist, PL.y + 0.5);
+      const ct = camClip(PL.x, PL.y + 1.5, PL.z, bx, by, bz, dist);
+      CAMS.f = ct < CAMS.f ? ct : CAMS.f + (ct - CAMS.f) * Math.min(1, dt * 3);   // 被擋時立刻拉近，空出來才慢慢退回
+      camera.position.set(PL.x + (bx - PL.x) * CAMS.f, PL.y + 1.5 + (by - PL.y - 1.5) * CAMS.f, PL.z + (bz - PL.z) * CAMS.f); camera.lookAt(PL.x, PL.y + 1.2, PL.z);
+      avatar.visible = dist * CAMS.f > 1.0; avatar.position.set(PL.x, PL.y, PL.z); avatar.rotation.y = PL.yaw;   // 鏡頭貼得太近時暫時隱藏角色，避免頭髮蓋滿畫面
     } else {
       avatar.visible = false; camera.position.set(PL.x, eye, PL.z);
       camera.lookAt(PL.x - Math.sin(PL.yaw) * cy, eye + Math.sin(PL.pitch), PL.z - Math.cos(PL.yaw) * cy);
