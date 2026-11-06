@@ -11114,6 +11114,29 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const ISW = (lx, lz) => { const g = ISL.g, c = Math.cos(g.rotation.y), s = Math.sin(g.rotation.y); return { x: g.position.x + (lx * c + lz * s) * ISK, z: g.position.z + (-lx * s + lz * c) * ISK }; };
   const txtTex = (txt, col, w, h, fs) => { const c = document.createElement('canvas'); c.width = w || 256; c.height = h || 128; const x = c.getContext('2d'); x.font = '900 ' + (fs || 80) + 'px "Noto Sans TC","Microsoft JhengHei",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineWidth = 6; x.strokeStyle = 'rgba(40,20,0,.55)'; x.strokeText(txt, c.width / 2, c.height / 2); x.fillStyle = col; x.fillText(txt, c.width / 2, c.height / 2); const t = new T.CanvasTexture(c); return t; };
   const STELE = ['好奇，是第一把鑰匙。', '勇氣，是第二把。', '一起，是第三把。', '照顧別人，是第四把。', '快樂，要唱出來才算數。'], STN = ['①', '②', '③', '④', '⑤'];
+  /* ---------- 光束特效：由下往上漸層淡出的光柱 + 緩緩上升的光粒子 ---------- */
+  const BFX = [];
+  L.bfx = BFX;
+  const beamFx = (beam, H, R, n) => {
+    const c = document.createElement('canvas'); c.width = 64; c.height = 128; const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 128, 0, 0); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,.55)'); g.addColorStop(0.75, 'rgba(255,255,255,.18)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, 64, 128);
+    { const mk = document.createElement('canvas'); mk.width = 64; mk.height = 128; const mx = mk.getContext('2d'); for (let i = 0; i < 64; i += 4) { mx.fillStyle = 'rgba(255,255,255,' + (0.55 + 0.45 * Math.abs(Math.sin(i * 1.7))) + ')'; mx.fillRect(i, 0, 4, 128); } x.globalCompositeOperation = 'destination-in'; x.drawImage(mk, 0, 0); x.globalCompositeOperation = 'source-over'; }
+    const tex = new T.CanvasTexture(c); tex.wrapS = T.RepeatWrapping; beam.material.map = tex; beam.material.needsUpdate = true;
+    if (!beamFx.dot) { const d = document.createElement('canvas'); d.width = d.height = 32; const q = d.getContext('2d'); const rg = q.createRadialGradient(16, 16, 0, 16, 16, 16); rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.4, 'rgba(255,255,255,.55)'); rg.addColorStop(1, 'rgba(255,255,255,0)'); q.fillStyle = rg; q.fillRect(0, 0, 32, 32); beamFx.dot = new T.CanvasTexture(d); }
+    const N = 34, pos = new Float32Array(N * 3), geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3));
+    const pts = new T.Points(geo, new T.PointsMaterial({ map: beamFx.dot, color: 0xffffff, size: Math.max(0.35, R * 0.55), transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, sizeAttenuation: true }));
+    pts.frustumCulled = false; beam.add(pts);
+    const pr = []; for (let i = 0; i < N; i++) pr.push({ ph: Math.random(), sp: 0.05 + Math.random() * 0.07, a: Math.random() * 6.283, rf: 0.2 + Math.random() * 0.85, w: (Math.random() - 0.5) * 0.8 });
+    BFX.push({ beam, tex, pts, pos, geo, pr, H, R, n });
+  };
+  FXQ.push({ tick: t => { BFX.forEach(b => { const m = b.beam.material, low = !!S.lowGfx, o = m.opacity;
+    b.tex.offset.x = (t * 0.03 + b.n * 0.17) % 1;
+    const on = !low && o > 0.03 && b.beam.visible; b.pts.visible = on; if (!on) return;
+    b.pts.material.color.copy(m.color).lerp(beamFx.wh || (beamFx.wh = new T.Color(0xffffff)), 0.35); b.pts.material.opacity = Math.min(1, o * 1.8);
+    for (let i = 0; i < b.pr.length; i++) { const q = b.pr[i], k = (t * q.sp + q.ph) % 1, a = q.a + t * q.w, r = b.R * q.rf * (1 - 0.3 * k);
+      b.pos[i * 3] = Math.cos(a) * r; b.pos[i * 3 + 1] = (k - 0.5) * b.H; b.pos[i * 3 + 2] = Math.sin(a) * r; }
+    b.geo.attributes.position.needsUpdate = true; }); } });
   const STL = [];   // 石碑：沿石子路，從洞口（路徑終點）往城門排列
   if (ISL.pathPts) { const pts = ISL.pathPts, segs = []; let tot = 0; for (let i = pts.length - 1; i > 0; i--) { const [x1, z1] = pts[i], [x2, z2] = pts[i - 1], L = Math.hypot(x2 - x1, z2 - z1); segs.push({ x1, z1, x2, z2, L, s: tot }); tot += L; }
     [0.1, 0.3, 0.5, 0.7, 0.9].forEach((f, n) => { const d = f * tot; let sg = segs[segs.length - 1]; for (const q of segs) if (d <= q.s + q.L) { sg = q; break; } const t = (d - sg.s) / sg.L, dx = (sg.x2 - sg.x1) / sg.L, dz = (sg.z2 - sg.z1) / sg.L, px = sg.x1 + (sg.x2 - sg.x1) * t + dz * 3.0, pz = sg.z1 + (sg.z2 - sg.z1) * t - dx * 3.0;
@@ -11125,7 +11148,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       gp.lookAt(new T.Vector3(0, 0, 0)); gp.rotation.x = 0; gp.rotation.z = 0;   // 正面朝向島中心（大約朝著路徑）
       const OV = { 0: [19.2, 28.8], 3: [-3.4, 25.5] }; let fx = px, fz = pz; if (OV[n]) { fx = OV[n][0]; fz = OV[n][1]; gp.position.set(fx, 5.15, fz); gp.lookAt(new T.Vector3(0, 5.15, 20)); gp.rotation.x = 0; gp.rotation.z = 0; }   // 第 4 塊原本卡在城門牆上，移到門外路旁
       gp.scale.setScalar(1.6);
-      const beam = new T.Mesh(new T.CylinderGeometry(0.5, 0.8, 16, 12, 1, true), new T.MeshBasicMaterial({ color: 0xffa51f, transparent: true, opacity: 0.6, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide })); beam.position.y = 8 + 1; beam.scale.setScalar(1 / 1.6); beam.frustumCulled = false; gp.add(beam);
+      const beam = new T.Mesh(new T.CylinderGeometry(0.5, 0.8, 16, 12, 1, true), new T.MeshBasicMaterial({ color: 0xffa51f, transparent: true, opacity: 0.6, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide })); beam.position.y = 8 + 1; beam.scale.setScalar(1 / 1.6); beam.frustumCulled = false; gp.add(beam); beamFx(beam, 16, 0.7, n);
       const lb = new T.Sprite(new T.SpriteMaterial({ map: emojiTex('📜'), transparent: true, depthTest: false })); lb.scale.set(0.8 / 1.6, 0.8 / 1.6, 1); lb.position.y = 3.3; lb.renderOrder = 31; lb.frustumCulled = false; gp.add(lb);
       STL.push({ gp, st, beam, lb, lx: fx, lz: fz, n }); });
     STL.forEach(o => ia({ id: 'islStele' + o.n, get x() { return ISW(o.lx, o.lz).x; }, get y() { return ISY(); }, get z() { return ISW(o.lx, o.lz).z; }, r: 3.2,
@@ -11171,7 +11194,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     else { h.pole.rotation.z = -Math.PI / 2 + 0; h.pole.position.y = 5.55; }
   } });
   L.isl = { IS, ISW, HALL, STL };
-  FXQ.push({ tick: t => { STL.forEach(o => { const r = !!IS().stele[o.n], m = o.beam.material; m.opacity += ((r ? 0.12 : 0.55 + Math.sin(t * 2 + o.n) * 0.1) - m.opacity) * 0.1; m.color.setHex(r ? 0x8fd0ff : 0xffa51f); o.lb.visible = !r; o.lb.position.y = 3.3 + Math.sin(t * 2 + o.n) * 0.15; o.st.material.color.setHex(r ? 0xaee4ff : 0xffd54a); }); } });
+  FXQ.push({ tick: t => { STL.forEach(o => { const r = !!IS().stele[o.n], m = o.beam.material; m.opacity += ((r ? 0.2 : 0.8 + Math.sin(t * 2 + o.n) * 0.1) - m.opacity) * 0.1; m.color.setHex(r ? 0x8fd0ff : 0xffa51f); o.lb.visible = !r; o.lb.position.y = 3.3 + Math.sin(t * 2 + o.n) * 0.15; o.st.material.color.setHex(r ? 0xaee4ff : 0xffd54a); }); } });
   /* ---------- 管理者：故事進度選單（僅 adminEmails 帳號可見；可直接從指定章節開始測試／示範）---------- */
   function storyAdmin() {
     const sp = SPD(), d = IS(), ids = Object.keys(ARTS);
@@ -11201,7 +11224,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   TW.forEach(o => {
     const gp = new T.Group(); gp.position.set(o.tx, 5, o.tz); ISL.g.add(gp);
     const beam = new T.Mesh(new T.CylinderGeometry(1.1, 1.5, 46, 16, 1, true), new T.MeshBasicMaterial({ color: o.col, transparent: true, opacity: 0.0, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide }));
-    beam.position.y = 38; beam.frustumCulled = false; gp.add(beam);
+    beam.position.y = 38; beam.frustumCulled = false; gp.add(beam); beamFx(beam, 46, 1.2, o.n || 0);
     const mk = new T.Group(); mk.position.set(o.sx, 5.2, o.sz); ISL.g.add(mk);
     const ring = new T.Mesh(new T.RingGeometry(1.0, 1.35, 28), new T.MeshBasicMaterial({ color: o.col, transparent: true, opacity: 0.85, side: T.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; ring.frustumCulled = false; mk.add(ring);
     const em = new T.Sprite(new T.SpriteMaterial({ map: emojiTex(o.icon), transparent: true, depthTest: false })); em.scale.set(1.6, 1.6, 1); em.position.y = 2.6; em.renderOrder = 31; em.frustumCulled = false; mk.add(em);
@@ -11312,7 +11335,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       else twFail(o, skipped ? '你按了「跳過」……誘惑影得意地閃了閃。\n「沒關係，再來一次，這次唱完它。」' : '對上 ' + RH.hits + ' 個，還差一點點。\n「再唱一次，我陪你。」');
     }), '上舞台');
   }
-  FXQ.push({ tick: t => { TW.forEach(o => { const w = TWL[o.k], on = !!twD()[o.k]; w.beam.material.opacity += ((on ? 0.34 : 0) - w.beam.material.opacity) * 0.08; w.mk.visible = !on && IS().hall >= 2; w.em.position.y = 2.6 + Math.sin(t * 2 + o.n) * 0.25; w.ring.rotation.z = t * 0.8; }); } });
+  FXQ.push({ tick: t => { TW.forEach(o => { const w = TWL[o.k], on = !!twD()[o.k]; w.beam.material.opacity += ((on ? 0.62 : 0) - w.beam.material.opacity) * 0.08; w.mk.visible = !on && IS().hall >= 2; w.em.position.y = 2.6 + Math.sin(t * 2 + o.n) * 0.25; w.ring.rotation.z = t * 0.8; }); } });
   L.tw = { TW, twD, twN, twStart, RH, rhHit, EH, SONGS, SONG_MOTIF, songParse, rhStart };
   /* ---------- 第四章：雙影（主塔頂層小戰與淨化）：3 回合知識題，誘惑影＝偷看答案、懶惰靈＝先放著 ---------- */
   const BK = { x: 6.4, z: 2.0 };
