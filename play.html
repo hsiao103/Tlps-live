@@ -9165,6 +9165,22 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       g.font = '64px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#222'; g.fillText(txt, 64, 70);
     });
   }
+  /* 透明背景的發光星形／閃光貼圖（不含圓底與外框，用於七十顆星光與彈出特效） */
+  const GLT = {};
+  function glowTex(kind) {
+    return GLT[kind] || (GLT[kind] = canvasTex(128, 128, (g, w, h) => {
+      g.clearRect(0, 0, w, h);
+      const gr = g.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(255,240,160,.85)'); gr.addColorStop(0.45, 'rgba(255,214,90,.28)'); gr.addColorStop(1, 'rgba(255,200,60,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      if (kind === 'star') {
+        g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 17 : 40; g.lineTo(64 + Math.cos(a) * r, 66 + Math.sin(a) * r); } g.closePath();
+        g.fillStyle = '#ffd23f'; g.strokeStyle = '#fff4b8'; g.lineWidth = 5; g.lineJoin = 'round'; g.fill(); g.stroke();
+        g.beginPath(); g.arc(64, 64, 9, 0, 7); g.fillStyle = 'rgba(255,255,255,.75)'; g.fill();
+      } else {
+        g.fillStyle = '#fff6c8'; g.beginPath(); for (let i = 0; i < 8; i++) { const a = -Math.PI / 2 + i * Math.PI / 4, r = i % 2 ? 8 : 46; g.lineTo(64 + Math.cos(a) * r, 64 + Math.sin(a) * r); } g.closePath(); g.fill();
+      }
+    }));
+  }
   function nameTex(txt, col) {
     const w = 320, h = 84;
     return canvasTex(w, h, (g) => {
@@ -9730,7 +9746,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     } else if (BBS.st === 'fly') bbStep(dt);
     if (BBS.burst) { const b = BBS.burst; b.t += dt; if (b.t > 0.05 && !b.done) { b.done = 1; try { beaconPop(b); } catch (e) { /* 忽略 */ } } if (b.t > 1) BBS.burst = null; }
   }
-  const beaconPop = b => { const sp = sprite(emojiTex('✨'), [1.4, 1.4], b.x, b.y + 0.2, b.z, 31); setTimeout(() => { try { G.remove(sp); } catch (e) { /* 忽略 */ } }, 900); };
+  const beaconPop = b => { const sp = sprite(glowTex('spark'), [1.8, 1.8], b.x, b.y + 0.2, b.z, 31); setTimeout(() => { try { G.remove(sp); } catch (e) { /* 忽略 */ } }, 900); };
   bbq('bbgo').addEventListener('pointerdown', e => { e.preventDefault(); bbCharge(true); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => bbq('bbgo').addEventListener(ev, () => bbCharge(false)));
   bbq('bbx').addEventListener('click', () => bbEnd(''));
@@ -11514,7 +11530,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const d = x.getImageData(0, 0, 240, 120).data, pts = []; for (let yy = 4; yy < 120; yy += 5) for (let xx = 4; xx < 240; xx += 5) if (d[(yy * 240 + xx) * 4 + 3] > 140) pts.push([xx / 240 - 0.5, 0.5 - yy / 120]);
     const out = []; for (let i = 0; i < 70; i++) out.push(pts[Math.floor(i * pts.length / 70)] || [0, 0]); return (FIN.form = out); };
   function finMake(fx, fz, dx, dz) { const f = finForm(); FIN.cx = fx; FIN.cz = fz; let ux = dx || 0, uz = dz || 0; const dl = Math.hypot(ux, uz); if (dl < 1e-6) { ux = 0; uz = -1; } else { ux /= dl; uz /= dl; } dx = ux; dz = uz; FIN.dir = { dx, dz }; const ccx = fx + dx * 36, ccz = fz + dz * 36, rx = -dz, rz = dx;
-    if (!FIN.st.length) for (let i = 0; i < 70; i++) { const s = sprite(emojiTex('⭐'), [3.2, 3.2], 0, -999, 0, 31); s.visible = false; FIN.st.push(s); }
+    if (!FIN.st.length) for (let i = 0; i < 70; i++) { const s = sprite(glowTex('star'), [3.2, 3.2], 0, -999, 0, 31); s.visible = false; FIN.st.push(s); }
     FIN.st.forEach((s, i) => { s.userData.f = [ccx + rx * f[i][0] * 60, 40 + f[i][1] * 28, ccz + rz * f[i][0] * 60]; });
     if (!FIN.slogan) { const sp = new T.Sprite(new T.SpriteMaterial({ map: txtTex('同心七十　樂而自信', '#ffe28a', 1024, 160, 104), transparent: true, depthTest: false })); sp.scale.set(64, 10, 1); sp.renderOrder = 31; sp.visible = false; sp.frustumCulled = false; G.add(sp); FIN.slogan = sp; }
     FIN.slogan.position.set(ccx, 16, ccz); }
