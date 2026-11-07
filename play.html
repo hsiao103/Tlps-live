@@ -11390,6 +11390,24 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       { label: '▶ 從第五章開始（灰燼守門獸）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; ISL.landed = null; go(CV.sx, CV.sz); done('已設定：雙影已淨化，傳送到封印洞穴'); } },
       { label: '▶ 從第四章開始（雙影小戰）', fn: () => { base(); steles(true); d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 0; go(BK.x - 2.4, BK.z); done('已設定：四座塔已點亮，可到發光的書挑戰雙影'); } },
       { label: '↺ 重置全部故事進度', fn: () => { sp.art = {}; sp.blue = 0; sp.portal = 0; S.islKey = 0; S.islDoor = 0; steles(false); d.hall = 0; d.tw = {}; d.all = 0; d.pur = 0; d.beast = 0; d.gs = {}; d.ch5 = 0; d.ch6 = 0; S.islDock = 0; ISL.dk = null; ISL.landed = null; done('故事進度已重置'); } },
+      { label: '🚀 同樂號測試選單（小創任務＋艙內）', fn: shipAdmin },
+      { label: '關閉' }], AV(0));
+  }
+  function shipAdmin() {
+    const d = IS(), sp = SPD(), ids = Object.keys(ARTS);
+    const base = () => { ids.forEach(k => { sp.art[k] = 1; }); sp.blue = 1; sp.portal = 1; S.islKey = 1; S.islDoor = 1; d.stele = {}; STL.forEach(o => { d.stele[o.n] = 1; }); d.steleDone = 1; d.hall = 2; d.tw = { e: 1, w: 1, s: 1, n: 1 }; d.all = 1; d.pur = 1; d.beast = 1; d.gs = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 }; d.ch5 = 1; ISL.syncWalls(); };
+    const at = (lx, lz, fx, fz) => { const w = ISW(lx, lz), f = ISW(fx, fz); teleport(w.x, ISY(), w.z, f.x, f.z); };
+    const q0 = () => { delete d.ship; return SHP(); };
+    const done = m => { save(); toast('🛠 ' + m, 3200); };
+    const mats = (q) => { SHM.forEach(s => { q.m[s.k] = 1; }); };
+    const q = SHP();
+    say('🛠 管理者・同樂號測試', '目前：材料 ' + SHM.filter(s => q.m[s.k]).length + '/4・魔法石 ' + (q.stone ? '有' : '無') + '・石座 ' + (q.placed ? '已放' : '未放') + '・航程 ' + (q.voy >= 3 ? '已完成' : q.voy) + '\n（會把前置劇情設為完成並傳送）', [
+      { label: '① 從頭：找小創、蒐集材料', pri: true, fn: () => { base(); q0(); S.caveDone = 0; at(10, 22, 12, 25); done('已設定：洞穴已淨化，傳送到小創的工作台'); } },
+      { label: '② 材料已集齊，去找小創合成', fn: () => { base(); const k = q0(); k.talk = 1; mats(k); at(10, 22, 12, 25); done('已設定：四樣材料齊全'); } },
+      { label: '③ 魔法石已完成，傳送到碼頭（跳過迷宮）', fn: () => { base(); const k = q0(); k.talk = 1; mats(k); k.stone = 1; at(25.5, -1.5, ISL.dock.lx, ISL.dock.lz); done('已設定：魔法石完成，傳送到碼頭'); } },
+      { label: '④ 直接登船（引擎未啟動）', fn: () => { base(); const k = q0(); k.talk = 1; mats(k); k.stone = 1; at(25.5, -1.5, ISL.dock.lx, ISL.dock.lz); save(); shpEnter(); } },
+      { label: '⑤ 艙內：魔法石已就位（待上二樓）', fn: () => { base(); const k = q0(); k.talk = 1; mats(k); k.stone = 1; k.placed = 1; k.voy = 1; at(25.5, -1.5, ISL.dock.lx, ISL.dock.lz); save(); shpEnter(); } },
+      { label: '↺ 重置同樂號進度', fn: () => { q0(); S.caveDone = 0; done('同樂號進度已重置'); } },
       { label: '關閉' }], AV(0));
   }
 
@@ -11672,6 +11690,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     { k: 'gear', ic: '🔩', n: '黃銅齒輪', how: '掉在城堡後方花園的老齒輪', ex: false },
     { k: 'cry', ic: '💎', n: '紫水晶碎片', how: '西側紫水晶旁的碎片', ex: false }];
   const SHP_SP = { gear: [13, -25.5], cry: [-24.6, 12.8] };
+  const SHADM = () => (typeof isAdm2 === 'function' && isAdm2()) ? [{ label: '🛠 管理者：同樂號測試', fn: () => shipAdmin() }] : [];
   const shpHave = k => !!SHP().m[k];
   const shpFade = (fn, ms) => { const el = document.createElement('div'); el.style.cssText = 'position:fixed;inset:0;z-index:9400;background:#000;opacity:0;transition:opacity .45s;pointer-events:none'; document.body.appendChild(el); requestAnimationFrame(() => { el.style.opacity = '1'; }); setTimeout(() => { try { fn(); } catch (e) { /* 忽略 */ } el.style.opacity = '0'; setTimeout(() => el.remove(), 600); }, ms || 520); };
   // --- 島上：小創（工程師）與兩個蒐集點 ---
@@ -11694,12 +11713,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function shpTalk() {
     const d = IS(), q = SHP(), n = SHM.filter(s => q.m[s.k]).length;
     if (!q.talk) { spSay('⚙️ 小創（工程師）', ['小創在工作台上敲著一個黃銅零件，抬頭看見你：「來得正好！」', '「碼頭停的那艘飛空艇，我替她取了名字——『同樂號』。外殼修好了，可是引擎還差最重要的東西：魔法石。」', '「魔法石要四樣材料：\n🌟 星光核心（守門獸那五顆星光）\n📜 賢者拓印（五塊石碑）\n🔩 黃銅齒輪（城堡後方花園，有個老齒輪）\n💎 紫水晶碎片（西側紫水晶旁）」', '「星光和石碑你已經弄好了，直接交給我就行；齒輪和水晶我在島上做了記號，你去撿回來吧！」'], AV(2), () => { q.talk = 1; save(); toast('🧰 新任務：為同樂號準備魔法石材料', 3200); shpTalk(); }, '交給我'); return; }
-    if (q.stone) { say('⚙️ 小創（工程師）', '「魔法石已經完成啦！去碼頭，穿過山洞，登上同樂號吧。\n我在引擎艙等你。」', [{ label: '好' }], AV(2)); return; }
+    if (q.stone) { say('⚙️ 小創（工程師）', '「魔法石已經完成啦！去碼頭，穿過山洞，登上同樂號吧。\n我在引擎艙等你。」', [{ label: '好' }].concat(SHADM()), AV(2)); return; }
     const btns = [];
     if (d.ch5 && !q.m.core) btns.push({ label: '🌟 交出星光核心', pri: true, fn: () => { q.m.core = 1; save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('🌟 交出了星光核心', 2200); setTimeout(shpTalk, 150); } });
     if (d.steleDone && !q.m.rub) btns.push({ label: '📜 交出賢者拓印', pri: !btns.length, fn: () => { q.m.rub = 1; save(); try { SFX.play('win', 300); } catch (e) { /* 忽略 */ } toast('📜 交出了賢者拓印', 2200); setTimeout(shpTalk, 150); } });
     if (n === 4) btns.push({ label: '🔮 合成魔法石', pri: true, fn: shpSynth });
-    btns.push({ label: '先去蒐集' });
+    btns.push({ label: '先去蒐集' }); SHADM().forEach(b => btns.push(b));
     say('⚙️ 小創（工程師）', '「魔法石材料（' + n + '/4）」\n\n' + shpMats() + (!d.steleDone && !q.m.rub ? '\n\n（拓印要先集齊天之城的五塊石碑）' : ''), btns, AV(2));
   }
   function shpSynth() {
@@ -11780,8 +11799,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       setTimeout(() => { q.voy = 3; spSay('☁️ 雲海', ['窗外，天之城慢慢變小，雲海在腳下展開，金色的陽光灑滿駕駛艙。', '⚙️ 小創（傳聲管）：「第一次試飛成功！引擎穩定。」', '🔮 小知：「前方有一片很藍的海——那是龜島的方向。」', '🐢 《龜島傳奇》\n第一章・完\n下一章：預備中……'], AV(2), () => { addPts(60, '🚀 同樂號・首航'); save(); toast('🏅 完成：同樂號首航（龜島之旅，敬請期待）', 4200); setTimeout(shpLeave, 600); }, '回到碼頭'); }, 3200); }, '啟航！'); });
   cbIa('cbDoor', [3.2, 0, -3.3], 2.2, () => '🚪 下船（回到碼頭）', () => say('🚪 艙門', '要回碼頭嗎？', [{ label: '回到碼頭', pri: true, fn: shpLeave }, { label: '留下' }], AV(0)));
   ia({ id: 'islDock', get x() { return ISW(ISL.dock.lx + 2, ISL.dock.lz).x; }, get y() { return ISY(); }, get z() { return ISW(ISL.dock.lx + 2, ISL.dock.lz).z; }, r: 4.2, txt: () => '⛵ 同樂號', act: () => { const q = SHP();
-    if (q.stone) { say('⛵ 同樂號', q.voy >= 3 ? '同樂號停在碼頭待命。要上船看看嗎？' : '木頭與黃銅的老飛空艇。小創說，只要把魔法石放進引擎艙的石座，她就能醒來。要登船嗎？', [{ label: '⚓ 登船', pri: true, fn: () => shpEnter() }, { label: '再等等' }], AV(2)); return; }
-    say('⛵ 同樂號', '碼頭停著一艘復古的飛空艇：帆布補丁的氣囊、黃銅箍、木頭船殼，煙囪輕輕冒著白煙，船身寫著「同樂號」。\n\n艙門鎖著，引擎還沒有魔法石。' + (IS().ch5 ? '\n（小創在城堡門前的工作台，可以去找他。）' : '\n（先把洞穴的事處理好，再來看看。）'), [{ label: '好' }], AV(2)); } });
+    if (q.stone) { say('⛵ 同樂號', q.voy >= 3 ? '同樂號停在碼頭待命。要上船看看嗎？' : '木頭與黃銅的老飛空艇。小創說，只要把魔法石放進引擎艙的石座，她就能醒來。要登船嗎？', [{ label: '⚓ 登船', pri: true, fn: () => shpEnter() }, { label: '再等等' }].concat(SHADM()), AV(2)); return; }
+    say('⛵ 同樂號', '碼頭停著一艘復古的飛空艇：帆布補丁的氣囊、黃銅箍、木頭船殼，煙囪輕輕冒著白煙，船身寫著「同樂號」。\n\n艙門鎖著，引擎還沒有魔法石。' + (IS().ch5 ? '\n（小創在城堡門前的工作台，可以去找他。）' : '\n（先把洞穴的事處理好，再來看看。）'), [{ label: '好' }].concat(SHADM()), AV(2)); } });
   function beastTalk() {
     const d = IS();
     if (!d.pur) { say('🕳 封印洞穴', '洞口被厚厚的灰色封住，裡面有東西在緩慢地呼吸……\n先到城堡大廳的「發光的書」，把雙影的事解決吧。', [{ label: '好' }], AV(4)); return; }
