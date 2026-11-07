@@ -7300,6 +7300,44 @@ function heroDetail(ch, kind, lite) {
     box(hw * 1.7, 0.012, 0.006, P.stripe, 0, tor.y - 0.02, zf - 0.003, 'Torso'); box(hw * 1.7, 0.012, 0.006, P.band2, 0, tor.y - 0.045, zf - 0.003, 'Torso');
     const fcR = LC.FistR, laR = LC.LowerArmR; if (fcR && laR) { const m = fcR.c.clone().lerp(laR.c, 0.45); box(0.05, 0.03, 0.05, 0x222222, m.x + 0.004, m.y, m.z, 'LowerArmR'); box(0.03, 0.012, 0.01, 0x9fe3ff, m.x + 0.004, m.y, m.z - 0.027, 'LowerArmR'); }
   }
+  heroDetail2(ch, kind, { hw, zf, zb, LC, cy, P, box, limb, bp, tor, nk });
+}
+// ---- 主角細節 II：水壺、書包側袋與反光條、拉鍊頭、領口釦、鞋底與鞋帶、襪口環、腰帶、髮圈、耳機、帽徽 ----
+const HERO_DET2 = {
+  boy:   { bottle: 0x39a0ed, lid: 0xf5821f, sock: 0x2e9b45, belt: 0x2e9b45, shoeLace: 0xffffff },
+  girl:  { bottle: 0xff8fb1, lid: 0xffffff, sock: 0xf29bb5, belt: 0xd9708f, shoeLace: 0xffffff },
+  sport: { bottle: 0xdddddd, lid: 0x1c2f66, sock: 0xf5821f, belt: 0xf5821f, shoeLace: 0xf5821f }
+};
+function heroDetail2(ch, kind, X) {
+  const D = HERO_DET2[kind] || HERO_DET2.boy, P = X.P, hw = X.hw, zf = X.zf, zb = X.zb, LC = X.LC, cy = X.cy, tor = X.tor, nk = X.nk, box = X.box, bp = X.bp;
+  const cyl = (rt, rb, h, col, x, y, z, bone, rx, rz) => { const m = new T.Mesh(new T.CylinderGeometry(rt, rb, h, 12), propMat(col)); m.position.set(x, y, z); if (rx) m.rotation.x = rx; if (rz) m.rotation.z = rz; return addProp(ch, bone, m); };
+  const pd = 0.075, zp = zb + pd + 0.004;
+  // 書包：兩側網袋、背面反光條、中央拉鍊頭、頂部提把
+  [-1, 1].forEach(sd => { box(0.04, 0.12, pd * 0.8, P.pack2, sd * (hw * 0.95 + 0.02), cy - 0.05, zb + pd * 0.45, 'Torso'); });
+  box(0.018, 0.2, 0.008, 0xffffff, hw * 0.45, cy - 0.01, zp + 0.004, 'Torso'); box(0.018, 0.2, 0.008, 0xffffff, -hw * 0.45, cy - 0.01, zp + 0.004, 'Torso');
+  box(0.014, 0.03, 0.01, 0xffd23f, 0, cy + 0.085, zp - 0.004, 'Torso');
+  { const h = new T.Mesh(new T.TorusGeometry(0.032, 0.007, 6, 12, Math.PI), propMat(P.pack2)); h.position.set(0, cy + 0.12, zb + pd / 2); h.rotation.y = Math.PI / 2; addProp(ch, 'Torso', h); }
+  // 水壺：掛在書包右側，壺身＋壺蓋＋提環
+  { const bx = hw * 0.95 + 0.075, by = cy - 0.09, bz = zb + pd * 0.45; cyl(0.03, 0.03, 0.14, D.bottle, bx, by, bz, 'Torso'); cyl(0.032, 0.032, 0.025, D.lid, bx, by + 0.082, bz, 'Torso'); cyl(0.0325, 0.0325, 0.012, D.lid, bx, by - 0.035, bz, 'Torso'); }
+  // 胸前：領口釦（兩顆）
+  if (kind === 'boy') { [0.0, -0.03].forEach(dy => { const m = new T.Mesh(new T.CircleGeometry(0.008, 10), propMat(0xffffff)); m.rotation.y = Math.PI; m.position.set(0, nk.y - 0.1 + dy, zf - 0.008); addProp(ch, 'Torso', m); }); }
+  // 腰帶（褲頭一圈）
+  { const hp = bp('Hips'); if (hp) { const w = new T.Mesh(new T.CylinderGeometry(hw * 0.95, hw * 0.95, 0.022, 16), propMat(D.belt)); w.scale.set(1, 1, 0.78); w.position.set(0, hp.y + 0.075, (zf + zb) / 2); addProp(ch, 'Hips', w); } }
+  // 襪口環與鞋底／鞋帶
+  ['L', 'R'].forEach(sd => {
+    const ll = LC['LowerLeg' + sd], ft = bp('Foot' + sd); const sg = sd === 'R' ? 1 : -1;
+    if (ll) { const r = new T.Mesh(new T.CylinderGeometry(0.047, 0.047, 0.016, 12), propMat(D.sock)); r.position.set(ll.c.x, ll.c.y + 0.045, ll.c.z); addProp(ch, 'LowerLeg' + sd, r); const r2 = new T.Mesh(new T.CylinderGeometry(0.047, 0.047, 0.01, 12), propMat(0xffffff)); r2.position.set(ll.c.x, ll.c.y + 0.065, ll.c.z); addProp(ch, 'LowerLeg' + sd, r2); }
+    if (ft) { box(0.1, 0.016, 0.17, 0xffffff, ft.x, ft.y - 0.052, ft.z - 0.025, 'Foot' + sd); [0, 1, 2].forEach(i => box(0.07, 0.007, 0.01, D.shoeLace, ft.x, ft.y + 0.012, ft.z - 0.045 + i * 0.022, 'Foot' + sd)); }
+  });
+  // 角色專屬
+  const hd = ch.head, hy = hd ? hd.cy : 0.84 * ch.h, hr = hd ? hd.r : 0.165 * ch.h;
+  if (kind === 'girl') {   // 雙馬尾髮圈（粉紅圈＋小星）
+    [-1, 1].forEach(sd => { const t = new T.Mesh(new T.TorusGeometry(0.024, 0.008, 6, 12), propMat(0xff6f9c)); t.position.set(sd * 1.06 * hr, hy - 0.02 * hr, 0.18 * hr); t.rotation.y = Math.PI / 2; addProp(ch, 'Head', t); });
+  } else if (kind === 'sport') {   // 掛頸耳機＋帽徽
+    { const band = new T.Mesh(new T.TorusGeometry(0.115, 0.014, 6, 20, Math.PI), propMat(0x222222)); band.rotation.z = Math.PI; band.position.set(0, nk.y + 0.03, zf - 0.035); addProp(ch, 'Torso', band);
+      [-1, 1].forEach(sd => cyl(0.04, 0.04, 0.03, 0x2a2a2a, sd * 0.118, nk.y + 0.03, zf - 0.035, 'Torso', 0, Math.PI / 2)); }
+    { const m = new T.Mesh(new T.CircleGeometry(0.018, 14), propMat(0xf5821f)); m.position.set(0, hy + 0.55 * hr, -1.03 * hr); m.rotation.y = Math.PI; addProp(ch, 'Head', m); }
+  }
 }
 window.__heroDetail = heroDetail;
 async function setHero(kind, chosen) {
