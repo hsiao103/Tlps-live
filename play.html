@@ -11643,7 +11643,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function caveCross(dir) {
     const d = IS(), S0 = S, first = !S0.caveDone;
     const go = (got) => { S0.caveDone = 1; if (got) addPts(got * 2, '✨ 洞穴星屑'); save();
-      const dst = dir ? ISW(CV.sx, CV.sz) : ISW(ISL.caveE.lx, ISL.caveE.lz), look = dir ? ISW(CV.sx - 3, CV.sz + 4) : ISW(ISL.caveE.lx + 4, ISL.caveE.lz - 8);
+      const dst = dir ? ISW(CV.sx, CV.sz) : ISW(25.5, -1.5), look = dir ? ISW(CV.sx - 3, CV.sz + 4) : ISW(ISL.dock.lx, ISL.dock.lz);
       teleport(dst.x, ISY(), dst.z, look.x, look.z); toast(dir ? '🌤 回到城堡這一側' : '⛵ 洞穴的另一側，碼頭就在前方', 2600); };
     MZ.start(dir, go);
   }
