@@ -11012,6 +11012,23 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     add(new T.Mesh(new T.BoxGeometry(1, 6, 1.1), rock2), -3, 3, 0.2, mouth); add(new T.Mesh(new T.BoxGeometry(1, 6, 1.1), rock2), 3, 3, 0.2, mouth); add(new T.Mesh(new T.BoxGeometry(7.4, 1.2, 1.1), rock2), 0, 6.8, 0.2, mouth);
     const glow = add(new T.Mesh(new T.SphereGeometry(0.7, 8, 6), new T.MeshBasicMaterial({ color: 0xffb347 })), 1.2, 1.2, 0.9, mouth); ISL.glow = glow;
     add(new T.Mesh(new T.DodecahedronGeometry(1.1, 0), rock), -3.8, 0.8, 1.6, mouth); add(new T.Mesh(new T.DodecahedronGeometry(0.8, 0), rock), 4, 0.6, 2, mouth);
+    // ===== 洞穴東口（碼頭側出口）＋ 落石封路（逼玩家走洞穴迷宮）=====
+    { const mx = 29.9, mz = 6.9, em = new T.Group(); em.position.set(mx, 4.8, mz); em.rotation.y = Math.PI; ISL.g.add(em); ISL.caveE = { lx: 29.9, lz: 4.7 };
+      add(new T.Mesh(new T.BoxGeometry(5, 5, 0.6), M(0x16120f)), 0, 2.5, 0, em); add(new T.Mesh(new T.CylinderGeometry(2.5, 2.5, 0.6, 12, 1, false, 0, Math.PI), M(0x16120f)), 0, 5, 0, em).rotation.x = Math.PI / 2;
+      add(new T.Mesh(new T.BoxGeometry(1, 6, 1.1), rock2), -3, 3, 0.2, em); add(new T.Mesh(new T.BoxGeometry(1, 6, 1.1), rock2), 3, 3, 0.2, em); add(new T.Mesh(new T.BoxGeometry(7.4, 1.2, 1.1), rock2), 0, 6.8, 0.2, em);
+      const eg = add(new T.Mesh(new T.SphereGeometry(0.7, 8, 6), new T.MeshBasicMaterial({ color: 0x9fe3ff })), -1.2, 1.2, 0.9, em); ISL.glowE = eg;
+      add(new T.Mesh(new T.DodecahedronGeometry(1.0, 0), rock), 3.9, 0.7, 1.7, em); add(new T.Mesh(new T.DodecahedronGeometry(0.7, 0), rock), -4, 0.5, 2, em);
+      const dirt2 = M(0xc9ad7a); const pth = add(new T.Mesh(new T.BoxGeometry(3.4, 0.2, 4.2), dirt2), mx, 5.08, mz - 3.6);
+      // 洞口上方的牌子
+      const sg = new T.Group(); sg.position.set(mx + 4.2, 4.8, mz - 1.2); sg.rotation.y = -0.2; ISL.g.add(sg); add(new T.Mesh(new T.CylinderGeometry(0.09, 0.09, 1.7, 6), M(0x8a6238)), 0, 0.85, 0, sg);
+      const st = document.createElement('canvas'); st.width = 256; st.height = 128; { const x = st.getContext('2d'); x.fillStyle = '#f3e6c4'; x.fillRect(0, 0, 256, 128); x.strokeStyle = '#8a6238'; x.lineWidth = 8; x.strokeRect(4, 4, 248, 120); x.fillStyle = '#4a3a24'; x.font = '900 40px "Noto Sans TC","Microsoft JhengHei",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('🕳 洞穴東口', 128, 46); x.font = '700 26px "Noto Sans TC","Microsoft JhengHei",sans-serif'; x.fillText('往碼頭 → 穿越迷宮', 128, 94); }
+      const stx = new T.CanvasTexture(st); stx.encoding = T.sRGBEncoding; add(new T.Mesh(new T.PlaneGeometry(1.8, 0.9), new T.MeshBasicMaterial({ map: stx, side: T.DoubleSide })), 0, 1.5, 0.08, sg);
+      // 落石封路：城堡東北角塔到島緣（走外圍繞不到碼頭）
+      const rb = []; for (let x = 18.5; x <= 36.5; x += 2.1) rb.push([x + (Math.sin(x * 3) * 0.4), -17.6 + Math.cos(x * 2) * 0.5, 1.4 + (Math.abs(Math.sin(x * 1.7)) * 1.2)]);
+      rb.forEach(([x, z, r]) => { const m = add(new T.Mesh(new T.DodecahedronGeometry(r, 0), (x * 10 | 0) % 2 ? rock : rock2), x, 4.8 + r * 0.55, z); m.rotation.set(x, z, 0); });
+      const fs = new T.Group(); fs.position.set(21.5, 4.8, -14.4); ISL.g.add(fs); add(new T.Mesh(new T.CylinderGeometry(0.09, 0.09, 1.9, 6), M(0x8a6238)), 0, 0.95, 0, fs);
+      const ft = document.createElement('canvas'); ft.width = 256; ft.height = 128; { const x = ft.getContext('2d'); x.fillStyle = '#ffe9a8'; x.fillRect(0, 0, 256, 128); x.strokeStyle = '#c0392b'; x.lineWidth = 8; x.strokeRect(4, 4, 248, 120); x.fillStyle = '#c0392b'; x.font = '900 38px "Noto Sans TC","Microsoft JhengHei",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('⚠ 落石封路', 128, 44); x.fillStyle = '#4a3a24'; x.font = '700 24px "Noto Sans TC","Microsoft JhengHei",sans-serif'; x.fillText('東側請由山洞穿越', 128, 92); }
+      const ftx = new T.CanvasTexture(ft); ftx.encoding = T.sRGBEncoding; const fb = add(new T.Mesh(new T.PlaneGeometry(1.9, 0.95), new T.MeshBasicMaterial({ map: ftx, side: T.DoubleSide })), 0, 1.65, 0.08, fs); fb.rotation.y = Math.PI; fs.rotation.y = 0.2; }
     // 圍牆補齊：左、右、後牆＋四角塔，與前牆門樓合成一圈
     { const X = 17, Z0 = -17, Z1 = 20, Lz = Z1 - Z0;
       for (const sx of [-X, X]) { add(new T.Mesh(new T.BoxGeometry(2, 9, Lz), stone2), sx, 8.5, (Z0 + Z1) / 2); for (let i = 0; i < 10; i++) add(new T.Mesh(new T.BoxGeometry(1.6, 1.2, 1.4), stone2), sx, 13.6, Z0 + 2 + i * ((Lz - 4) / 9)); }
@@ -11086,7 +11103,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     // 為避免與原本的針葉樹重疊，把靠近新物件的舊樹藏起來
     const clear = (x, z, r) => ISL.g.children.forEach(c => { if (c.isGroup && c.children.length === 2 && Math.abs(c.position.y - Y) < 0.6 && Math.hypot(c.position.x - x, c.position.z - z) < r) c.visible = false; });
     // 櫻花樹
-    [[-27, -7], [-29, 3], [-22, -24], [27, -9], [29, 1], [9, -28], [-10, -29]].forEach(([x, z], i) => { clear(x, z, 4.2);
+    [[-27, -7], [-29, 3], [-22, -24], [27, -9], [31, -9.5], [9, -28], [-10, -29]].forEach(([x, z], i) => { clear(x, z, 4.2);
       const g = new T.Group(), h = 4.2 + (i % 3) * 0.6; add(new T.Mesh(new T.CylinderGeometry(0.35, 0.55, h, 6), trunk), 0, h / 2, 0, g);
       [[0, h + 1.4, 0, 2.7], [1.6, h + 0.6, 0.6, 1.9], [-1.5, h + 0.8, -0.5, 2.0], [0.2, h + 2.6, 0.3, 1.6]].forEach((q, k) => add(new T.Mesh(new T.SphereGeometry(q[3], 9, 7), pinks[(i + k) % 3]), q[0], q[1], q[2], g));
       g.position.set(x, Y, z); g.rotation.y = i * 1.3; ISL.g.add(g); ISL.deco.push(g); });
@@ -11117,7 +11134,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const tg = new T.Group(); add(new T.Mesh(new T.CylinderGeometry(0.25, 0.35, 2.2, 5), trunk), 0, 1.1, 0, tg); add(new T.Mesh(new T.SphereGeometry(1.5, 8, 6), pinks[i % 3]), 0, 2.8, 0, tg); tg.position.set(r * 0.25, 0.6, 0); g.add(tg);
       g.position.set(x, y, z); ISL.g.add(g); isl.push({ g, y, ph: i * 2.1 }); ISL.deco.push(g); });
     // ===== ⛵ 龜島碼頭：島東側的小碼頭，停著小型飛空艇「龜島號」（下一章：飛往龜山島的預備） =====
-    { const DX = 32, DZ = 8; clear(DX, DZ, 7); clear(DX + 6, DZ, 5);
+    { const DX = 32, DZ = 0; clear(DX, DZ, 7); clear(DX + 6, DZ, 5);
       const wood2 = M(0x8a6238), ropeM = M(0xe4d3a2), dk = new T.Group(); dk.position.set(DX, Y, DZ); ISL.g.add(dk); ISL.dock = { lx: DX, lz: DZ, grp: dk };
       const A = (m, x, y, z, par) => add(m, x, y, z, par || dk);
       const deckTex = cv(256, 192, (x, w, h) => { for (let i = 0; i < 12; i++) { x.fillStyle = i % 2 ? '#a97a47' : '#c49a63'; x.fillRect(0, i * 16, w, 15); x.fillStyle = '#7a5530'; x.fillRect(0, i * 16 + 15, w, 1.5); } });
@@ -11230,7 +11247,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const ISK = 0.7, ISY = () => ISL.g.position.y + 5 * ISK;
   ISL.g.updateMatrixWorld(true);
   ISL.g.children.forEach(m => { if (m.isMesh && m.geometry && ((m.geometry.type === 'CylinderGeometry' && m.geometry.parameters.radiusTop === 38.5) || (m.geometry.type === 'SphereGeometry' && m.geometry.parameters.radius >= 5 && m.geometry.parameters.thetaLength < 2))) walk.push(m); });
-  ISL.walls = [[-8, -7, -9, 5], [7, 8, -9, 5], [-8, 8, -9, -8], [-8, -2.3, 4, 5], [2.3, 8, 4, 5], [-13.2, -6.8, -12.2, -5.8], [6.8, 13.2, -12.2, -5.8], [-13.2, -6.8, 1.8, 8.2], [6.8, 13.2, 1.8, 8.2], [-18, -16, -17, 20], [16, 18, -17, 20], [-18, 18, -18, -16], [-18, -2.5, 19, 21], [2.5, 18, 19, 21]].map(b => { const w = { x0: ISL.g.position.x + b[0] * ISK, x1: ISL.g.position.x + b[1] * ISK, z0: ISL.g.position.z + b[2] * ISK, z1: ISL.g.position.z + b[3] * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(w); return w; });
+  const CAVE_WALLS = (() => { const o = [], cx = 27, cz = 15, r = 10; for (let z = 5.5; z < 24.5; z += 1) { const far = Math.max(Math.abs(z - cz), Math.abs(z + 1 - cz)), hw = Math.sqrt(Math.max(0, r * r - far * far)) * 0.97; if (hw < 1) continue; o.push([cx - hw, z < 9 ? cx + hw : 41, z, z + 1]); }
+    o.push([17.5, 24, 6.5, 12.5]);   // 與城堡東牆接合，封住山丘與城牆之間的縫
+    o.push([17, 36.8, -18.6, -16.8]);   // 落石封路
+    return o; })();
+  ISL.walls = [[-8, -7, -9, 5], [7, 8, -9, 5], [-8, 8, -9, -8], [-8, -2.3, 4, 5], [2.3, 8, 4, 5], [-13.2, -6.8, -12.2, -5.8], [6.8, 13.2, -12.2, -5.8], [-13.2, -6.8, 1.8, 8.2], [6.8, 13.2, 1.8, 8.2], [-18, -16, -17, 20], [16, 18, -17, 20], [-18, 18, -18, -16], [-18, -2.5, 19, 21], [2.5, 18, 19, 21]].concat(CAVE_WALLS).map(b => { const w = { x0: ISL.g.position.x + b[0] * ISK, x1: ISL.g.position.x + b[1] * ISK, z0: ISL.g.position.z + b[2] * ISK, z1: ISL.g.position.z + b[3] * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(w); return w; });
   ISL.doorW = { x0: ISL.g.position.x - 2.3 * ISK, x1: ISL.g.position.x + 2.3 * ISK, z0: ISL.g.position.z + 4 * ISK, z1: ISL.g.position.z + 5 * ISK, y0: 0, y1: 0, tf: null }; window.__school.WALLS.push(ISL.doorW);
   ISL.syncWalls = () => { const b = ISL.g.position.y; ISL.walls.forEach(w => { w.y0 = b + 4 * ISK; w.y1 = b + 25 * ISK; }); const d = ISL.doorW; if (S.islDoor) { d.y0 = d.y1 = -999; } else { d.y0 = b + 4 * ISK; d.y1 = b + 14 * ISK; } };
   ISL.syncWalls();
@@ -11573,10 +11594,65 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   function puzzleRun(sc, who, done) { let k = 0; const order = sc.s.slice(), shuf = shuffled(order, Math.random), taken = [];
     const ask = () => { if (k >= order.length) { done(); return; } const left = shuf.filter(x => !taken.includes(x));
       say('⚙️ 合作星機關（第 ' + (k + 1) + ' 步／共 ' + order.length + ' 步）', sc.t + '\n\n已完成：' + (taken.length ? taken.map((x, i) => (i + 1) + '. ' + x).join('\n　　　　') : '（還沒有）') + '\n\n接下來要做哪一步？', left.map(x => ({ label: x, fn: () => { if (x === order[k]) { taken.push(x); k++; toast('⚙️ 接上了！', 1200); setTimeout(ask, 120); } else { toast('🤔 順序不太對：' + sc.h, 2800); setTimeout(ask, 120); } } })), AV(2)); }; ask(); }
+  // ===== 洞穴迷宮（2D）：穿越山洞時的小遊戲 =====
+  const MZ = (() => {
+    const N = 9, CS = 38, W = N * CS; let el = null, st = null, raf = 0, cb = null;
+    const gen = (seed) => { let s = seed >>> 0 || 7; const rnd = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+      const cells = []; for (let i = 0; i < N * N; i++) cells.push({ w: [1, 1, 1, 1] }); // 上右下左
+      const stack = [0], seen = new Set([0]), D = [[0, -1, 0, 2], [1, 0, 1, 3], [0, 1, 2, 0], [-1, 0, 3, 1]];
+      while (stack.length) { const c = stack[stack.length - 1], x = c % N, y = c / N | 0, nb = D.filter(d => { const nx = x + d[0], ny = y + d[1]; return nx >= 0 && ny >= 0 && nx < N && ny < N && !seen.has(ny * N + nx); });
+        if (!nb.length) { stack.pop(); continue; } const d = nb[rnd() * nb.length | 0], n = (y + d[1]) * N + x + d[0]; cells[c].w[d[2]] = 0; cells[n].w[d[3]] = 0; seen.add(n); stack.push(n); }
+      return cells; };
+    const path = (cells, a, b) => { const prev = new Map([[a, -1]]), q = [a], D = [[0, -1], [1, 0], [0, 1], [-1, 0]]; while (q.length) { const c = q.shift(); if (c === b) break; for (let k = 0; k < 4; k++) if (!cells[c].w[k]) { const n = ((c / N | 0) + D[k][1]) * N + (c % N) + D[k][0]; if (!prev.has(n)) { prev.set(n, c); q.push(n); } } } const p = []; for (let c = b; c !== -1; c = prev.get(c)) p.unshift(c); return p; };
+    function draw() { if (!el) return; const c = el.cv.getContext('2d'), s = st; c.clearRect(0, 0, W, W); c.fillStyle = '#14101a'; c.fillRect(0, 0, W, W);
+      const px = s.x * CS + CS / 2, py = s.y * CS + CS / 2, R = CS * 3.1;
+      c.save(); c.beginPath(); c.arc(px, py, R, 0, 7); c.clip();
+      c.fillStyle = '#2b2236'; c.fillRect(0, 0, W, W);
+      if (s.hint > 0) { c.fillStyle = 'rgba(255,220,120,.35)'; s.sol.forEach(i => c.fillRect((i % N) * CS + 4, (i / N | 0) * CS + 4, CS - 8, CS - 8)); }
+      c.fillStyle = 'rgba(120,200,255,.25)'; c.fillRect(s.goal % N * CS, (s.goal / N | 0) * CS, CS, CS); c.font = (CS * .6) + 'px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🚪', s.goal % N * CS + CS / 2, (s.goal / N | 0) * CS + CS / 2 + 2);
+      s.gems.forEach(g => { if (!g.got) c.fillText('✨', g.x * CS + CS / 2, g.y * CS + CS / 2 + 2); });
+      c.strokeStyle = '#d9c9a8'; c.lineWidth = 3; c.lineCap = 'round'; c.beginPath();
+      s.cells.forEach((cl, i) => { const x = i % N * CS, y = (i / N | 0) * CS; if (cl.w[0]) { c.moveTo(x, y); c.lineTo(x + CS, y); } if (cl.w[1]) { c.moveTo(x + CS, y); c.lineTo(x + CS, y + CS); } if (cl.w[2]) { c.moveTo(x, y + CS); c.lineTo(x + CS, y + CS); } if (cl.w[3]) { c.moveTo(x, y); c.lineTo(x, y + CS); } }); c.stroke();
+      const gr = c.createRadialGradient(px, py, R * .25, px, py, R); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(10,6,16,.95)'); c.fillStyle = gr; c.fillRect(0, 0, W, W);
+      c.restore(); c.font = (CS * .7) + 'px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🧒', px, py + 2);
+      if (el.info) el.info.textContent = '✨ ' + s.gems.filter(g => g.got).length + '/' + s.gems.length + '　步數 ' + s.steps; }
+    function move(k) { if (!st || st.done) return; const cl = st.cells[st.y * N + st.x]; if (cl.w[k]) { st.bump = 1; try { SFX.play('click', 60); } catch (e) { /* 忽略 */ } return; }
+      st.x += [0, 1, 0, -1][k]; st.y += [-1, 0, 1, 0][k]; st.steps++; const g = st.gems.find(q => !q.got && q.x === st.x && q.y === st.y); if (g) { g.got = 1; try { SFX.play('coin', 80); } catch (e) { /* 忽略 */ } }
+      if (st.y * N + st.x === st.goal) { st.done = 1; draw(); setTimeout(() => finish(true), 400); } else draw(); }
+    function finish(ok) { const got = st ? st.gems.filter(g => g.got).length : 0, f = cb; stop(); if (ok && f) f(got); }
+    function stop() { if (el) { removeEventListener('keydown', el.kd, true); el.root.remove(); } el = null; st = null; cb = null; }
+    function start(dir, done) { stop(); cb = done; const seed = (Date.now() / 1000 | 0) + (dir ? 11 : 3), cells = gen(seed), a = dir ? N * N - 1 : 0, b = dir ? 0 : N * N - 1;
+      const gems = []; const sol = path(cells, a, b); [.3, .55, .8].forEach(f => { const i = sol[sol.length * f | 0]; gems.push({ x: i % N, y: i / N | 0 }); });
+      st = { cells, x: a % N, y: a / N | 0, goal: b, sol, gems, steps: 0, hint: 0, done: 0 };
+      const root = document.createElement('div'); root.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(8,5,14,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;touch-action:none;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f3e6c4';
+      const cv = document.createElement('canvas'); cv.width = cv.height = W; cv.style.cssText = 'width:min(92vw,50vh,' + W + 'px);aspect-ratio:1;border:3px solid #8a7a64;border-radius:10px;background:#14101a';
+      const ttl = document.createElement('div'); ttl.style.cssText = 'font-weight:900;font-size:18px'; ttl.textContent = '🕳 洞穴迷宮　找到發光的門 🚪'; const info = document.createElement('div'); info.style.cssText = 'font-size:14px;opacity:.85';
+      const bar = document.createElement('div'); bar.style.cssText = 'display:grid;grid-template-columns:repeat(3,52px);gap:6px;margin-top:2px';
+      const mk = (t, f, col) => { const b2 = document.createElement('button'); b2.textContent = t; b2.style.cssText = 'height:46px;border-radius:10px;border:2px solid #8a7a64;background:#3a2f4a;color:#f3e6c4;font-size:20px;font-weight:900;touch-action:manipulation;' + (col || ''); b2.onclick = f; return b2; };
+      const sp = () => document.createElement('span');
+      [sp(), mk('▲', () => move(0)), sp(), mk('◀', () => move(3)), mk('▼', () => move(2)), mk('▶', () => move(1))].forEach(x => bar.appendChild(x));
+      const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:10px'; row.appendChild(mk('💡 提示', () => { st.hint = 1; draw(); setTimeout(() => { if (st) { st.hint = 0; draw(); } }, 2500); }, 'width:auto;padding:0 14px;font-size:15px')); row.appendChild(mk('離開', () => finish(false), 'width:auto;padding:0 14px;font-size:15px'));
+      [ttl, cv, info, bar, row].forEach(x => root.appendChild(x)); document.body.appendChild(root);
+      const kd = e => { const k = { ArrowUp: 0, KeyW: 0, ArrowRight: 1, KeyD: 1, ArrowDown: 2, KeyS: 2, ArrowLeft: 3, KeyA: 3 }[e.code]; if (k !== undefined) { e.preventDefault(); e.stopImmediatePropagation(); move(k); } else if (e.code === 'Escape') { e.stopImmediatePropagation(); finish(false); } };
+      addEventListener('keydown', kd, true); let t0 = null; cv.addEventListener('touchstart', e => { t0 = [e.touches[0].clientX, e.touches[0].clientY]; }, { passive: true });
+      cv.addEventListener('touchend', e => { if (!t0) return; const t = e.changedTouches[0], dx = t.clientX - t0[0], dy = t.clientY - t0[1]; t0 = null; if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return; move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0)); }, { passive: true });
+      el = { root, cv, info, kd }; draw(); }
+    return { start, move, stop, get st() { return st; }, N };
+  })();
+  // 穿越：dir 0=由西口進、東口出；1=反向
+  function caveCross(dir) {
+    const d = IS(), S0 = S, first = !S0.caveDone;
+    const go = (got) => { S0.caveDone = 1; if (got) addPts(got * 2, '✨ 洞穴星屑'); save();
+      const dst = dir ? ISW(CV.sx, CV.sz) : ISW(ISL.caveE.lx, ISL.caveE.lz), look = dir ? ISW(CV.sx - 3, CV.sz + 4) : ISW(ISL.caveE.lx + 4, ISL.caveE.lz - 8);
+      teleport(dst.x, ISY(), dst.z, look.x, look.z); toast(dir ? '🌤 回到城堡這一側' : '⛵ 洞穴的另一側，碼頭就在前方', 2600); };
+    MZ.start(dir, go);
+  }
+  ia({ id: 'islCaveE', get x() { return ISW(ISL.caveE.lx, ISL.caveE.lz + 0.8).x; }, get y() { return ISY(); }, get z() { return ISW(ISL.caveE.lx, ISL.caveE.lz + 0.8).z; }, r: 3.2,
+    txt: () => '🕳 洞穴東口（穿越迷宮回城堡）', act: () => { if (!IS().ch5) { say('🕳 洞穴東口', '洞裡灰燼瀰漫，現在進不去。', [{ label: '好' }], AV(4)); return; } say('🕳 洞穴東口', '從這裡穿過洞穴，可以回到城堡這一側。', [{ label: '🧩 穿越洞穴', pri: true, fn: () => caveCross(1) }, { label: '先不要' }], AV(4)); } });
   function beastTalk() {
     const d = IS();
     if (!d.pur) { say('🕳 封印洞穴', '洞口被厚厚的灰色封住，裡面有東西在緩慢地呼吸……\n先到城堡大廳的「發光的書」，把雙影的事解決吧。', [{ label: '好' }], AV(4)); return; }
-    if (d.ch5) { say('🌫 棄念者', '洞口坐著小小的棄念者，臉上有淡淡的笑。\n「謝謝你……先說了那句話。」', [{ label: '好' }], ART.shade); return; }
+    if (d.ch5) { say('🌫 棄念者', '洞口坐著小小的棄念者，臉上有淡淡的笑。\n「謝謝你……先說了那句話。洞裡很暗，但我知道路——穿過去，另一邊有碼頭。」', [{ label: '🧩 穿越洞穴', pri: true, fn: () => caveCross(0) }, { label: '先不要' }], ART.shade); return; }
     if (!d.beast) { spSay('🕳 封印洞穴', ['洞穴深處，灰燼堆成一座小山——山在呼吸。', '它站了起來，高到快碰到洞頂，身體裡浮著五顆熄滅的星光。', '🌫 灰燼守門獸：「……算了吧。」\n灰燼風吹來，你被吹得退了一步。', '🔮 小知：「要把五顆星光一顆一顆點亮！每顆星光，對應一座塔的心意。」\n（不會被打倒，失敗最多重來，放心試。）'], AV(4), () => { d.beast = 1; save(); beastMenu(); }, '知道了'); return; }
     beastMenu();
   }
@@ -11612,7 +11688,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   FXQ.push({ tick: t => { const d = IS(), g = gsD(), b = BST; b.g.visible = !!d.pur;
     if (d.pur) { const lit = d.ch5 ? 5 : gsN(), tgt = d.ch5 ? 0.3 : (d.beast ? 1 - lit * 0.1 : 1); b.sc += (tgt - b.sc) * 0.05; b.g.scale.setScalar(b.sc); b.g.position.y = 5 + (d.ch5 ? 0 : Math.sin(t * 1.2) * 0.12);
       b.stars.forEach((q, i) => { const on = !!g[i + 1]; q.material.color.setHex(on ? GST[i].col : 0x3a3a3a); q.rotation.y = t * (on ? 2 : 0.3); q.scale.setScalar(on ? 1.3 + Math.sin(t * 4 + i) * 0.15 : 1); q.visible = !d.ch5; }); } } });
-  L.beast = { GST, gsD, gsN, beastTalk, beastMenu, BST, CV };
+  L.maze = MZ; L.beast = { GST, gsD, gsN, beastTalk, beastMenu, BST, CV };
   /* ---------- 第六章（終章）：七十顆星光回家（綁定 70 週年校慶）---------- */
   const MB = { x: -5.8, z: 0.5 };
   { const gp = new T.Group(); gp.position.set(MB.x, 5, MB.z); ISL.g.add(gp);
