@@ -10613,6 +10613,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       b7.onclick = () => { S.lowGfx = S.lowGfx ? 0 : 1; S.lowHint = 1; save(); sync7(); toast(S.lowGfx ? '🔋 省電模式：陰影關閉、解析度降低、隱藏部分裝飾' : '已回到標準畫質', 2600); }; sync7(); r6.after(r7);
       const r8 = document.createElement('div'); r8.className = 'row'; r8.id = 'gGalRow'; r8.innerHTML = '<span class="lab">故事圖鑑</span><button type="button" id="bGal">📖 查看章節封面</button>';
       r8.querySelector('#bGal').onclick = () => { document.body.classList.remove('gearopen'); coverGallery(); }; r7.after(r8);
+      const r9 = document.createElement('div'); r9.className = 'row'; r9.id = 'gAdvRow'; r9.innerHTML = '<span class="lab">冒險提示</span><button type="button" id="bAdv">🧭 下一步該做什麼？</button>';
+      r9.querySelector('#bAdv').onclick = () => { document.body.classList.remove('gearopen'); advShow(); }; r8.after(r9);
     }
     setTimeout(festSync, 300);
   }
@@ -11042,6 +11044,30 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       crys.forEach((c, i) => { cm.emissiveIntensity = 0.5 + Math.sin(t * 1.5) * 0.2; });
       isl.forEach(o => { o.g.position.y = o.y + Math.sin(t * 0.5 + o.ph) * 0.9; }); } });
   })();
+  /* ---------- 🧭 下一步提示：依目前進度給一句話（可再要求更具體的提示） ---------- */
+  const onIsland = () => { try { const g = ISL.g, K = 0.7; return Math.abs((PL.x - g.position.x) / K) < 42 && Math.abs((PL.z - g.position.z) / K) < 42 && PL.y > g.position.y - 2; } catch (e) { return false; } };
+  function advHint() {
+    const sp = S.sp || {}, A = sp.art || {}, d = IS(), nA = Object.keys(A).filter(k => A[k]).length, on = onIsland();
+    const pre = on ? '' : '（先踏進西北小森林的拱門，前往天之城）\n';
+    const NM = { e: '東塔（籃球）', w: '西塔（節奏）', s: '南塔（機關）', n: '北塔（健康問答）' };
+    if (!sp.portal) {
+      if (!sp.blue) return { t: '校史室裡，有人正在研究一卷古老的藍圖。', d: '到「校史室」找小知。另外，午後 3～6 點的梅花廣場、夜晚的集合場，也藏著跟天空有關的線索。' };
+      if (nA < 5) { const miss = Object.keys(ARTS).filter(k => !A[k]).map(k => ARTS[k][1] + ARTS[k][0] + '（' + ARTS[k][3] + '）'); return { t: '還有夥伴守著神器，各自在校園裡等你。（已集齊 ' + nA + '/5）', d: '還缺：' + miss.join('、') + '。' }; }
+      return { t: '五件神器到齊了！去找那座被蔓藤纏住的拱門。', d: '拱門在西北方的小森林。校長・停停.鄧不利也會在那裡等你。' };
+    }
+    if (!d.steleDone) { const n = Object.keys(d.stele || {}).filter(k => d.stele[k]).length; return { t: pre + '天之城的石子路上，有東西在發光。（石碑 ' + n + '/5）', d: '沿著石子路走，橘金色光柱的石碑都要讀；路的盡頭是洞穴，從洞口往城門讀會比較順。' }; }
+    if (!S.islKey) return { t: pre + '大門上了鎖，鑰匙就掉在附近。', d: '鑰匙在石子路盡頭、封印洞穴的旁邊。' };
+    if (!S.islDoor) return { t: pre + '拿到鑰匙了，回到城堡大門。', d: '走到城堡正前方的大門，靠近就能開門。' };
+    if ((d.hall || 0) < 2) return { t: pre + '大廳裡有個灰色的影子，旗桿也倒了。', d: '先和灰色的影子聊一聊，再走到旁邊把倒下的旗桿扶正。' };
+    if (!d.all) { const tw = twD(), left = Object.keys(NM).filter(k => !tw[k]).map(k => NM[k]); return { t: pre + '城堡四周的藍色塔樓，各有一個挑戰。（已點亮 ' + twN() + '/4）', d: '還沒點亮：' + left.join('、') + '。順序不限，去找地上發光的標記圈。' }; }
+    if (!d.pur) return { t: pre + '四座塔都亮了，大廳裡有本書在發光。', d: '大廳東側的「發光的書」，翻開後會登上主塔頂層。' };
+    if (!d.ch5) { if (!d.beast) return { t: pre + '塔頂的影子淨化了，但封印洞穴裡有更大的東西在動。', d: '回到石子路盡頭的封印洞穴，和洞口的棄念者說話。' };
+      return { t: pre + '洞穴裡的守門獸胸口有五顆星光要點亮。（' + gsN() + '/5）', d: '每顆星光是一個小挑戰；挑一顆開始，順序不限。' }; }
+    if (!d.ch6) return { t: pre + '五顆星光亮起，大廳裡的音樂盒似乎醒了。', d: '大廳西側的「星光音樂盒」，和夥伴們一起合唱。' };
+    return { t: '故事已通關，恭喜！', d: '⚙ 設定裡可以重播終章動畫、開關 70 週年星光與標語，或到故事圖鑑重看封面。' };
+  }
+  function advShow() { const h = advHint(); say('🧭 下一步提示', h.t, [{ label: '再多一點提示', fn: () => setTimeout(() => say('🧭 更具體的提示', h.d, [{ label: '知道了', pri: true }]), 120) }, { label: '知道了', pri: true }]); }
+  L.adv = { advHint, advShow };
   /* ---------- 章節封面卡與故事圖鑑 ---------- */
   const COVERS = [
     { k: 'c1', t: '第 1 章｜校門口的轉學生', f: 'cover/ch1.webp', th: 'cover/ch1_s.webp', sub: '你轉生到同樂宇宙的第一天' },
