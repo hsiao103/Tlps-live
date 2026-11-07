@@ -7243,6 +7243,65 @@ const SPORT = { colors: { 'school-shirt': 0x2b5fd9, 'school-sleeve': 0x2b5fd9, '
 // 角色外觀只存代號 a／b／c（舊版存過 boy／girl 者自動沿用）；不蒐集、不詢問、不使用性別資訊
 const heroCode = k => k === 'girl' ? 'b' : k === 'sport' ? 'c' : 'a';
 const heroKind = c => (c === 'b' || c === 'girl') ? 'girl' : (c === 'c' || c === 'sport') ? 'sport' : (c === 'a' || c === 'boy') ? 'boy' : null;
+// ---- 主角身上的細節：書包、70 週年徽章、手環、褲側條紋、領結／識別證等（掛在骨架上，隨動畫擺動）----
+const HERO_DET = {
+  boy:   { pack: 0x2e9b45, pack2: 0x1f7a33, acc: 0xf5821f, band: 0xffffff, band2: 0xf5821f, stripe: 0xffffff },
+  girl:  { pack: 0xf29bb5, pack2: 0xd9708f, acc: 0xe53935, band: 0xffffff, band2: 0xf29bb5, stripe: 0xffffff },
+  sport: { pack: 0x1c2f66, pack2: 0x14224d, acc: 0xf5821f, band: 0xf4f4f4, band2: 0x2b5fd9, stripe: 0xf4f4f4 }
+};
+let HERO_BADGE_TEX = null;
+function heroBadgeTex() {
+  if (HERO_BADGE_TEX) return HERO_BADGE_TEX; const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(32, 32, 31, 0, 7); g.fill(); g.strokeStyle = '#e85a1f'; g.lineWidth = 4; g.beginPath(); g.arc(32, 32, 27, 0, 7); g.stroke();
+  g.fillStyle = '#b3261e'; g.font = 'bold 30px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('70', 32, 34);
+  HERO_BADGE_TEX = new T.CanvasTexture(c); HERO_BADGE_TEX.encoding = T.sRGBEncoding; return HERO_BADGE_TEX;
+}
+function heroDetail(ch, kind, lite) {
+  if (!ch || ch.detail) return; const P = HERO_DET[kind] || HERO_DET.boy, n = ch.node; n.updateMatrixWorld(true);
+  const inv = new T.Matrix4().copy(n.matrixWorld).invert(), bp = nm => { const o = n.getObjectByName(nm); return o ? o.getWorldPosition(new T.Vector3()).applyMatrix4(inv) : null; };
+  const tor = bp('Torso'), ual = bp('UpperArmL'), lal = bp('LowerArmL'), fl = bp('FistL'), nk = bp('Neck'); if (!tor || !ual || !lal || !fl || !nk) return; ch.detail = 1;
+  const hw = Math.abs(ual.x) * 0.85; let zf = 1e9, zb = -1e9;
+  { const sm = n.getObjectByProperty('isSkinnedMesh', true); if (sm) { sm.updateWorldMatrix(true, false); const A = sm.geometry.attributes.position, v = new T.Vector3(); for (let i = 0; i < A.count; i++) { v.fromBufferAttribute(A, i).applyMatrix4(sm.matrixWorld).applyMatrix4(inv); if (Math.abs(v.y - tor.y) < 0.05 && Math.abs(v.x) < hw) { zf = Math.min(zf, v.z); zb = Math.max(zb, v.z); } } } }
+  if (zf > zb) { zf = -0.105; zb = 0.09; }
+  // 以蒙皮權重求各肢體的「視覺」中心與外緣（手臂已被縮短，骨骼位置與實際看到的位置不一致，故不直接用骨骼座標）
+  const LC = {}; { const sm = n.getObjectByProperty('isSkinnedMesh', true); if (sm) { sm.updateWorldMatrix(true, false); const bn = sm.skeleton.bones, A = sm.geometry.attributes.position, SI = sm.geometry.attributes.skinIndex, SW = sm.geometry.attributes.skinWeight, v = new T.Vector3();
+    ['UpperArmL', 'LowerArmL', 'FistL', 'UpperArmR', 'LowerArmR', 'FistR', 'UpperLegL', 'LowerLegL', 'UpperLegR', 'LowerLegR'].forEach(nm => { const bi = bn.findIndex(b => b.name === nm); if (bi < 0) return; const c = new T.Vector3(); let w = 0, ox = 0;
+      for (let i = 0; i < A.count; i++) { let ww = 0; for (let q = 0; q < 4; q++) if (SI.array[i * 4 + q] === bi) ww += SW.array[i * 4 + q]; if (ww < 0.5) continue; v.fromBufferAttribute(A, i).applyMatrix4(sm.matrixWorld).applyMatrix4(inv); c.add(v); w++; ox = Math.max(ox, Math.abs(v.x)); }
+      if (w) LC[nm] = { c: c.multiplyScalar(1 / w), ox }; }); } }
+  const box = (w, h, d, col, x, y, z, bone, rz) => { const m = new T.Mesh(new T.BoxGeometry(w, h, d), propMat(col)); m.position.set(x, y, z); if (rz) m.rotation.z = rz; return addProp(ch, bone, m); };
+  const limb = (a, b, off, w, t, col, bone) => { const d = b.clone().sub(a), L = d.length(), m = new T.Mesh(new T.BoxGeometry(t, L, w), propMat(col)); m.position.copy(a).add(b).multiplyScalar(0.5); m.position.x += off; m.rotation.z = Math.atan2(-d.x, d.y); return addProp(ch, bone, m); };
+  const cy = Math.max(0.3, tor.y - 0.06), pd = 0.075;
+  // 書包：本體＋上蓋＋前口袋＋兩條肩帶＋鑰匙圈
+  box(hw * 1.9, 0.24, pd, P.pack, 0, cy, zb + pd / 2 + 0.004, 'Torso');
+  box(hw * 1.9, 0.07, pd + 0.014, P.pack2, 0, cy + 0.085, zb + pd / 2 + 0.004, 'Torso');
+  box(hw * 1.2, 0.09, 0.02, P.pack2, 0, cy - 0.06, zb + pd + 0.012, 'Torso');
+  [-1, 1].forEach(sd => { box(0.028, 0.012, zb - zf + 0.02, P.pack2, sd * hw * 0.52, tor.y + 0.1, (zf + zb) / 2, 'Torso'); if (!lite) box(0.028, 0.2, 0.01, P.pack2, sd * hw * 0.52, tor.y - 0.01, zf - 0.004, 'Torso'); });
+  if (!lite) { const k = new T.Mesh(new T.SphereGeometry(0.018, 8, 6), propMat(0xffd23f)); k.position.set(hw * 0.95, cy - 0.1, zb + pd + 0.02); addProp(ch, 'Torso', k); }
+  // 70 週年徽章（左胸）
+  { const m = new T.Mesh(new T.CircleGeometry(0.036, 20), new T.MeshStandardMaterial({ map: heroBadgeTex(), roughness: 0.6 })); m.rotation.y = Math.PI; m.position.set(hw * 0.55, tor.y + 0.07, zf - 0.006); addProp(ch, 'Torso', m); }
+  if (lite) return;
+  // 手環＋袖口：每隻手腕一圈主色、一圈副色
+  ['L', 'R'].forEach(sd => {
+    const ua = LC['UpperArm' + sd], la = LC['LowerArm' + sd], fc = LC['Fist' + sd], ul = LC['UpperLeg' + sd], ll = LC['LowerLeg' + sd], sg = sd === 'R' ? 1 : -1;
+    if (ua && la && fc) {
+      const dir = la.c.clone().sub(fc.c).normalize(), rz = Math.atan2(-dir.x, dir.y) * -1, wr = fc.c.clone().addScaledVector(dir, 0.075);
+      [[0, P.band], [0.028, P.band2]].forEach(w => { const m = new T.Mesh(new T.CylinderGeometry(0.046, 0.046, 0.022, 12), propMat(w[1])); m.position.copy(wr).addScaledVector(dir, w[0]); m.rotation.z = Math.atan2(-dir.x, dir.y) * 1; addProp(ch, 'LowerArm' + sd, m); });
+      if (kind === 'sport') { const o = sg * 0.044; limb(ua.c.clone().addScaledVector(ua.c.clone().sub(la.c), 0.4), la.c, o, 0.03, 0.008, P.stripe, 'UpperArm' + sd); limb(la.c, wr.clone().addScaledVector(dir, 0.0), o, 0.03, 0.008, P.stripe, 'LowerArm' + sd); }
+    }
+    if (ul && ll) { const top = ul.c.clone(), bot = ul.c.clone(); top.y += 0.045; bot.y -= 0.07; limb(top, bot, sg * 0.051, 0.03, 0.008, kind === 'sport' ? P.stripe : P.acc, 'UpperLeg' + sd); }
+  });
+  if (kind === 'boy') {   // 識別證：領繩＋證件
+    const r = new T.Mesh(new T.TorusGeometry(0.072, 0.007, 6, 20), propMat(0x2b5fd9)); r.rotation.x = Math.PI / 2; r.scale.set(1, 0.85, 1); r.position.set(0, nk.y - 0.02, (zf + zb) / 2); addProp(ch, 'Torso', r);
+    box(0.012, 0.1, 0.006, 0x2b5fd9, 0, tor.y + 0.12, zf - 0.003, 'Torso'); box(0.06, 0.075, 0.007, 0xffffff, 0, tor.y + 0.02, zf - 0.006, 'Torso'); box(0.06, 0.02, 0.008, 0x2b5fd9, 0, tor.y + 0.047, zf - 0.007, 'Torso');
+  } else if (kind === 'girl') {   // 領結
+    const z = zf - 0.012, y = nk.y - 0.08; [-1, 1].forEach(sd => { const c = new T.Mesh(new T.ConeGeometry(0.034, 0.06, 8), propMat(P.acc)); c.rotation.z = sd * Math.PI / 2; c.position.set(sd * 0.032, y, z); addProp(ch, 'Torso', c); });
+    const k = new T.Mesh(new T.SphereGeometry(0.017, 8, 6), propMat(0xb71c1c)); k.position.set(0, y, z); addProp(ch, 'Torso', k);
+  } else {   // 運動款：胸前白橫帶＋右手腕運動錶
+    box(hw * 1.7, 0.012, 0.006, P.stripe, 0, tor.y - 0.02, zf - 0.003, 'Torso'); box(hw * 1.7, 0.012, 0.006, P.band2, 0, tor.y - 0.045, zf - 0.003, 'Torso');
+    const fcR = LC.FistR, laR = LC.LowerArmR; if (fcR && laR) { const m = fcR.c.clone().lerp(laR.c, 0.45); box(0.05, 0.03, 0.05, 0x222222, m.x + 0.004, m.y, m.z, 'LowerArmR'); box(0.03, 0.012, 0.01, 0x9fe3ff, m.x + 0.004, m.y, m.z - 0.027, 'LowerArmR'); }
+  }
+}
+window.__heroDetail = heroDetail;
 async function setHero(kind, chosen) {
   CH.kind = kind; if (chosen) { CH.chosen = true; try { localStorage.setItem('tl3d_char', heroCode(kind)); } catch (e) {} }
   $('bChar').textContent = '角色 ' + heroCode(kind).toUpperCase();
@@ -7254,7 +7313,7 @@ async function setHero(kind, chosen) {
     if (CH.hero) { avatar.remove(CH.hero.node); CH.hero.mixer.stopAllAction(); const i = DQ.hide.indexOf(CH.hero.node); if (i >= 0) DQ.hide.splice(i, 1); }
     avatar.children.forEach(c => { if (!c.userData.hero) c.visible = false; });
     const opt = kind === 'sport' ? { colors: Object.assign({}, UNI, SPORT.colors), sport: true, cap: SPORT.cap } : { colors: Object.assign({}, UNI, { hair: kind === 'girl' ? 0x6b4228 : 0x5b3a24, 'hair-band': 0xf5821f }) };
-    CH.hero = makeChar(asset, Object.assign({ h: GLB_H }, opt)); CH.hero.node.userData.hero = true; avatar.add(CH.hero.node); DQ.hide.push(CH.hero.node); CH.ready = true;
+    CH.hero = makeChar(asset, Object.assign({ h: GLB_H }, opt)); heroDetail(CH.hero, kind); CH.hero.node.userData.hero = true; avatar.add(CH.hero.node); DQ.hide.push(CH.hero.node); CH.ready = true;
   } catch (e) { console.warn('hero load', e); }
 }
 window.__SPORT = SPORT; window.__addCap = addCap;
@@ -12920,7 +12979,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     try {
       const asset = await loadGLB(q.k === 'girl' ? 'girl' : 'boy'); if (!MP.peers[q.uid]) return; const sh = MPSHIRT[mpHash(q.uid) % MPSHIRT.length];
       const colors = Object.assign({}, UNI, { 'school-shirt': sh, 'school-sleeve': 0xffffff, collar: sh, hair: [0x2a1d14, 0x5b3a24, 0x1b1b1b, 0x7a4a2a][mpHash(q.uid + 'h') % 4], 'hair-band': sh });
-      q.ch = q.k === 'sport' ? makeChar(asset, { h: GLB_H, colors: Object.assign({}, UNI, window.__SPORT.colors), sport: true, cap: window.__SPORT.cap }) : makeChar(asset, { h: GLB_H, colors }); q.ch.node.position.set(q.x, q.y, q.z); mpG.add(q.ch.node);
+      q.ch = q.k === 'sport' ? makeChar(asset, { h: GLB_H, colors: Object.assign({}, UNI, window.__SPORT.colors), sport: true, cap: window.__SPORT.cap }) : makeChar(asset, { h: GLB_H, colors }); try { window.__heroDetail(q.ch, q.k === 'sport' ? 'sport' : q.k === 'girl' ? 'girl' : 'boy', true); } catch (e) { /* 忽略 */ } q.ch.node.position.set(q.x, q.y, q.z); mpG.add(q.ch.node);
     } catch (e) { /* 模型載入失敗：只顯示名牌 */ } q.busy = false;
   }
   function mpPeerMeta(q, mt) { if (!mt) return; const ch = q.n !== mt.n || q.l !== mt.l || q.k !== mpKind(mt.k); q.n = String(mt.n || '學員').slice(0, 10); q.l = +mt.l || 1; q.c = /^#[0-9a-f]{6}$/i.test(mt.c) ? mt.c : '#2e9b45'; if (mpKind(mt.k) !== q.k && q.ch) { mpG.remove(q.ch.node); q.ch = null; } q.k = mpKind(mt.k); if (ch) mpLabel(q); }
