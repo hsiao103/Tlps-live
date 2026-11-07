@@ -10881,7 +10881,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   })();
   const CLD_COVER = { sun: 0.22, cloud: 0.62, over: 1, mist: 0.5, drizzle: 1, storm: 1, heavy: 1, typhoon: 1 };
   function cloudTick(dt, st, c, intro, night) {
-    const on = S.noCloud ? false : true; CLD.grp.visible = on; if (!on) return;
+    const on = S.noCloud || window.__birdCine ? false : true; CLD.grp.visible = on; if (!on) return;
     const tgt = intro ? 0.3 : (CLD_COVER[c.id] != null ? CLD_COVER[c.id] : 0.4), cx = camera.position.x, cz = camera.position.z, wind = 1 + st.wind * 5, sh = Math.max(0.28, 1 - st.dark * 1.15 - (night ? 0.62 : 0)) + st.flash * 0.6;
     CLD.cover += (tgt - CLD.cover) * Math.min(1, dt * 0.8);
     const day = night ? new T.Color(0x38405c) : new T.Color(0xffffff); CLD.col.copy(day).multiplyScalar(Math.min(1.3, sh)); CLD.mat.color.copy(CLD.col); CLD.mat.opacity = 0.72 + st.dark * 0.4;
@@ -11596,21 +11596,21 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
 
   /* ☁️ 城堡前的兩片雲：飛近時向左右拉開，露出天空城堡 */
   const CLD2 = { g: null };
-  function cloudMake() {
+  function curtainMake() {
     const grp = new T.Group(), mk = (sx) => { const c = new T.Group(); let sd = sx * 7.7; const rn = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
       for (let i = 0; i < 18; i++) { const r = 7 + rn() * 7, m = new T.Mesh(new T.SphereGeometry(1, 10, 8), new T.MeshLambertMaterial({ color: 0xffffff, emissive: 0x9aa6b6, transparent: true, opacity: 0.97 }));
         m.scale.set(r * 1.25, r * 0.8, r); m.position.set((rn() - 0.5) * 30, (rn() - 0.3) * 16, (rn() - 0.5) * 12); c.add(m); } return c; };
     const L = mk(1), Rr = mk(2); grp.add(L, Rr); grp.userData = { L, R: Rr }; grp.visible = false; scene.add(grp); return grp;
   }
-  function cloudTick(tt) {
-    if (!CLD2.g) CLD2.g = cloudMake(); const g = CLD2.g;
+  function curtainTick(tt) {
+    if (!CLD2.g) CLD2.g = curtainMake(); const g = CLD2.g;
     g.visible = tt > 30; if (!g.visible) return;
     const k = bE((tt - 46) / 8), x = 12 + 40 * k;
     g.position.set(0, 106, -84);
     g.userData.L.position.set(-x, k * 3, 0); g.userData.R.position.set(x, k * 3, 0);
     g.userData.L.scale.setScalar(1 + k * 0.2); g.userData.R.scale.setScalar(1 + k * 0.2);
   }
-  function cloudClear() { if (CLD2.g) CLD2.g.visible = false; }
+  function curtainClear() { if (CLD2.g) CLD2.g.visible = false; }
   const bP = bV(0, 0, 0), bQ = bV(0, 0, 0), bL = bV(0, 0, 0), bTmp = bV(0, 0, 0);
   const bEl = (() => {
     const css = document.createElement('style'); css.textContent = '#birdUI{position:fixed;inset:0;z-index:60;pointer-events:none;display:none}body.birdcine #birdUI{display:block}#birdUI .bar{position:absolute;left:0;right:0;height:9vh;background:#000}#birdUI .bar.t{top:0}#birdUI .bar.b{bottom:0}#birdUI .fade{position:absolute;inset:0;background:#000;opacity:1;transition:opacity 1s}#birdUI .wing{position:absolute;bottom:9vh;width:34vw;max-width:260px;height:80px;opacity:.55}#birdUI .wing.l{left:-4px;transform-origin:100% 100%;animation:bwl 1.1s ease-in-out infinite}#birdUI .wing.r{right:-4px;transform:scaleX(-1);transform-origin:100% 100%;animation:bwr 1.1s ease-in-out infinite}@keyframes bwl{50%{transform:rotate(14deg) translateY(10px)}}@keyframes bwr{0%,100%{transform:scaleX(-1)}50%{transform:scaleX(-1) rotate(14deg) translateY(10px)}}#birdUI .cap{position:absolute;left:0;right:0;bottom:calc(9vh + 14px);text-align:center;color:#fff;font:600 15px system-ui,"Noto Sans TC",sans-serif;text-shadow:0 1px 6px #000;transition:opacity .8s}body.birdcine #gGear,body.birdcine #modes,body.birdcine #info,body.birdcine #search,body.birdcine #credit,body.birdcine #hint,body.birdcine #gHud,body.birdcine #gWxChip,body.birdcine #gTime,body.birdcine #bBird,body.birdcine .joy,body.birdcine #joyL,body.birdcine #joyR{display:none!important}';
@@ -11626,12 +11626,12 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     if (document.body.classList.contains('intro')) { toast('請先進入世界再使用「一覽世界」'); return; }
     if (FIN.on || ISL.dk) { toast('動畫進行中，請稍後再試'); return; }
     document.body.classList.remove('gearopen');
-    flockClear(); BIRD.on = true; BIRD.t = 0; BIRD.p0 = { x: PL.x, y: PL.y, z: PL.z, yaw: PL.yaw, pitch: PL.pitch }; BIRD.fov0 = camera.fov; BIRD.up0 = camera.up.clone(); BIRD.last = performance.now();
+    flockClear(); window.__birdCine = true; BIRD.on = true; BIRD.t = 0; BIRD.p0 = { x: PL.x, y: PL.y, z: PL.z, yaw: PL.yaw, pitch: PL.pitch }; BIRD.fov0 = camera.fov; BIRD.up0 = camera.up.clone(); BIRD.last = performance.now();
     document.body.classList.add('birdcine'); bBtn.style.display = 'block';
     const f = bEl.querySelector('.fade'); f.style.transition = 'none'; f.style.opacity = 1; void f.offsetWidth; f.style.transition = 'opacity 1s'; f.style.opacity = 0;
   }
   function birdStop() {
-    if (!BIRD.on) return; BIRD.on = false; flockClear(); cloudClear();
+    if (!BIRD.on) return; BIRD.on = false; window.__birdCine = false; flockClear(); curtainClear();
     const p = BIRD.p0; if (p) { PL.x = p.x; PL.y = p.y; PL.z = p.z; PL.vy = 0; PL.yaw = p.yaw; PL.pitch = p.pitch; }
     camera.up.copy(BIRD.up0 || bV(0, 1, 0)); camera.fov = BIRD.fov0; camera.updateProjectionMatrix();
     document.body.classList.remove('birdcine'); bBtn.style.display = 'none';
@@ -11659,7 +11659,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     camera.up.set(Math.sin(roll), Math.cos(roll), 0); camera.lookAt(bL);
     if (camera.fov !== 72) { camera.fov = 72; camera.updateProjectionMatrix(); }
     if (camera.near > 0.3 || camera.near < 0.15) { camera.near = 0.3; camera.updateProjectionMatrix(); }
-    camera.updateMatrixWorld(); lamp.position.copy(camera.position); flockTick(tt); cloudTick(tt);
+    camera.updateMatrixWorld(); lamp.position.copy(camera.position); flockTick(tt); curtainTick(tt);
     const cp = bEl.querySelector('.cap'), tx = bCap(tt); if (cp.textContent !== tx) cp.textContent = tx;
   } });
   /* 首次邀請卡：新手教學完成、回到可自由行動後，詢問一次是否先「一覽世界」 */
