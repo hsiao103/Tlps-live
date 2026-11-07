@@ -11594,7 +11594,27 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     camera.updateMatrixWorld(); lamp.position.copy(camera.position);
     const cp = bEl.querySelector('.cap'), tx = bCap(tt); if (cp.textContent !== tx) cp.textContent = tx;
   } });
+  /* 首次邀請卡：新手教學完成、回到可自由行動後，詢問一次是否先「一覽世界」 */
+  const bAsk = (() => {
+    const css = document.createElement('style'); css.textContent = '#gBirdAsk{position:fixed;left:50%;bottom:92px;transform:translate(-50%,24px);z-index:58;width:min(86vw,340px);padding:14px 16px;border-radius:16px;background:rgba(18,28,48,.94);border:1.5px solid #8fd3ff;color:#fff;font:600 14px/1.5 system-ui,"Noto Sans TC",sans-serif;opacity:0;pointer-events:none;transition:.45s;text-align:center;box-shadow:0 8px 30px #0008}#gBirdAsk.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}#gBirdAsk small{display:block;font-weight:400;opacity:.8;margin-top:2px}#gBirdAsk .bt{display:flex;gap:10px;margin-top:10px}#gBirdAsk button{flex:1;padding:9px 6px;border-radius:12px;border:0;font:700 14px system-ui,"Noto Sans TC",sans-serif;cursor:pointer}#gBirdAsk .y{background:#ffb347;color:#2a1800}#gBirdAsk .n{background:#ffffff22;color:#fff}';
+    document.head.appendChild(css);
+    const e = document.createElement('div'); e.id = 'gBirdAsk';
+    e.innerHTML = '🐦 要不要先飛一圈，<b>一覽世界</b>？<small>約 50 秒，從校門飛過整個校園，再到天空城堡。之後可在 ⚙ 設定重看。</small><div class="bt"><button type="button" class="n">之後再說</button><button type="button" class="y">好，起飛！</button></div>';
+    document.body.appendChild(e);
+    const seen = () => { S.birdAsk = 1; save(); e.classList.remove('show'); };
+    e.querySelector('.n').onclick = seen; e.querySelector('.y').onclick = () => { seen(); birdStart(); };
+    return e;
+  })();
+  let bAskT = 0, bAskL = performance.now();
+  FXQ.push({ tick: () => {
+    if (S.birdAsk || BIRD.on) { if (bAsk.classList.contains('show') && BIRD.on) bAsk.classList.remove('show'); return; }
+    const ok = S.opening && pastOf() >= 0 && !opActive && !dlgOpen && !FIN.on && !ISL.dk && !document.body.classList.contains('intro') && !document.querySelector('#gCov.show') && PL.y < 5 && Math.hypot(PL.x, PL.z - 6) < 70;
+    const nw = performance.now(), dtA = Math.min(1, (nw - bAskL) / 1000); bAskL = nw;
+    bAskT = ok ? bAskT + dtA : 0;
+    if (bAskT > 5 && !bAsk.classList.contains('show')) bAsk.classList.add('show');
+  } });
   L.bird = { BIRD, birdStart, birdStop };
+  L.bird.ask = bAsk;
   { /* 通關後的設定：重播終章動畫、七十星光／標語顯示開關 */
     const m = document.getElementById('modes');
     if (m) {
