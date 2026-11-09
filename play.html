@@ -8855,6 +8855,7 @@ window.__tlLogo='data:image/webp;base64,UklGRh6vAABXRUJQVlA4WAoAAAAQAAAALwIAfQEA
     ['大魔法師', '🔮', '過目不忘', '資源回收分類時，正確的桶子會亮起 ✨ 提示', '用記憶與分析能力，破解各種挑戰。']
   ];
   L.PASTS = PASTS;
+  const PORT = { shark: 'cover/av_shark.webp', octo: 'cover/av_octo.webp', squid: 'cover/av_squid.webp', turtle: 'cover/av_turtle.webp' };   // 海洋篇角色對話頭像（只在顯示時載入）
   const AV = (k, t) => { const a = window.__tlAvatars && window.__tlAvatars[k]; return a ? a[t === undefined ? level() : t] || '' : ''; };
   /* Google 帳號的姓名與頭像（完整版登入後才有；訪客版無） */
   const escH = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -12669,7 +12670,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     function townDone(i, miss) {
       const T0 = TWN(); const first = !T0.d[i]; T0.d[i] = 1; const n = T0.d.filter(Boolean).length;
       if (first) addPts(60, '🧩 解開' + TOWNS[i].t.split('・')[0] + '的謎題'); save();
-      if (first && n >= 3) { addPts(100, '🐢 龜島解謎家'); if (S.badges && !S.badges.includes('🐢 龜島解謎家')) S.badges.push('🐢 龜島解謎家'); save(); setTimeout(() => spSay('🧓 龜長老', ['三個鄉鎮的謎題，你們全都解開了！', '你們認識了噶瑪蘭人、吳沙，也記得了宜蘭怎麼一步一步被開墾。', '還有我——龜山島。要好好愛護這片海和這座島喔。', '🏅 獲得徽章「龜島解謎家」＋100 點！'], AV(4), null, '謝謝龜長老！'), 900); }
+      if (first && n >= 3) { addPts(100, '🐢 龜島解謎家'); if (S.badges && !S.badges.includes('🐢 龜島解謎家')) S.badges.push('🐢 龜島解謎家'); save(); setTimeout(() => spSay('🧓 龜長老', ['三個鄉鎮的謎題，你們全都解開了！', '你們認識了噶瑪蘭人、吳沙，也記得了宜蘭怎麼一步一步被開墾。', '還有我——龜山島。要好好愛護這片海和這座島喔。', '🏅 獲得徽章「龜島解謎家」＋100 點！'], PORT.turtle, null, '謝謝龜長老！'), 900); }
       else say('🧩 謎題完成', TOWNS[i].t + (first ? ' 過關！＋60 點。' : ' 再次完成。') + (miss ? '\n答錯 ' + miss + ' 次，沒關係，學到更重要。' : '\n全部一次答對，太厲害了！') + '\n已解開 ' + n + '／3 個鄉鎮。', [{ label: '好', pri: true }], AV(2));
     }
     DKTW.forEach((tw, i) => ia({ id: 'dkTown' + i, x: OX + DKX + tw.x, get y() { return PL.y; }, z: OZ + DKZ + tw.z, r: 9, txt: () => st.on && st.dock ? '📜 ' + tw.n + (TWN().d[i] ? ' ✅' : ' 🧩') : '',
@@ -12685,7 +12686,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       { n: '龜尾村', t: '第 3 章・龜山島的火山與海', key: 'tl3', ic: '🌋', story: ['龜尾村的燈塔旁，海風帶著淡淡的硫磺味。第三塊龜甲在海邊閃著光。', '龜山島在宜蘭頭城外海約 10 公里，是一座火山島，最高約 398 公尺，遠看像一隻浮在海上的烏龜：有龜首、龜甲，也有龜尾。', '島東邊的海底有熱泉，硫磺讓海水變成乳白色，叫「牛奶海」。龜山島曾是軍事管制區，2000 年才開放登島，如今是保育、賞鯨與賞豚的好地方。', '最後一塊碎片了，回答三個問題吧！'] }];
     function tlFinale() {
       const T0 = TLS(); T0.done = 1; save();
-      spSay('🐢 龜島傳奇・終章', ['三塊龜甲碎片同時亮起，在龜背上拼成了一整片。', '龜島輕輕一震——背甲村後山的火山口噴出一道溫暖的白色水柱，熱泉沿著地底一路流向海底，流進蒂芬妮綠的地底溫泉。', '🧓 龜長老：「謝謝你，守護龜島的人。故事會被記住，海也會。」'], AV(2), () => {
+      spSay('🐢 龜島傳奇・終章', ['三塊龜甲碎片同時亮起，在龜背上拼成了一整片。', '龜島輕輕一震——背甲村後山的火山口噴出一道溫暖的白色水柱，熱泉沿著地底一路流向海底，流進蒂芬妮綠的地底溫泉。', '🧓 龜長老：「謝謝你，守護龜島的人。故事會被記住，海也會。」'], PORT.turtle, () => {
         addPts(200, '🐢 龜島守護者'); if (S.badges && !S.badges.includes('🐢 龜島守護者')) S.badges.push('🐢 龜島守護者'); save();
         say('🏅 龜島守護者', '《龜島傳奇》完成！獲得徽章「🐢 龜島守護者」＋200 點。\n\n想回校園時，隨時可以按右上角的 🏫。', [{ label: '好' }], AV(2)); }, '收下徽章');
     }
@@ -12704,7 +12705,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const land = { label: '⚓ 降落龜島', fn: () => { if (st.dock) return; if (st.mode !== 'air') { toast('⬆ 先升到空中模式，再降落龜島', 2400); return; } dockIn(); } };
       if (stCh() < 7) { say('🐢 龜島', base + '\n\n📜 《龜島傳奇》：擊沉墨鯊號、完成海洋主線後開啟。', [land, { label: '好' }], AV(2)); return; }
       const T0 = TLS();
-      if (!T0.open) { spSay('🧓 龜長老', ['墨鯊號沉了，海也安靜下來。你做到了。', '但龜背上，還有一件事沒完成……', '很久以前，龜甲裂成三塊，散落在龜首、背甲和龜尾。三塊拼回來，龜島的熱泉才會醒來，島上的人和海，才能再一起呼吸。', '去吧，聽聽三個地方的故事。故事不只是故事，它們是記得這片土地的人，留下的路標。'], AV(2), () => { T0.open = 1; save(); toast('📜 《龜島傳奇》開啟！降落龜島，到三個鄉鎮找龜甲碎片', 3600); }, '我去找碎片'); return; }
+      if (!T0.open) { spSay('🧓 龜長老', ['墨鯊號沉了，海也安靜下來。你做到了。', '但龜背上，還有一件事沒完成……', '很久以前，龜甲裂成三塊，散落在龜首、背甲和龜尾。三塊拼回來，龜島的熱泉才會醒來，島上的人和海，才能再一起呼吸。', '去吧，聽聽三個地方的故事。故事不只是故事，它們是記得這片土地的人，留下的路標。'], PORT.turtle, () => { T0.open = 1; save(); toast('📜 《龜島傳奇》開啟！降落龜島，到三個鄉鎮找龜甲碎片', 3600); }, '我去找碎片'); return; }
       say('🐢 龜島傳奇', (T0.done ? '🏅 傳奇完成！龜島的熱泉已經醒來。\n\n' : '去龜首鎮、背甲村、龜尾村，各找一塊龜甲碎片。\n\n') + tlStatus(), [land, { label: '好' }], AV(2));
     }
     const UW = new T.Group(); g.add(UW); UW.visible = false;
@@ -13103,6 +13104,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       if (!st.on || st.dock || FL.active || FLS().done) return;
       if (stCh() < 7) { if (force) toast('📻 先完成海洋篇主線（擊沉墨鯊號），帝國艦隊才會現身', 2800); return; }
       const k = FLS().st;
+      if (k === 2) { /* 第 3 關：八爪魚大將先現身 */ const q = () => say('📻 末日帝國艦隊', FLTX[k], [{ label: '🛩 迎戰第 ' + (k + 1) + ' 關', pri: true, fn: () => fleetStart(k) }, { label: '稍後再說' }], AV(1)); spSay('🐙 八爪魚大將', ['哼哼哼……能撐到這裡，算你們有本事。', '我的旗艦「末日號」可不像前哨那麼好對付！'], PORT.octo, q, '看招！'); return; }
       say('📻 末日帝國艦隊', FLTX[k], [{ label: '🛩 迎戰第 ' + (k + 1) + ' 關', pri: true, fn: () => fleetStart(k) }, { label: '稍後再說' }], AV(1));
     }
     function offerLater(n) { if (!st.on || st.dock || FL.active || FLS().done || stCh() < 7) return; if (document.querySelector('#gDlg.show') && n < 8) { setTimeout(() => offerLater(n + 1), 4000); return; } fleetOffer(); }
@@ -13111,7 +13113,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const k = FL.stage, pts = [100, 150, 300][k]; fleetAbort(); const F = FLS(); F.st = k + 1; addPts(pts, '🛩 通過第 ' + (k + 1) + ' 關'); save();
       if (k >= 2) {
         F.done = 1; if (S.badges && !S.badges.includes('🛩 末日終結者')) S.badges.push('🛩 末日終結者'); addPts(300, '🏅 末日終結者'); save();
-        setTimeout(() => spSay('🛩 結局', ['「末日號」冒著黑煙，一頭栽進了雲海。', '艦隊的紫色燈光一盞一盞熄滅，雲海又恢復了平靜。', '📻 台灣各港口同時響起歡呼：「守住了！」', '🏅 獲得徽章「末日終結者」＋300 點。末日帝國艦隊被擊退！'], stAV.elder(), null, '太棒了！'), 1200);
+        setTimeout(() => spSay('🛩 結局', ['「末日號」冒著黑煙，一頭栽進了雲海。', '艦隊的紫色燈光一盞一盞熄滅，雲海又恢復了平靜。', '📻 台灣各港口同時響起歡呼：「守住了！」', '🏅 獲得徽章「末日終結者」＋300 點。末日帝國艦隊被擊退！'], AV(4), null, '太棒了！'), 1200);
       } else setTimeout(() => { say('✅ 第 ' + (k + 1) + ' 關通過！', '敵艦全數被擊落，+' + pts + ' 點。\n📻 「準備好了就接著迎戰下一關。」', [{ label: '🛩 迎戰第 ' + (k + 2) + ' 關', pri: true, fn: () => fleetStart(k + 1) }, { label: '先補給一下' }], AV(1)); }, 1400);
     }
     function hitCraft(c) {
@@ -13252,7 +13254,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     // ---------- 海洋篇主線劇情 ----------
     // 章節：0 未開始｜1 擊沉巡邏船 3｜2 造訪 3 港｜3 海洋守護者｜4 風環 1 圈｜5 前往神殿｜6 擊敗墨鯊｜7 完成
     const STN = '墨鯊船長', STS = '黑潮商會';
-    const stAV = { radio: () => AV(2), elder: () => AV(4), boss: () => AV(1) };
+    const stAV = { radio: () => AV(2), elder: () => PORT.turtle, boss: () => PORT.shark };
     const STB = [
       null,
       { t: '擊沉黑潮商會的巡邏船', g: () => (S.ocKills || 0) >= 3, p: () => Math.min(3, S.ocKills || 0) + '/3', h: '海面上的黑色海盜船是「' + STS + '」的巡邏船。用 J／💥 開砲，擊沉 3 艘。' },
@@ -13280,7 +13282,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       const c = stCh(); if (c < 1) return;
       if (c >= 7) { say('📖 海洋篇', '🏅 海洋篇完成！你守護了海洋，也喚醒了海底王國的入口。\n\n去海底神殿，就能進入下一篇章。', [{ label: '好' }], AV(2)); return; }
       const b = STB[c], pr = b.p() === 'ENV' ? stEnv() : b.p();
-      if (intro && STX[c]) { spSay(STX[c][0], STX[c][1].concat(['📖 目標：' + b.t + (pr ? '（' + pr + '）' : '')]), stAV.radio(), null, '收到！'); return; }
+      if (intro && STX[c]) { spSay(STX[c][0], STX[c][1].concat(['📖 目標：' + b.t + (pr ? '（' + pr + '）' : '')]), /龜長老/.test(STX[c][0]) ? PORT.turtle : stAV.radio(), null, '收到！'); return; }
       say('📖 海洋篇・任務（第 ' + c + '／6 章）', '🎯 ' + b.t + (pr ? '　' + pr : '') + '\n\n' + b.h + '\n\n進度：' + '■'.repeat(c - 1) + '□'.repeat(7 - c), [{ label: '知道了', pri: true }, { label: '🗂 回飛空艇討論（會議室有線索）', fn: () => say('🗂 回飛空艇', '要暫時回到同樂號的會議室討論嗎？\n（任務進度會保留；要再出海，請到駕駛艙舵輪。）', [{ label: '回艙討論', pri: true, fn: () => toCabin() }, { label: '繼續航行' }], AV(4)) }], AV(2));
     }
     function toCabin() {
@@ -13315,7 +13317,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     function storyBossDown() {
       S.ocSt.ch = 7; S.ocKingdomOpen = 1; setTimeout(() => offerLater(0), 15000); addPts(300, '🏆 擊沉墨鯊號'); if (S.badges && !S.badges.includes('🌊 海洋守護者')) S.badges.push('🌊 海洋守護者'); save();
       try { SFX.play('win', 300); } catch (e) { /* 忽略 */ }
-      setTimeout(() => spSay('🏴‍☠️ ' + STN, ['不、不可能……我的墨鯊號！', '（黑船沉入海裡，鎖鏈鬆開，沿著神殿滑進深海。）', '算你們狠……我會再回來的！']), 1800);
+      setTimeout(() => spSay('🏴‍☠️ ' + STN, ['不、不可能……我的墨鯊號！', '（黑船沉入海裡，鎖鏈鬆開，沿著神殿滑進深海。）', '算你們狠……我會再回來的！'], PORT.shark), 1800);
       setTimeout(() => spSay('🌊 結局', ['海面恢復平靜，抽水管斷成兩截，火山口又只冒著暖暖的煙。', '龜長老慢慢地游過來：「謝謝你們，守護海洋的孩子。」', '神殿的石門緩緩打開，門內流動著藍綠色的光——那裡是沉睡千年的「海底王國」。', '🏅 獲得徽章「海洋守護者」＋300 點。海洋篇完成！', '（海底王國篇，下一章見。）'], stAV.elder(), null, '太棒了！'), 6200);
     }
     window.__ocStory = { toCabin, adv: storyAdv, brief: storyBrief, st: () => S.ocSt, stb: STB };
