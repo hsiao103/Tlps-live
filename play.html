@@ -13525,6 +13525,13 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const mk = (sx) => { const p = new T.Group(); p.position.set(sx * 0.3, 0.15, 0.1); const w1 = new T.Mesh(new T.BoxGeometry(1.7, 0.05, 1.0), W); w1.position.x = sx * 0.85; const w2 = new T.Mesh(new T.BoxGeometry(1.2, 0.05, 0.7), Gy); w2.position.set(sx * 2.2, 0, -0.1); p.add(w1, w2); g.add(p); return p; };
     g.userData.L = mk(-1); g.userData.R = mk(1); g.scale.setScalar(2.1); g.traverse(m => { m.frustumCulled = false; }); scene.add(g); return g;
   }
+  // 海鳥翅膀：拍拍拍→滑行→拍拍拍→滑行（週期 3.6 秒：前 1.5 秒拍 3 下，其餘滑行）；回傳 [拍翅量, 拍動強度 0-1]
+  function cutFlap(t) {
+    const P = 3.6, F = 1.5, c = ((t % P) + P) % P;
+    if (c >= F) return [0, 0];
+    const k = c / F, env = Math.sin(Math.PI * k);
+    return [Math.sin(k * 6 * Math.PI) * Math.min(1, env * 1.6), env];
+  }
   function cutStep(dt) {
     const C = CUT, wv = cutUI.w;
     avatar.visible = false; window.__cutPet = true;
@@ -13562,11 +13569,11 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     }
     let pos, look;
     if (t2 < B1) {
-      const u = t2 / B1, uu = u * (1.6 - 0.6 * u);   // 海鳥由快漸慢、最後慢慢滑行（速度 1.6→0.4 倍）
+      const u = t2 / B1, uu = u * (1.06 - 0.06 * u);   // 海鳥近乎等速、平穩飛行（僅起步極輕微加速）
       if (!C.bird) C.bird = cutBird();
       const bp = C.curve.getPoint(Math.min(1, uu)), bq = C.curve.getPoint(Math.min(1, uu + 0.012)), dir = bq.clone().sub(bp).normalize();
       bp.y += Math.sin(t2 * 2.1) * 0.35; C.bird.position.copy(bp); C.bird.lookAt(bp.clone().add(dir));
-      const bank = 0.25 * Math.sin(t2 * 0.9); C.bird.rotateZ(bank); C.fph = (C.fph || 0) + dt * 8.5 * (1 - 0.8 * u); const fl = Math.sin(C.fph) * (1 - 0.6 * cutSm(u));   // 拍翅漸慢、幅度漸小＝滑行
+      const bank = 0.25 * Math.sin(t2 * 0.9); C.bird.rotateZ(bank); const fw = cutFlap(t2), fl = fw[0]; C.bird.position.y += 0.5 * fw[1]; bp.y = C.bird.position.y;   // 拍翅時微升、滑行時微降   // 拍翅漸慢、幅度漸小＝滑行
       C.bird.userData.L.rotation.z = 0.15 + fl * 0.75; C.bird.userData.R.rotation.z = -0.15 - fl * 0.75;
       // 第三人稱追拍：在鳥後上方，左右緩慢擺動、距離略有變化
       const rt = new T.Vector3(dir.z, 0, -dir.x).normalize(), eu = cutSm(u), back = 5 + 38 * eu + Math.sin(t2 * 0.6), side = (3 + 8 * eu) * Math.sin(t2 * 0.55 + 0.4);
@@ -13580,8 +13587,8 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
       // 鳥自然飛出畫面；鏡頭接著繞龜島環繞，之後結束（不再下潛拍神殿）
       const u = Math.min(1, (t2 - B1) / (TT - B1)), e = cutSm(u), dtt = t2 - B1;
       const tc = new T.Vector3(); TU.g.getWorldPosition(tc); tc.y += 2;
-      if (C.dive.a0 == null) { C.dive.a = C.last.clone(); C.dive.a0 = Math.atan2(C.last.x - tc.x, C.last.z - tc.z); C.dive.r0 = Math.hypot(C.last.x - tc.x, C.last.z - tc.z); C.dive.spd = C.curve.getLength() / B1 * 0.4; }
-      if (C.bird) { const bd = C.bdir, bpp = C.bp.clone().addScaledVector(bd, C.dive.spd * dtt * (1 + 0.5 * u)); bpp.y += 2.5 * dtt * 0.3 + Math.sin(t2 * 2.1) * 0.3; C.bird.position.copy(bpp); C.bird.lookAt(bpp.clone().add(bd)); C.bird.rotateZ(0.25 * Math.sin(t2 * 0.9)); C.fph = (C.fph || 0) + dt * 2.2; const fl = Math.sin(C.fph) * 0.4; C.bird.userData.L.rotation.z = 0.15 + fl * 0.75; C.bird.userData.R.rotation.z = -0.15 - fl * 0.75; C.bird.visible = bpp.distanceTo(C.last) < 170; }
+      if (C.dive.a0 == null) { C.dive.a = C.last.clone(); C.dive.a0 = Math.atan2(C.last.x - tc.x, C.last.z - tc.z); C.dive.r0 = Math.hypot(C.last.x - tc.x, C.last.z - tc.z); C.dive.spd = C.curve.getLength() / B1 * 1.0; }
+      if (C.bird) { const bd = C.bdir, bpp = C.bp.clone().addScaledVector(bd, C.dive.spd * dtt * (1 + 0.15 * u)); bpp.y += 2.5 * dtt * 0.3 + Math.sin(t2 * 2.1) * 0.3; C.bird.position.copy(bpp); C.bird.lookAt(bpp.clone().add(bd)); C.bird.rotateZ(0.25 * Math.sin(t2 * 0.9)); const fl = cutFlap(t2)[0]; C.bird.userData.L.rotation.z = 0.15 + fl * 0.75; C.bird.userData.R.rotation.z = -0.15 - fl * 0.75; C.bird.visible = bpp.distanceTo(C.last) < 170; }
       const ang = C.dive.a0 - 1.9 * e, rr = C.dive.r0 + (44 - C.dive.r0) * cutSm(u / 0.5), oy = C.last.y + (tc.y + 17 - C.last.y) * cutSm(u / 0.6);   // 順時鐘環繞龜島、高度降到約 17 m
       pos = new T.Vector3(tc.x + Math.sin(ang) * rr, oy, tc.z + Math.cos(ang) * rr);
       look = C.lastLook.clone().lerp(tc.clone().setY(tc.y + 1), cutSm(u / 0.4));
