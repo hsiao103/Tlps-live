@@ -12021,10 +12021,52 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   const SHADM = () => (typeof isAdm2 === 'function' && isAdm2()) ? [{ label: '🛠 管理者：同樂號測試', fn: () => shipAdmin() }] : [];
   const shpHave = k => !!SHP().m[k];
   const shpFade = (fn, ms) => { const el = document.createElement('div'); el.style.cssText = 'position:fixed;inset:0;z-index:9400;background:#000;opacity:0;transition:opacity .45s;pointer-events:none'; document.body.appendChild(el); requestAnimationFrame(() => { el.style.opacity = '1'; }); setTimeout(() => { try { fn(); } catch (e) { /* 忽略 */ } el.style.opacity = '0'; setTimeout(() => el.remove(), 600); }, ms || 520); };
+  // 小創（工程師）去背造型：綠色刺刺頭、橘色護目鏡、青色單片眼鏡、橄欖綠外套、紫色手套與扳手（程式繪製、透明底，取代原本的 👷 圓形 emoji）
+  let _xcT = null;
+  function xcTex() {
+    if (_xcT) return _xcT;
+    const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), OL = '#1d2b1f';
+    x.lineJoin = 'round'; x.lineCap = 'round';
+    const ell = (cx, cy, rx, ry, col, lw) => { x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, 7); x.fillStyle = col; x.fill(); if (lw !== 0) { x.lineWidth = lw || 5; x.strokeStyle = OL; x.stroke(); } };
+    const poly = (pts, col, lw) => { x.beginPath(); pts.forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.closePath(); x.fillStyle = col; x.fill(); x.lineWidth = lw || 5; x.strokeStyle = OL; x.stroke(); };
+    // 扳手（舉在右手）
+    x.save(); x.translate(200, 122); x.rotate(0.22);
+    x.lineWidth = 17; x.strokeStyle = OL; x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -62); x.stroke();
+    x.lineWidth = 10; x.strokeStyle = '#d5dde8'; x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -62); x.stroke();
+    ell(0, -70, 19, 19, '#d5dde8', 5); x.globalCompositeOperation = 'destination-out'; x.beginPath(); x.rect(-7, -92, 14, 20); x.fill(); x.globalCompositeOperation = 'source-over'; x.lineWidth = 5; x.strokeStyle = OL; x.beginPath(); x.moveTo(-7, -90); x.lineTo(-7, -72); x.lineTo(7, -72); x.lineTo(7, -90); x.stroke();
+    x.restore();
+    // 腿與靴
+    ell(106, 236, 17, 13, '#3a3150'); ell(150, 236, 17, 13, '#3a3150'); ell(106, 244, 19, 8, '#2a2236'); ell(150, 244, 19, 8, '#2a2236');
+    // 身體（橄欖綠外套）
+    ell(128, 190, 46, 42, '#6aa84f'); poly([[96, 160], [128, 176], [160, 160], [152, 150], [104, 150]], '#b5d86a', 4);
+    x.lineWidth = 9; x.strokeStyle = '#8a5a2b'; x.beginPath(); x.moveTo(98, 158); x.lineTo(150, 214); x.stroke();
+    ell(128, 214, 36, 9, '#8a5a2b', 3); x.fillStyle = '#f2c230'; x.beginPath(); x.rect(121, 207, 14, 14); x.fill(); x.lineWidth = 3; x.strokeStyle = OL; x.stroke();
+    // 左手垂下、右手舉起（紫色手套）
+    ell(78, 190, 14, 26, '#6aa84f'); ell(76, 214, 13, 12, '#6b4fa3');
+    x.save(); x.translate(176, 158); x.rotate(-0.9); ell(0, 0, 14, 28, '#6aa84f'); x.restore(); ell(194, 128, 14, 13, '#6b4fa3');
+    // 後髮
+    poly([[64, 96], [54, 60], [78, 70], [80, 30], [104, 52], [118, 18], [138, 50], [162, 24], [168, 56], [196, 40], [192, 76], [208, 70], [194, 104]], '#38b24a');
+    // 耳朵與臉
+    ell(66, 106, 9, 12, '#ffe0c4'); ell(190, 106, 9, 12, '#ffe0c4'); ell(128, 104, 62, 54, '#ffe0c4');
+    // 瀏海
+    poly([[68, 86], [76, 56], [98, 78], [112, 50], [130, 78], [148, 50], [160, 78], [182, 54], [188, 88], [170, 70], [150, 86], [130, 72], [108, 88], [90, 72]], '#38b24a');
+    // 護目鏡（額頭上）
+    x.lineWidth = 12; x.strokeStyle = OL; x.beginPath(); x.moveTo(72, 62); x.quadraticCurveTo(128, 42, 184, 62); x.stroke();
+    x.lineWidth = 7; x.strokeStyle = '#ffb02e'; x.beginPath(); x.moveTo(72, 62); x.quadraticCurveTo(128, 42, 184, 62); x.stroke();
+    [[106, 54], [150, 54]].forEach(p => { ell(p[0], p[1], 19, 17, '#ffb02e', 5); ell(p[0], p[1], 12, 11, '#bfe9ff', 3); ell(p[0] - 4, p[1] - 4, 4, 3, '#ffffff', 0); });
+    // 眼睛、單片眼鏡、嘴、腮紅
+    ell(106, 108, 9, 12, '#2a2230', 0); ell(103, 103, 3.5, 4, '#fff', 0); ell(152, 108, 9, 12, '#2a2230', 0); ell(149, 103, 3.5, 4, '#fff', 0);
+    x.beginPath(); x.ellipse(152, 108, 19, 19, 0, 0, 7); x.fillStyle = 'rgba(95,227,232,.45)'; x.fill(); x.lineWidth = 4; x.strokeStyle = '#2bb7c0'; x.stroke();
+    ell(88, 128, 9, 6, 'rgba(255,130,130,.55)', 0); ell(168, 128, 9, 6, 'rgba(255,130,130,.55)', 0);
+    x.beginPath(); x.moveTo(112, 128); x.quadraticCurveTo(128, 150, 144, 128); x.closePath(); x.fillStyle = '#8c2f2f'; x.fill(); x.lineWidth = 4; x.strokeStyle = OL; x.stroke();
+    ell(128, 138, 8, 4, '#ff9aa8', 0);
+    _xcT = new T.CanvasTexture(c); return _xcT;
+  }
+  const mkXc = (sc) => { const s = new T.Sprite(new T.SpriteMaterial({ map: xcTex(), transparent: true, fog: false })); s.scale.set(sc, sc, 1); return s; };
   // --- 島上：小創（工程師）與兩個蒐集點 ---
   const SHE = (() => {
     const mk = (emo, bg, ring, sc) => { const s = new T.Sprite(new T.SpriteMaterial({ map: emojiTex(emo, bg, ring), transparent: true, fog: false })); s.scale.set(sc, sc, 1); return s; };
-    const eng = mk('👷', '#fff3c4', '#c8963e', 2.6); eng.position.set(12, 6.9, 25); ISL.g.add(eng); eng.visible = false;
+    const eng = mkXc(2.9); eng.position.set(12, 6.9, 25); ISL.g.add(eng); eng.visible = false;
     const wb = new T.Mesh(new T.BoxGeometry(2.2, 0.9, 1.1), new T.MeshLambertMaterial({ color: 0x8a5a2e })); wb.position.set(10.2, 5.45, 25.4); ISL.g.add(wb); wb.visible = false;
     const tool = new T.Mesh(new T.TorusGeometry(0.32, 0.09, 6, 12), new T.MeshLambertMaterial({ color: 0xc8963e })); tool.position.set(10.2, 6.2, 25.4); ISL.g.add(tool); tool.visible = false;
     const gear = new T.Group(); gear.position.set(SHP_SP.gear[0], 5.9, SHP_SP.gear[1]); ISL.g.add(gear);
@@ -12215,7 +12257,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const dream = new T.Mesh(new T.PlaneGeometry(0.9, 0.9), new T.MeshBasicMaterial({ map: emojiTex('🌙', '#2a2a5a', '#8a8ae0'), transparent: true })); dream.position.set(-19.95, 5.0, 0.2); dream.rotation.y = Math.PI / 2; g.add(dream);
     // --- 人物 ---
     const sf = (e, bg, ring, sc) => { const s = new T.Sprite(new T.SpriteMaterial({ map: emojiTex(e, bg, ring), transparent: true, fog: false })); s.scale.set(sc, sc, 1); g.add(s); return s; };
-    const eg2 = sf('👷', '#fff3c4', '#c8963e', 1.8); eg2.position.set(3.4, 1.35, 1.0); const kn = sf('🔮', '#efe6ff', '#8a5ae0', 1.0); kn.position.set(8.7, 4.7, 0.9);
+    const eg2 = mkXc(2.1); g.add(eg2); eg2.position.set(3.4, 1.5, 1.0); const kn = sf('🔮', '#efe6ff', '#8a5ae0', 1.0); kn.position.set(8.7, 4.7, 0.9);
     const door = new T.Mesh(new T.BoxGeometry(1.6, 2.4, 0.1), mD); door.position.set(5.0, 1.2, -3.93); g.add(door); const dh = new T.Mesh(new T.TorusGeometry(0.1, 0.03, 6, 12), mB); dh.position.set(5.35, 1.2, -3.86); g.add(dh);
     FXQ.push({ tick: t => { if (!g.visible) return; const q = SHP(), sp = q.voy === 2.5 ? 5 : 1; stone.visible = !!q.placed; stoneLt.intensity = q.placed ? 0.9 + Math.sin(t * 3) * 0.3 : 0; if (q.placed) { stone.rotation.y = t * 1.5; stone.position.y = 1.35 + Math.sin(t * 2) * 0.05; }
       if (Math.floor(t) !== scLast) { scLast = Math.floor(t); scDraw(); } lamps.forEach((l, i) => { l.scale.setScalar(1 + Math.sin(t * 5 + i) * 0.06); }); wheel.rotation.x = q.voy >= 3 ? t * 0.5 : 0; eg2.position.y = 1.35 + Math.sin(t * 2) * 0.04; kn.position.y = 4.7 + Math.sin(t * 2.4) * 0.06;
