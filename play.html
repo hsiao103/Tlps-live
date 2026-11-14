@@ -4836,9 +4836,12 @@ window.TL_PE = [{"cat":"田徑","kind":"tf","q":"跑步前先做暖身運動，�
 /* ===== 核心：場景、材質、積木工具 ===== */
 const T = THREE, H = 3.4;                       // H = 樓層高度(公尺)
 const stage = document.getElementById('stage');
-const renderer = new T.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.shadowMap.enabled = true;
+// iPhone/iPad（含 Chrome，皆為 WebKit）網頁記憶體上限很低：一開始就用較省的設定（不抗鋸齒、解析度 1、無陰影），避免整頁被系統關閉
+const IOS_LOW = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+window.__iosLow = IOS_LOW;
+const renderer = new T.WebGLRenderer({ antialias: !IOS_LOW });
+renderer.setPixelRatio(IOS_LOW ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = !IOS_LOW;
 renderer.shadowMap.type = T.PCFSoftShadowMap;
 stage.appendChild(renderer.domElement);
 const scene = new T.Scene();
@@ -11540,7 +11543,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
     const apply = low => { GX.on = low;
       try { renderer.setPixelRatio(low ? 1 : Math.min(window.devicePixelRatio || 1, 2)); renderer.shadowMap.enabled = !low; scene.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { m.needsUpdate = true; }); }); window.dispatchEvent(new Event('resize')); } catch (e) { /* 忽略 */ }
       if (ISL.deco) ISL.deco.forEach(g => { g.visible = !low; }); };
-    FXQ.push({ tick: t => { const low = !!S.lowGfx; if (low !== GX.on) apply(low);
+    FXQ.push({ tick: t => { if (S.lowGfx === undefined && window.__iosLow) S.lowGfx = 1; const low = !!S.lowGfx; if (low !== GX.on) apply(low);
       if (!GX.t0) GX.t0 = performance.now(); const now = performance.now();
       if (!low && !S.lowHint && !GX.warned && document.visibilityState === 'visible' && !document.body.classList.contains('intro')) { if (GX.last) { const dt = now - GX.last; if (dt < 500) { GX.acc += dt; GX.n++; } } GX.last = now;
         if (GX.acc > 9000) { const fps = GX.n / (GX.acc / 1000); GX.acc = 0; GX.n = 0; if (fps < 22) { GX.warned = true; S.lowHint = 1; save(); toast('🐢 畫面好像有點卡？到 ⚙ 設定開啟「省電模式」會比較順', 6000); } } } else GX.last = 0; } });
