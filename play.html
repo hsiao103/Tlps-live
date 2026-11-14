@@ -6769,7 +6769,22 @@ function frame(now) {
 scene.updateMatrixWorld(true);
 $('loading').hidden = true;
 setMode('walk');
-renderer.setAnimationLoop(frame);
+// 防呆：three 的 setAnimationLoop 先執行 frame 再排下一次，只要 frame 丟出一次例外，整個 3D 畫面就永遠停住（手機上看到全黑，但介面還在）。
+// 這裡每幀包 try/catch：出錯只略過那一幀、仍畫出場景，並把第一個錯誤記到 window.__tlFrameErr 與提示，方便回報修正。
+let __frErr = 0;
+renderer.setAnimationLoop(now => {
+  try { frame(now); }
+  catch (e) {
+    if (__frErr++ < 3) { window.__tlFrameErr = String((e && e.stack) || e).slice(0, 700); try { console.error('[frame]', e); } catch (_) {} try { const L = window.__live; if (L && L.toast) L.toast('⚠ 畫面更新出錯，已自動略過：' + String((e && e.message) || e).slice(0, 60), 7000); } catch (_) {} }
+    try { renderer.render(scene, camera); } catch (_) {}
+  }
+});
+// WebGL 內容遺失（手機切 App、省電、記憶體不足時常見）→ 阻止預設行為讓瀏覽器有機會還原；5 秒內沒還原就自動重新載入（存檔在本機，不會遺失）。
+(function () {
+  const cv = renderer.domElement; let t = 0;
+  cv.addEventListener('webglcontextlost', e => { e.preventDefault(); window.__tlCtxLost = Date.now(); clearTimeout(t); t = setTimeout(() => { try { location.reload(); } catch (_) {} }, 5000); }, false);
+  cv.addEventListener('webglcontextrestored', () => { clearTimeout(t); window.__tlCtxLost = 0; }, false);
+})();
 window.__school = { scene, PL, teleport, setMode, orbit, view, iso, WALLS, walk };
 /* ===== 地點查詢與路徑導引：格點 A*（含樓梯換層）＋地面箭頭帶＋小地圖路線 ===== */
 const NAVR = 0.75, NX0 = -98, NZ0 = -168, NNX = Math.ceil((62 - NX0) / NAVR), NNZ = Math.ceil((22 - NZ0) / NAVR), NLV = 3, NCELLS = NNX * NNZ;
