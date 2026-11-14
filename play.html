@@ -6782,7 +6782,7 @@ renderer.setAnimationLoop(now => {
 // WebGL 內容遺失（手機切 App、省電、記憶體不足時常見）→ 阻止預設行為讓瀏覽器有機會還原；5 秒內沒還原就自動重新載入（存檔在本機，不會遺失）。
 (function () {
   const cv = renderer.domElement; let t = 0;
-  cv.addEventListener('webglcontextlost', e => { e.preventDefault(); window.__tlCtxLost = Date.now(); clearTimeout(t); t = setTimeout(() => { try { location.reload(); } catch (_) {} }, 5000); }, false);
+  cv.addEventListener('webglcontextlost', e => { e.preventDefault(); window.__tlCtxLost = Date.now(); try { window.__live && window.__live.lowOn && window.__live.lowOn(); } catch (_) {} clearTimeout(t); t = setTimeout(() => { try { location.reload(); } catch (_) {} }, 5000); }, false);
   cv.addEventListener('webglcontextrestored', () => { clearTimeout(t); window.__tlCtxLost = 0; }, false);
 })();
 window.__school = { scene, PL, teleport, setMode, orbit, view, iso, WALLS, walk };
@@ -11534,6 +11534,7 @@ body.gShake #gl,body.gShake canvas{animation:shk .12s linear 11}@keyframes shk{0
   { let on = false; FXQ.push({ tick: () => { if (on || cvSeen().c2) return; const g = ISL.g, K = 0.7, dx = (PL.x - g.position.x) / K, dz = (PL.z - g.position.z) / K;
     if (Math.abs(dx) < 30 && Math.abs(dz) < 30 && PL.y > g.position.y + 2 && !FIN.on && !document.body.classList.contains('intro')) { on = true; setTimeout(() => { on = false; coverOnce('c2'); }, 900); } } }); }
   L.cover = { COVERS, coverShow, coverOnce, coverGallery };
+  L.lowOn = () => { try { S.lowGfx = 1; S.lowHint = 1; save(); } catch (_) {} };  // 繪圖中斷時由 part4 呼叫：自動改為省電模式
   /* ---------- 省電模式（陰影、解析度、遠景裝飾）與卡頓提示 ---------- */
   { const GX = { on: null, acc: 0, n: 0, t0: 0, warned: false };
     const apply = low => { GX.on = low;
